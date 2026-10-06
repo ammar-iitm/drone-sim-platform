@@ -81,7 +81,7 @@
 .radar-big { background: #0a0c0b; }
 .view.radar-mode { cursor: pointer; }
 .view.radar-mode .gl, .view.radar-mode #noise, .view.radar-mode .vignette, .view.radar-mode #overlay,
-.view.radar-mode .reticle, .view.radar-mode .hud-tl { display: none; }
+.view.radar-mode .reticle, .view.radar-mode .hud-tl, .view.radar-mode .hud-bl { display: none; }
 .track-table { overflow-y: auto; max-height: 340px; }
 .track-table table.data td, .track-table table.data th { padding: 6px 8px; font-size: 13px; }
 .track-table button { all: unset; cursor: pointer; color: var(--cyan); font-weight: 700; }

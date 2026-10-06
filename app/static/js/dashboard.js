@@ -95,7 +95,8 @@ async function loadUnit() {
     type: 'bar',
     data: { labels: sorted.map((t) => t.callsign),
       datasets: [{ label: 'Average score', data: sorted.map((t) => t.total), backgroundColor: '#00e3fd', borderRadius: 4, barThickness: 14 }] },
-    options: { indexAxis: 'y', maintainAspectRatio: false, scales: { x: { min: 0, max: 100 } }, plugins: { legend: { display: false } } },
+    options: { indexAxis: 'y', maintainAspectRatio: false, scales: { x: { min: 0, max: 100 } }, plugins: { legend: { display: false } },
+      interaction: { mode: 'index', axis: 'y', intersect: false } },
   });
   table($('compare-table'), ['Trainee', 'Sessions', 'Average', ...METRICS, 'Breaches'],
     sorted.map((t) => [esc(t.callsign), t.sessions, fmtNum(t.total), ...METRICS.map((m) => fmtNum(t[m])), t.breaches ?? 0]));

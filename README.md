@@ -21,7 +21,9 @@ Optional extras:
 .venv/bin/python run.py --port 8000 --lan       # expose on the local network (no login; see AVD)
 ```
 
-No internet is needed once the requirements are installed. Three.js and Chart.js are in `app/static/vendor/`, and the pages use system fonts.
+No internet is needed once the requirements are installed.
+
+On a slow laptop, choose **Graphics quality** on Mission select. **Auto** (the default) starts at High and steps down if the frame rate stays under 35 fps for 3 seconds. **Low** renders at 0.75× resolution with no antialiasing and draws only the nearest 35% of scenery. You can also add `&quality=low` to a simulator URL. Three.js and Chart.js are in `app/static/vendor/`, and the pages use system fonts.
 
 ## Using it
 

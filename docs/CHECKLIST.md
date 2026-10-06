@@ -42,8 +42,8 @@ These cover requirements F1 to F9. Build the walking skeleton first: one contact
 - [x] Rural terrain from a seeded height field and urban terrain from seeded blocks
 - [x] Look, zoom, mark, classify and respond controls work by mouse and keyboard
 - [x] Contacts fly their waypoint paths with seeded wobble
-- [ ] All six contact types render with distinct silhouettes and motion
-- [ ] Swarm members follow a leader with formation offsets and separation
+- [x] All six contact types render with distinct silhouettes and motion
+- [x] Swarm members follow a leader with formation offsets and separation
 - [x] Day, night vision and thermal modes are clearly different, and switching takes under a second
 - [x] Four degradation levels change noise, fog, visible range and radar dropout
 - [x] Radar shows tracks with latency and noise, and never reveals the true class
@@ -82,7 +82,7 @@ These cover requirements F17 to F21 and the layout in the Visual Design doc.
 - [x] Confusion matrix of true class against chosen class
 - [x] Sortable session table with a link to each session review
 - [x] Session review shows the event timeline with decision paths, reasons and points
-- [ ] Every chart has hover details and a table view
+- [x] Every chart has hover details and a table view
 - [ ] Light and dark themes both read correctly
 - [x] CSV export of a session or unit report (could have)
 
@@ -94,11 +94,11 @@ Nothing should be called done until these pass on the demo laptop.
 - [x] Scoring tests pass for every branch: missed, slow, fast, wrong family, friendly engaged, restraint, breach, false alarms
 - [x] API tests pass: submit, read back, analytics shapes, bad input rejected
 - [x] Browser smoke test loads the simulator with no console errors and saves a session
-- [ ] The whole system works with Wi-Fi switched off
+- [x] The whole system works with Wi-Fi switched off
 - [ ] The simulator holds 30 fps or better with a 12-drone swarm on the demo laptop
 - [ ] Launch to first scenario takes under 60 seconds from a clean start
 - [x] Every score change shows a decision-tree reason
-- [ ] Keyboard-only run through a full scenario works
+- [x] Keyboard-only run through a full scenario works
 - [ ] Text is at least 14 px and focus rings are visible
 - [ ] Threat state never relies on colour alone
 - [x] Reduced-motion setting is respected

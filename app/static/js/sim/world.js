@@ -13,6 +13,15 @@ const LOOKS = {
 };
 
 // Approximate real sizes, used to keep every contact at least 6 px on screen.
+// Quality levels: render resolution and how much distant scenery is drawn. Scenery is sorted
+// nearest first, so lower levels drop the far skyline and keep the buildings that hide drones.
+export const QUALITY = {
+  high: { ratio: 1.5, scenery: 1.0 },
+  medium: { ratio: 1.0, scenery: 0.6 },
+  low: { ratio: 0.75, scenery: 0.35 },
+};
+export const QUALITY_ORDER = ['high', 'medium', 'low'];
+
 export const MODEL_SIZE = { quadcopter: 0.9, hexacopter: 1.6, fixed_wing: 3.0, balloon: 2.8, bird: 0.9, friendly_aircraft: 16 };
 const WOBBLE = { quadcopter: 1.5, hexacopter: 1.0, fixed_wing: 0, balloon: 2.5, bird: 5, friendly_aircraft: 0 };
 
@@ -112,15 +121,16 @@ const BUILDERS = {
 // ------------------------------------------------------------ world
 
 export class World {
-  constructor(canvas, scenario) {
+  constructor(canvas, scenario, quality = 'high') {
     this.scenario = scenario;
     this.env = scenario.environment;
     this.look = LOOKS[this.env.time_of_day] || LOOKS.day;
     this.urban = this.env.terrain === 'urban';
     this.eyeHeight = this.urban ? 24 : 6;
 
-    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'low-power' });
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+    // Antialiasing is fixed when the WebGL context is made, so only a forced Low start turns it off.
+    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: quality !== 'low', powerPreference: 'low-power' });
+    this.scenery = [];
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(60, 1, 0.5, 10000);
     this.camera.rotation.order = 'YXZ';
@@ -146,6 +156,7 @@ export class World {
     this.meshes = new Map();
     for (const c of scenario.contacts) this.meshes.set(c.id, this.buildContact(c));
     this.mode = 'eo';
+    this.setQuality(quality);
   }
 
   buildSky() {
@@ -206,12 +217,17 @@ export class World {
     const count = 420;
     const trees = new THREE.InstancedMesh(new THREE.ConeGeometry(4, 13, 5), new THREE.MeshLambertMaterial({ color: this.look.ground[0], flatShading: true }), count);
     const m = new THREE.Matrix4();
+    const placed = [];
     for (let i = 0; i < count; i++) {
       const a = rand() * Math.PI * 2, r = 220 + rand() * 3400, s = 0.7 + rand() * 0.8;
-      const x = Math.cos(a) * r, z = Math.sin(a) * r;
+      placed.push([r, Math.cos(a) * r, Math.sin(a) * r, s]);
+    }
+    placed.sort((p, q) => p[0] - q[0]);
+    placed.forEach(([, x, z, s], i) => {
       m.compose(new THREE.Vector3(x, height(x, z) + 6 * s, z), new THREE.Quaternion(), new THREE.Vector3(s, s, s));
       trees.setMatrixAt(i, m);
-    }
+    });
+    this.scenery.push({ mesh: trees, total: count });
     this.scene.add(trees);
   }
 
@@ -230,6 +246,7 @@ export class World {
         list.push([x, z, 6 + Math.pow(rand(), 1.4) * cap, 0.75 + rand() * 0.25]);
       }
     }
+    list.sort((p, q) => Math.hypot(p[0], p[1]) - Math.hypot(q[0], q[1]));
     const mesh = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshLambertMaterial({ color: 0xffffff }), list.length);
     const m = new THREE.Matrix4(), col = new THREE.Color(), base = new THREE.Color(this.look.building);
     list.forEach(([x, z, h, shade], i) => {
@@ -238,7 +255,17 @@ export class World {
       mesh.setColorAt(i, col.copy(base).multiplyScalar(shade));
     });
     mesh.userData.occluder = true;
+    this.scenery.push({ mesh, total: list.length });
     this.scene.add(mesh);
+  }
+
+  /** Apply a quality level: render resolution and the share of (nearest-first) scenery drawn. */
+  setQuality(level) {
+    const q = QUALITY[level];
+    this.quality = level;
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, q.ratio));
+    for (const s of this.scenery) s.mesh.count = Math.max(1, Math.round(s.total * q.scenery));
+    if (this.viewWidth) this.resize(this.viewWidth, this.viewHeight);
   }
 
   buildContact(c) {
@@ -293,6 +320,7 @@ export class World {
   }
 
   resize(w, h) {
+    this.viewWidth = w;
     this.renderer.setSize(w, h, false);
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();

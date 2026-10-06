@@ -87,7 +87,9 @@ function launch() {
   const unit = $('unit').value.trim();
   store.set('dtt.callsign', callsign);
   store.set('dtt.unit', unit);
+  store.set('dtt.quality', $('quality').value);
   const q = new URLSearchParams({ callsign, unit });
+  if ($('quality').value !== 'auto') q.set('quality', $('quality').value);
   if (selection.kind === 'scripted') q.set('id', selection.id);
   else Object.entries(selection.params).forEach(([k, v]) => q.set(k, v));
   location.href = '/sim?' + q;
@@ -95,6 +97,7 @@ function launch() {
 
 $('callsign').value = store.get('dtt.callsign') || '';
 $('unit').value = store.get('dtt.unit') || '';
+$('quality').value = store.get('dtt.quality') || 'auto';
 ['callsign', 'unit'].forEach((id) => $(id).addEventListener('input', updateHeader));
 $('difficulty').addEventListener('input', () => { $('difficulty-out').textContent = $('difficulty').value; });
 $('reseed').addEventListener('click', () => { $('seed').value = Math.floor(Math.random() * 1e6); preview(); });

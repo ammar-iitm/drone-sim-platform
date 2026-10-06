@@ -1,7 +1,7 @@
 // Simulator: game loop, input, HUD and session submission.
 // The browser only records raw events; the server rebuilds the scenario and scores them.
 import * as THREE from '/static/vendor/three.module.js';
-import { World } from './world.js';
+import { World, QUALITY_ORDER } from './world.js';
 import { Sound } from './audio.js';
 import { Radar, fmtR, pad3 } from './radar.js';
 import { rollFor } from './rng.js';
@@ -12,6 +12,8 @@ import { esc, renderStages, renderPenalties, renderContacts, gradeBlock } from '
 const $ = (id) => document.getElementById(id);
 const TICK = 1 / 30;
 const DRONES = new Set(['quadcopter', 'hexacopter', 'fixed_wing']);
+const MIN_SEPARATION_M = 22;
+const swarmGroups = new Map(); // reused every frame: group -> live member meshes
 const ZOOMS = [1, 2, 4, 8];
 const MODES = ['eo', 'nv', 'thermal'];
 const MODE_NAME = { eo: 'Day EO', nv: 'Night vision', thermal: 'Thermal' };
@@ -27,6 +29,8 @@ const fmt = (t) => `${String(Math.floor(t / 60)).padStart(2, '0')}:${String(Math
 const query = new URLSearchParams(location.search);
 // Fast-forward for instructor demos and automated tests (?speed=1..16). Scenario time drives everything.
 const SPEED = Math.min(16, Math.max(1, Number(query.get('speed')) || 1));
+// Quality: auto (start high, step down if the frame rate stays low) or a fixed level.
+const QUALITY_MODE = ['auto', ...QUALITY_ORDER].includes(query.get('quality')) ? query.get('quality') : 'auto';
 const trainee = { callsign: (query.get('callsign') || '').trim(), unit: (query.get('unit') || '').trim() };
 
 const S = {
@@ -37,7 +41,7 @@ const S = {
   scatter: new Map(), // swarm group -> scenario time it was first engaged
   marked: new Map(),  // id -> { state, chosen, last, markedT }
   selected: null, events: [], held: new Set(),
-  sound: new Sound(),
+  sound: new Sound(), lowFpsWindows: 0,
   listDirty: true, alertUntil: 0, toastTimer: 0, frames: 0, fpsT: 0, resolvedAt: null,
 };
 const tmp = [0, 0, 0];
@@ -467,9 +471,14 @@ function drawFrame() {
     drawReadouts(t, brg);
     return;
   }
+  for (const list of swarmGroups.values()) list.length = 0;
   for (const c of S.scenario.contacts) {
     const mesh = w.meshes.get(c.id);
     if (!isAlive(c, t) || !positionAt(c, t, tmp)) { mesh.visible = false; continue; }
+    if (c.swarm) {
+      if (!swarmGroups.has(c.swarm.group)) swarmGroups.set(c.swarm.group, []);
+      swarmGroups.get(c.swarm.group).push(mesh);
+    }
     w.wobble(c, t, tmp);
     // Swarm separation: once any member is engaged, the group spreads out over 3 s (visual only;
     // the server scores the formation path, and 40 m is well inside every scoring threshold).
@@ -491,6 +500,7 @@ function drawFrame() {
     }
     if (mesh.userData.nav) mesh.userData.nav.visible = (t % 1.2) < 0.18;
   }
+  separate();
   w.render();
 
   // Marker overlay (not affected by the sensor filter).
@@ -558,6 +568,43 @@ function drawReadouts(t, brg) {
   if (S.listDirty || Math.floor(t * 2) !== Math.floor((t - TICK) * 2)) { renderList(); updateButtons(); }
 }
 
+/** Swarm avoidance: push apart any two members of a group closer than the minimum separation.
+ * Stateless (recomputed from the path each frame), so it never drifts and stays deterministic. */
+function separate() {
+  for (const members of swarmGroups.values()) {
+    for (let pass = 0; pass < 3; pass++) {
+      for (let i = 0; i < members.length; i++) {
+        for (let j = i + 1; j < members.length; j++) {
+          const a = members[i].position, b = members[j].position;
+          const dx = a.x - b.x, dy = a.y - b.y, dz = a.z - b.z;
+          const d = Math.hypot(dx, dy, dz);
+          if (d >= MIN_SEPARATION_M || d < 1e-3) continue;
+          const k = (MIN_SEPARATION_M - d) / (2 * d);
+          a.x += dx * k; a.y += dy * k; a.z += dz * k;
+          b.x -= dx * k; b.y -= dy * k; b.z -= dz * k;
+        }
+      }
+    }
+  }
+}
+
+function showQuality() {
+  $('quality').textContent = `${QUALITY_MODE === 'auto' ? 'Auto · ' : ''}${S.world.quality}`.toUpperCase();
+}
+
+/** Auto quality: after 3 s (six half-second windows) under 35 fps, step down one level. Never steps up. */
+function autoQuality(fps) {
+  if (QUALITY_MODE !== 'auto') return;
+  S.lowFpsWindows = fps < 35 ? S.lowFpsWindows + 1 : 0;
+  const i = QUALITY_ORDER.indexOf(S.world.quality);
+  if (S.lowFpsWindows >= 6 && i < QUALITY_ORDER.length - 1) {
+    S.world.setQuality(QUALITY_ORDER[i + 1]);
+    S.lowFpsWindows = 0;
+    showQuality();
+    toast(`Quality lowered to ${S.world.quality} to keep the frame rate up`);
+  }
+}
+
 function loop(now) {
   requestAnimationFrame(loop);
   if (!S.world) return;
@@ -568,7 +615,13 @@ function loop(now) {
   }
   drawFrame();
   S.frames += 1;
-  if (now - S.fpsT > 500) { $('fps').textContent = Math.round((S.frames * 1000) / (now - S.fpsT)); S.frames = 0; S.fpsT = now; }
+  if (now - S.fpsT > 500) {
+    const fps = Math.round((S.frames * 1000) / (now - S.fpsT));
+    $('fps').textContent = fps;
+    S.frames = 0;
+    S.fpsT = now;
+    if (S.phase === 'running' && !S.radarMode) autoQuality(fps);
+  }
 }
 
 // ------------------------------------------------------------ finish and score
@@ -735,6 +788,7 @@ async function boot() {
   scenarioQuery.delete('callsign');
   scenarioQuery.delete('unit');
   scenarioQuery.delete('speed');
+  scenarioQuery.delete('quality');
   try {
     const [sRes, rRes] = await Promise.all([fetch('/api/scenario?' + scenarioQuery), fetch('/api/rubric')]);
     const sc = await sRes.json();
@@ -758,7 +812,8 @@ async function boot() {
     $('speed').textContent = `×${SPEED}`;
   }
 
-  S.world = new World($('gl'), sc);
+  S.world = new World($('gl'), sc, QUALITY_MODE === 'auto' ? 'high' : QUALITY_MODE);
+  showQuality();
   S.radar = new Radar(sc, reducedMotion);
   const v = $('view');
   S.world.resize(v.clientWidth, v.clientHeight);
@@ -772,6 +827,7 @@ async function boot() {
 requestAnimationFrame(loop);
 boot();
 window.__sim = S; // exposed for the browser tests
+S.autoQuality = autoQuality;
 // Test hooks: the same decision functions the keyboard and mouse call.
 window.__simApi = { mark: (id) => mark(contactById(id), 'radar'), classify, respond, select: (id) => select(id),
   contactById, isAlive, range: (id) => rangeAt(contactById(id), S.t),

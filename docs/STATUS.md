@@ -7,11 +7,10 @@
 
 ## Summary
 
-Of the 21 requirements: **18 Verified, 2 Partial, 1 Present but unverified, 0 Missing, 0 Broken.**
-- **Partial:** F7 (swarm avoidance is fixed formation spacing plus a visual spread on engagement, not dynamic avoidance) and F9 (the VR seam is an isolated renderer module, not a WebXR mode).
-- **Present but unverified:** F8 (audio cues are implemented, but sound cannot be checked in a headless browser).
-- **Tests:** 136 automated tests pass. They cover the generator, every scoring branch, the API, the offline rule, JS/Python roll parity, and 22 browser tests that include all six scenarios played end to end.
-- **Checklist:** 58 of 81 items are ticked.
+Of the 21 requirements: **19 Verified, 2 Partial, 0 Present but unverified, 0 Missing, 0 Broken.**
+- **Partial:** F8 (every audio cue, the distance-based hum and mute are verified by test, but nobody has listened yet) and F9 (the VR seam is an isolated renderer module, not a WebXR mode).
+- **Tests:** 144 automated tests pass. They cover the generator, every scoring branch, the API, the offline rule, JS/Python roll parity, and 30 browser tests that include all six scenarios played end to end.
+- **Checklist:** 63 of 81 items are ticked.
 - **What remains:** checks only a person can do on the demo laptop (Wi-Fi off, frame rate, hearing the audio, colour-blind review), five open decisions, and demo rehearsal.
 
 ## Requirement map
@@ -23,9 +22,9 @@ Of the 21 requirements: **18 Verified, 2 Partial, 1 Present but unverified, 0 Mi
 | F3 | Degraded sensors: noise, reduced range, radar dropout, fog | Verified | `test_scenario::test_four_degradation_levels_match_visual_design_table`, `test_verification::test_four_degradation_levels_in_the_view`, `11-degradation-3.png` | |
 | F4 | Radar with tracks that carry latency and noise | Verified | `test_verification::test_radar_latency_and_noise` (updates once per 2 s sweep, lags truth, error under 250 m), `test_smoke::test_radar_console_tracks_and_marking` (never shows class), `07-radar-console.png` | Full radar model: RCS-based detection, clutter, false returns, 2-of-3 track initiation |
 | F5 | Look, zoom, mark, classify, respond by mouse and keyboard | Verified | `test_verification::test_look_and_zoom_by_mouse_and_keyboard`, `test_smoke::test_play_score_and_review` (mouse mark), `test_access::test_keyboard_only_run` | |
-| F6 | Distinct quadcopter, hexacopter, fixed-wing, balloon, bird, friendly | Verified | `test_verification::test_contact_silhouettes` (6 distinct geometries), `12-silhouettes.png` | Motion cues (wobble, bird wing flap, friendly nav light) not separately tested |
-| F7 | Swarms: shared goals, formation offsets, avoidance | Partial | **Works:** shared leader path and formation offsets (`test_scenario::test_scripted_catalogue_matches_prd`, `test_scenarios[s6]`). **Not dynamic:** 30 m formation spacing keeps members apart, and the group spreads 40 m when engaged (`app/static/js/sim/main.js`, visual only, no test) | Real separation steering is a possible upgrade |
-| F8 | Audio cues and mute (Should) | Present, unverified | `app/static/js/sim/audio.js`: rotor hum by distance, mark tick, response chime, failure buzz, breach alarm; mute on **M** | Needs a person to listen |
+| F6 | Distinct quadcopter, hexacopter, fixed-wing, balloon, bird, friendly | Verified | `test_verification::test_contact_silhouettes` (6 distinct geometries), `12-silhouettes.png`, `test_finish::test_motion_cues_differ_by_type` (erratic bird, steady aircraft, flapping wings, blinking nav light) | |
+| F7 | Swarms: shared goals, formation offsets, avoidance | Verified | Shared leader path and formation offsets (`test_scenario::test_scripted_catalogue_matches_prd`); separation steering keeps members at least 20 m apart, and the group spreads when engaged (`test_finish::test_swarm_keeps_separation_and_spreads_when_engaged`) | Separation and spread are visual; the server scores the formation path |
+| F8 | Audio cues and mute (Should) | Partial | **Verified by test:** the hum rises as a drone closes, and the tick, chime, buzz and two-tone breach alarm fire on their events; **M** mutes and unmutes (`test_finish::test_audio_cues_and_mute`, `test_breach_alarm_sounds`). **Not yet:** a person listening | Human check 3 |
 | F9 | Clean seam for VR/WebXR (Could) | Partial | Rendering is isolated in `world.js`; game logic and input live in `main.js` | No WebXR mode, as the PRD states |
 | F10 | Six scripted scenarios with objectives | Verified | `test_scenarios::test_scenario_plays_end_to_end` ×6, each checking its own learning objective | |
 | F11 | Seeded procedural generation; same seed, same scenario | Verified | `test_scenario::test_same_seed_gives_identical_json` ×5, `test_api::test_procedural_via_api_is_deterministic`, `test_verification::test_instructor_settings_and_seed_reuse` | |
@@ -58,7 +57,7 @@ Of the 21 requirements: **18 Verified, 2 Partial, 1 Present but unverified, 0 Mi
 
 | Constraint | Status | Evidence |
 | --- | --- | --- |
-| Offline | Met in tests | Every browser test blocks non-local requests: zero attempts recorded. `test_offline_and_parity::test_no_external_urls_in_pages_scripts_or_styles`. A real Wi-Fi-off run on the demo laptop is still a human check |
+| Offline | Met | Every browser test blocks non-local requests: zero attempts recorded. `test_offline_and_parity::test_no_external_urls_in_pages_scripts_or_styles`. Human check 2026-10-06: fresh clone, install, seed and full run on the demo laptop with Wi-Fi off |
 | Deterministic | Met | Generator tests; seed-reuse browser test |
 | Server-owned scoring | Met | `api.submit_session` rebuilds the scenario and ignores any client score (`test_submit_score_store_and_read_back` sends `total: 100`) |
 | No real weapon modelling | Met | Abstract responses with configurable effectiveness only |
@@ -73,9 +72,9 @@ Of the 21 requirements: **18 Verified, 2 Partial, 1 Present but unverified, 0 Mi
 
 ## Needs a human check
 
-1. **On the demo laptop:** run `scripts/seed_demo.py --reset` and `run.py` with Wi-Fi off, play Saturation Swarm, and read the FPS chip (target 30 or more).
+1. ~~**On the demo laptop:** Wi-Fi-off run~~ done 2026-10-06. Saturation Swarm (8 drones) measured **30 fps**: passes, but with no headroom. Since then, quality levels have been added (Auto/High/Medium/Low; Auto steps down after 3 s under 35 fps). Re-measure there with a 12-drone swarm: `/sim?callsign=test&unit=test&seed=7&difficulty=5&swarm=12&degradation=0`, first on Auto, then on Low.
 2. **Audio:** play any scenario with sound on. The rotor hum should rise as a drone closes in, and the chime, buzz and breach alarm should play on their events. Check that **M** mutes.
-3. **Colour-blind review:** set macOS Display → Colour filters → Greyscale, then check that threat markers (triangle, diamond, circle, square, all with text labels) and the dashboard still read correctly.
+3. **Colour-blind review** (my review of the greyscale render `13-greyscale-markers.png` passed: all four states are distinct by shape and text; please confirm by eye): set macOS Display → Colour filters → Greyscale, then check that threat markers (triangle, diamond, circle, square, all with text labels) and the dashboard still read correctly.
 4. **Urban Canyon feel:** the drone should be visible for about 4 s around T+37 s and again on final approach.
 5. **Second machine:** clone the repo and follow the README.
 
