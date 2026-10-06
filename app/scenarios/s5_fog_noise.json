@@ -1,0 +1,16 @@
+{
+  "id": "s5-fog-noise",
+  "order": 5,
+  "name": "Fog and Noise",
+  "objective": "Rely on radar and cues when the picture is poor. Heavy noise, thick fog and radar dropout hide two quadcopters until they are close.",
+  "threat_summary": "Two quadcopters",
+  "seed": 505,
+  "duration_s": 180,
+  "environment": { "time_of_day": "dusk", "terrain": "rural", "terrain_seed": 8812, "degradation": 3 },
+  "contacts": [
+    { "model": "quadcopter", "threat": "hostile", "spawn_t": 15, "speed_mps": 15,
+      "waypoints": [ { "brg": 60, "rng": 2000, "alt": 90 }, { "brg": 70, "rng": 900, "alt": 80 }, { "brg": 65, "rng": 40, "alt": 25 } ] },
+    { "model": "quadcopter", "threat": "hostile", "spawn_t": 50, "speed_mps": 15,
+      "waypoints": [ { "brg": 85, "rng": 2100, "alt": 110 }, { "brg": 100, "rng": 1000, "alt": 90 }, { "brg": 90, "rng": 50, "alt": 25 } ] }
+  ]
+}

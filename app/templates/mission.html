@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}Mission select{% endblock %}
+{% block head %}
+<style>
+  .mission { display: grid; grid-template-columns: 300px minmax(0, 1fr) 340px; gap: var(--s3); align-items: start; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--s3); }
+  .card { background: var(--surface-lowest); border: 1px solid var(--outline-variant); padding: var(--s3);
+          display: flex; flex-direction: column; gap: var(--s2); }
+  .card[aria-pressed="true"] { border-color: var(--green); box-shadow: inset 3px 0 0 var(--green); }
+  .card h3 { margin: 0; font: 700 16px/1.25 var(--font-sans); color: var(--primary); text-transform: uppercase; }
+  .card p { margin: 0; color: var(--on-surface); }
+  .card .tags { display: flex; flex-wrap: wrap; gap: var(--s1); }
+  .card button.select { all: unset; cursor: pointer; display: flex; flex-direction: column; gap: var(--s2); }
+  .card button.select:focus-visible { outline: 2px solid var(--cyan); outline-offset: 4px; }
+  .launch { display: flex; flex-direction: column; gap: var(--s3); }
+  .preview { min-height: 88px; }
+  .stack { display: flex; flex-direction: column; gap: var(--s3); }
+  .seedrow { display: flex; gap: var(--s2); align-items: flex-end; }
+  .seedrow .field { flex: 1; }
+  @media (max-width: 1250px) { .mission { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}
+{% block cmdbar %}
+<span class="chip cyan">Scripted <strong id="count-scripted">6</strong></span>
+<span class="chip">Procedural <strong>Seeded</strong></span>
+{% endblock %}
+{% block content %}
+<main class="page">
+  <div class="opbar">
+    <div class="group">
+      <div class="kv"><span class="label">Mission planning</span><span class="value-lg">SELECT SCENARIO</span></div>
+    </div>
+    <div class="group">
+      <div class="kv"><span class="label">Trainee</span><span class="value green" id="who">NOT SET</span></div>
+      <div class="kv"><span class="label">Selected</span><span class="value cyan" id="selected-name">NONE</span></div>
+      <button class="btn primary" id="launch" disabled>Launch <kbd>Enter</kbd></button>
+    </div>
+  </div>
+
+  <div class="mission">
+    <section class="stack">
+      <div class="panel">
+        <div class="panel-head"><h2 class="panel-title"><span class="tag">01</span>Trainee</h2></div>
+        <form class="panel-body stack" id="trainee-form" autocomplete="off">
+          <div class="field"><label class="label" for="callsign">Callsign</label>
+            <input id="callsign" maxlength="24" required placeholder="e.g. VIPER-3"></div>
+          <div class="field"><label class="label" for="unit">Unit</label>
+            <input id="unit" maxlength="24" required placeholder="e.g. 4 GUARDS" list="units"></div>
+          <datalist id="units"></datalist>
+          <p class="label">Callsign and unit only. No personal data is stored.</p>
+        </form>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2 class="panel-title"><span class="tag">??</span>Controls</h2></div>
+        <div class="panel-body stack" style="gap:6px">
+          <div><span class="key">Drag</span> or <span class="key">Arrows</span> look</div>
+          <div><span class="key">Wheel</span> or <span class="key">+</span><span class="key">-</span> zoom</div>
+          <div><span class="key">Click</span> / <span class="key">Space</span> mark contact</div>
+          <div><span class="key">Tab</span> cycle marked contacts</div>
+          <div><span class="key">1</span>&ndash;<span class="key">5</span> classify</div>
+          <div><span class="key">T</span><span class="key">R</span><span class="key">J</span><span class="key">I</span><span class="key">C</span> respond</div>
+          <div><span class="key">S</span> sensor mode · <span class="key">Q</span> radar console · <span class="key">[</span><span class="key">]</span> radar range</div>
+          <div><span class="key">Space</span> in console: mark closest track</div>
+          <div><span class="key">M</span> mute · <span class="key">P</span> pause · <span class="key">Esc</span> end</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><h2 class="panel-title"><span class="tag">02</span>Scripted scenarios</h2>
+        <span class="label">Each teaches one skill</span></div>
+      <div class="panel-body"><div class="cards" id="cards" role="list"></div></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><h2 class="panel-title"><span class="tag">03</span>Procedural generator</h2>
+        <span class="label">Same seed, same scenario</span></div>
+      <form class="panel-body stack" id="proc-form">
+        <div class="seedrow">
+          <div class="field"><label class="label" for="seed">Seed</label>
+            <input id="seed" name="seed" type="number" min="0" max="2147483647" value="48213"></div>
+          <button type="button" class="btn" id="reseed">Random</button>
+        </div>
+        <div class="field"><label class="label" for="difficulty">Difficulty <span id="difficulty-out" class="green">3</span> / 5</label>
+          <input id="difficulty" name="difficulty" type="range" min="1" max="5" value="3"></div>
+        <div class="grid-2">
+          <div class="field"><label class="label" for="time_of_day">Time of day</label>
+            <select id="time_of_day" name="time_of_day"><option value="">From seed</option><option>day</option><option>dusk</option><option>night</option></select></div>
+          <div class="field"><label class="label" for="terrain">Terrain</label>
+            <select id="terrain" name="terrain"><option value="">From seed</option><option>rural</option><option>urban</option></select></div>
+          <div class="field"><label class="label" for="degradation">Degradation</label>
+            <select id="degradation" name="degradation"><option value="">From difficulty</option><option>0</option><option>1</option><option>2</option><option>3</option></select></div>
+          <div class="field"><label class="label" for="swarm">Swarm size</label>
+            <input id="swarm" name="swarm" type="number" min="0" max="12" placeholder="Auto"></div>
+          <div class="field"><label class="label" for="hostile">Hostile</label>
+            <input id="hostile" name="hostile" type="number" min="0" max="12" placeholder="Auto"></div>
+          <div class="field"><label class="label" for="decoy">Decoys</label>
+            <input id="decoy" name="decoy" type="number" min="0" max="8" placeholder="Auto"></div>
+          <div class="field"><label class="label" for="benign">Birds</label>
+            <input id="benign" name="benign" type="number" min="0" max="8" placeholder="Auto"></div>
+          <div class="field"><label class="label" for="friendly">Friendly</label>
+            <input id="friendly" name="friendly" type="number" min="0" max="3" placeholder="Auto"></div>
+        </div>
+        <button type="button" class="btn" id="use-proc">Use generated scenario</button>
+        <div class="notice preview" id="preview" aria-live="polite"><span class="label">Preview appears here</span></div>
+      </form>
+    </section>
+  </div>
+</main>
+{% endblock %}
+{% block scripts %}
+<script type="module" src="{{ url_for('static', filename='js/mission.js') }}"></script>
+{% endblock %}

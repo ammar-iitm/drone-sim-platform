@@ -1,0 +1,96 @@
+"""Play all six scripted scenarios end to end (checklist "Scenarios") at x16 fast-forward.
+
+A scripted trainee in the page calls the same decision functions the keyboard and mouse
+call (window.__simApi), making the choices each scenario is meant to test. The server
+then scores the saved session and we check the decision-tree outcome.
+"""
+
+import pytest
+
+BOT = """(cfg) => {
+  const S = window.__sim, A = window.__simApi, seen = new Map();
+  setInterval(() => {
+    if (S.phase !== 'running') return;
+    for (const c of S.scenario.contacts) {
+      if (!A.isAlive(c, S.t)) continue;
+      const hostile = c.threat === 'hostile';
+      if (!hostile && !cfg.nonHostile) continue;
+      const r = A.range(c.id);
+      const st = seen.get(c.id) || { tries: 0, last: -99 };
+      seen.set(c.id, st);
+      if (!S.marked.has(c.id)) {
+        const visible = cfg.radarOnly ? S.radar.tracks.has(c.id) : r < (cfg.markRange || 1400);
+        if (!visible) continue;
+        A.mark(c.id);
+        A.classify(c.true_class);
+      }
+      const plan = hostile ? cfg.plan[c.model] || cfg.plan.default : cfg.nonHostile[c.threat];
+      if (!plan || st.tries >= plan.length || r > 1300 || S.t - st.last < 2) continue;
+      if (hostile && r < 400) continue;
+      A.select(c.id);
+      A.respond(plan[st.tries]);
+      st.tries += 1;
+      st.last = S.t;
+      if (S.status.get(c.id).neutralisedT !== null) st.tries = plan.length;
+    }
+  }, 40);
+}"""
+
+INTERCEPT3 = ["INTERCEPT", "INTERCEPT", "INTERCEPT"]
+
+CASES = {
+    "s1-dawn-recon": {"plan": {"default": ["REPORT"]}},
+    "s2-night-loiter": {"plan": {"default": ["JAM", "INTERCEPT", "INTERCEPT"]}},
+    "s3-urban-canyon": {"plan": {"default": INTERCEPT3}, "markRange": 900},
+    "s4-mixed-traffic": {"plan": {"default": INTERCEPT3}, "nonHostile": {"benign": ["TRACK"], "friendly": ["JAM"]}},
+    "s5-fog-noise": {"plan": {"default": INTERCEPT3}, "radarOnly": True},
+    "s6-saturation-swarm": {"plan": {"default": INTERCEPT3}, "nonHostile": {"decoy": ["TRACK"]}},
+}
+
+
+def play(page, server, scenario_id, cfg):
+    page.goto(f"{server}/sim?callsign=bot&unit=e2e&id={scenario_id}&speed=16")
+    page.wait_for_selector("#begin")
+    briefing = page.inner_text("#screen-card")
+    page.keyboard.press("Enter")
+    page.evaluate(BOT, cfg)
+    page.wait_for_selector("#again", timeout=60_000)
+    sid = page.evaluate("fetch('/api/sessions').then(r => r.json())")[0]["id"]
+    detail = page.evaluate(f"fetch('/api/sessions/{sid}').then(r => r.json())")
+    return briefing, detail
+
+
+@pytest.mark.parametrize("scenario_id", list(CASES))
+def test_scenario_plays_end_to_end(page, server, scenario_id):
+    briefing, detail = play(page, server, scenario_id, CASES[scenario_id])
+    result = detail["result"]
+    by_threat = lambda t: [c for c in result["contacts"] if c["threat"] == t]  # noqa: E731
+    hostiles = by_threat("hostile")
+
+    assert "learning objective" in briefing.lower()
+    assert all(len(c["path"]) == 3 for c in hostiles)
+    assert page.errors == [] and page.external == []
+
+    if scenario_id == "s1-dawn-recon":
+        assert hostiles[0]["engagement"]["node"] == "correct_effective"
+        assert result["total"] >= 80
+    elif scenario_id == "s2-night-loiter":
+        c = hostiles[0]
+        assert c["attempts"][0]["response"] == "JAM" and c["attempts"][0]["effectiveness"] <= 0.1
+        assert c["engagement"]["node"] in ("unsuitable", "breach")
+        assert "Intercept" in c["engagement"]["reason"] or c["engagement"]["node"] == "breach"
+    elif scenario_id == "s3-urban-canyon":
+        assert hostiles[0]["detection"]["node"].startswith("detected")
+    elif scenario_id == "s4-mixed-traffic":
+        friendly = by_threat("friendly")[0]
+        assert friendly["engagement"]["node"] == "friendly_engaged"
+        assert result["penalties"]["critical_errors"] >= 1
+        assert all(b["engagement"]["node"] == "restraint" for b in by_threat("benign") if b["scored"])
+    elif scenario_id == "s5-fog-noise":
+        marks = [e for e in detail["events"] if e["type"] == "mark"]
+        assert marks and all(e["data"].get("via") == "radar" for e in marks)
+        assert all(c["detection"]["node"].startswith("detected") for c in hostiles)
+    elif scenario_id == "s6-saturation-swarm":
+        assert len(hostiles) == 8
+        assert sum(c["detection"]["node"].startswith("detected") for c in hostiles) >= 6
+        assert all(d["engagement"]["node"] == "restraint" for d in by_threat("decoy") if d["scored"])

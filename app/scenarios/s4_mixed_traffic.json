@@ -1,0 +1,22 @@
+{
+  "id": "s4-mixed-traffic",
+  "order": 4,
+  "name": "Mixed Traffic",
+  "objective": "Restraint. Birds and a friendly aircraft share the sky with one hostile quadcopter. Engage only the hostile; engaging the friendly is a critical error.",
+  "threat_summary": "Three birds, one friendly aircraft, one hostile quadcopter",
+  "seed": 404,
+  "duration_s": 180,
+  "environment": { "time_of_day": "day", "terrain": "rural", "terrain_seed": 2290, "degradation": 0 },
+  "contacts": [
+    { "model": "bird", "threat": "benign", "spawn_t": 2, "speed_mps": 12,
+      "waypoints": [ { "brg": 80, "rng": 700, "alt": 40 }, { "brg": 60, "rng": 900, "alt": 70 }, { "brg": 95, "rng": 600, "alt": 50 }, { "brg": 70, "rng": 1100, "alt": 60 } ] },
+    { "model": "bird", "threat": "benign", "spawn_t": 15, "speed_mps": 11,
+      "waypoints": [ { "brg": 330, "rng": 900, "alt": 60 }, { "brg": 350, "rng": 650, "alt": 35 }, { "brg": 320, "rng": 500, "alt": 55 }, { "brg": 300, "rng": 1000, "alt": 45 } ] },
+    { "model": "friendly_aircraft", "threat": "friendly", "spawn_t": 25, "speed_mps": 55,
+      "waypoints": [ { "brg": 250, "rng": 3200, "alt": 650 }, { "brg": 100, "rng": 3200, "alt": 650 } ] },
+    { "model": "quadcopter", "threat": "hostile", "spawn_t": 40, "speed_mps": 16,
+      "waypoints": [ { "brg": 300, "rng": 2100, "alt": 100 }, { "brg": 290, "rng": 1000, "alt": 90 }, { "brg": 300, "rng": 40, "alt": 25 } ] },
+    { "model": "bird", "threat": "benign", "spawn_t": 55, "speed_mps": 13,
+      "waypoints": [ { "brg": 180, "rng": 800, "alt": 30 }, { "brg": 200, "rng": 550, "alt": 60 }, { "brg": 170, "rng": 450, "alt": 40 }, { "brg": 150, "rng": 900, "alt": 50 } ] }
+  ]
+}

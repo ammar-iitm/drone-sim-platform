@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}AAR dashboard{% endblock %}
+{% block head %}
+<style>
+  .dash { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: var(--s3); margin-top: var(--s3); }
+  .dash .wide { grid-column: 1 / -1; }
+  .chart-box { position: relative; height: 300px; }
+  .toggle { display: flex; gap: var(--s1); }
+  .toggle .btn { min-height: 30px; font-size: 12px; }
+  .toggle .btn[aria-pressed="true"] { border-color: var(--cyan); color: var(--cyan); }
+  .confusion td.cell { text-align: center; font-weight: 700; min-width: 64px; }
+  .weak { display: flex; flex-direction: column; gap: var(--s2); }
+  .weak .row { display: grid; grid-template-columns: 1fr auto; gap: var(--s2); align-items: center; }
+  .empty-state { padding: var(--s5); text-align: center; }
+  @media (max-width: 1100px) { .dash { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}
+{% block cmdbar %}<span class="chip cyan">Target <strong>80</strong></span>{% endblock %}
+{% block content %}
+<main class="page">
+  <div class="opbar">
+    <div class="group">
+      <div class="kv"><span class="label">After-action review</span><span class="value-lg">READINESS MATRIX</span></div>
+    </div>
+    <form class="group" id="pickers" onsubmit="return false">
+      <div class="field"><label class="label" for="unit">Unit</label><select id="unit"></select></div>
+      <div class="field"><label class="label" for="trainee">Trainee</label><select id="trainee"></select></div>
+      <a class="btn" id="export-unit" href="#" download>Export unit CSV</a>
+    </form>
+  </div>
+
+  <div id="empty" class="panel empty-state" hidden>
+    <p class="value-lg">NO SESSIONS YET</p>
+    <p>Run a scenario from <a href="/mission">mission select</a>, or seed a demo cohort with <span class="key">python scripts/seed_demo.py</span>.</p>
+  </div>
+
+  <div id="content">
+    <section class="stat-tiles" aria-label="Unit summary">
+      <div class="tile"><div class="label">Sessions</div><div class="value-xl" id="t-sessions">--</div></div>
+      <div class="tile"><div class="label">Unit average score</div><div class="value-xl green" id="t-avg">--</div></div>
+      <div class="tile"><div class="label">Weakest skill</div><div class="value-xl amber" id="t-weak">--</div><div class="label" id="t-weak-v"></div></div>
+      <div class="tile"><div class="label">Breaches</div><div class="value-xl red" id="t-breaches">--</div></div>
+    </section>
+
+    <div class="dash">
+      <section class="panel">
+        <div class="panel-head"><h2 class="panel-title"><span class="tag">01</span>Trainee progress · <span id="progress-name"></span></h2>
+          <div class="toggle" role="group" aria-label="Progress view">
+            <button class="btn" type="button" data-view="chart" aria-pressed="true">Chart</button>
+            <button class="btn" type="button" data-view="table" aria-pressed="false">Table</button></div></div>
+        <div class="panel-body">
+          <div class="chart-box" data-pane="chart"><canvas id="progress" role="img" aria-label="Scores by session for detection, classification and engagement"></canvas></div>
+          <div data-pane="table" hidden><table class="data" id="progress-table"></table></div>
+          <p class="label" id="progress-notes"></p>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head"><h2 class="panel-title"><span class="tag">02</span>Unit comparison</h2>
+          <div class="toggle" role="group" aria-label="Comparison view">
+            <button class="btn" type="button" data-view="chart" aria-pressed="true">Chart</button>
+            <button class="btn" type="button" data-view="table" aria-pressed="false">Table</button></div></div>
+        <div class="panel-body">
+          <div class="chart-box" data-pane="chart"><canvas id="compare" role="img" aria-label="Average score per trainee"></canvas></div>
+          <div data-pane="table" hidden><table class="data" id="compare-table"></table></div>
+          <div class="weak" id="weakest"></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head"><h2 class="panel-title"><span class="tag">03</span>Confusion matrix · <span id="confusion-name"></span></h2>
+          <span class="label">Rows: truth · Columns: trainee's call</span></div>
+        <div class="panel-body" style="overflow-x:auto"><table class="data confusion" id="confusion"></table></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head"><h2 class="panel-title"><span class="tag">04</span>Recent unit sessions</h2></div>
+        <div class="panel-body" style="overflow-x:auto"><table class="data" id="recent"></table></div>
+      </section>
+
+      <section class="panel wide">
+        <div class="panel-head"><h2 class="panel-title"><span class="tag">05</span>Session log · <span id="sessions-name"></span></h2>
+          <span class="label">Click a column to sort</span></div>
+        <div class="panel-body" style="overflow-x:auto"><table class="data" id="sessions"></table></div>
+      </section>
+    </div>
+  </div>
+</main>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='vendor/chart.umd.min.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,106 @@
+{
+  "version": 1,
+  "notes": "Training rubric built from public counter-drone principles. Every number here can be edited without code changes; the next session is scored with the new values.",
+  "weights": {
+    "detection": 30,
+    "classification": 30,
+    "engagement": 40
+  },
+  "detection_tiers": [
+    { "max_par_ratio": 0.5, "score": 1.0, "node": "detected_fast" },
+    { "max_par_ratio": 1.0, "score": 0.75, "node": "detected_on_par" },
+    { "max_par_ratio": 2.0, "score": 0.4, "node": "detected_slow" },
+    { "max_par_ratio": null, "score": 0.1, "node": "detected_very_slow" }
+  ],
+  "classification_scores": {
+    "exact": 1.0,
+    "same_family": 0.5,
+    "wrong_family": 0.0
+  },
+  "engagement_scores": {
+    "correct_effective": 1.0,
+    "correct_failed_roll": 0.6,
+    "late_or_unsuitable": 0.2,
+    "none_or_breach": 0.0,
+    "restraint": 1.0,
+    "unnecessary_engagement": 0.0
+  },
+  "penalties": {
+    "false_alarm": 2,
+    "false_alarm_cap": 10,
+    "breach": 10,
+    "critical": 25
+  },
+  "grade_bands": [
+    { "min": 90, "grade": "A", "label": "Qualified, distinguished" },
+    { "min": 80, "grade": "B", "label": "Qualified" },
+    { "min": 70, "grade": "C", "label": "Qualified, needs practice" },
+    { "min": 60, "grade": "D", "label": "Not yet qualified" },
+    { "min": 0, "grade": "F", "label": "Retrain" }
+  ],
+  "geometry": {
+    "inner_ring_m": 120,
+    "late_range_m": 300,
+    "mark_tolerance_s": 1.0
+  },
+  "classes": {
+    "RECON_UAS": { "label": "Recon quadcopter", "family": "hostile_uas", "key": "1" },
+    "ARMED_UAS": { "label": "Armed loitering drone", "family": "hostile_uas", "key": "2" },
+    "DECOY": { "label": "Decoy or balloon", "family": "non_threat", "key": "3" },
+    "BIRD": { "label": "Bird", "family": "non_threat", "key": "4" },
+    "FRIENDLY": { "label": "Friendly aircraft", "family": "friendly", "key": "5" }
+  },
+  "critical_misclassification": {
+    "hostile_uas": ["non_threat", "friendly"]
+  },
+  "responses": {
+    "TRACK": { "label": "Track only", "key": "T", "engages": false },
+    "REPORT": { "label": "Report", "key": "R", "engages": false },
+    "JAM": {
+      "label": "Jam",
+      "key": "J",
+      "engages": true,
+      "max_range_m": 2000,
+      "out_of_range_factor": 0.0,
+      "effectiveness": {
+        "quadcopter": 0.85,
+        "hexacopter": 0.7,
+        "fixed_wing": 0.1,
+        "balloon": 0.0,
+        "bird": 0.0,
+        "friendly_aircraft": 0.6
+      }
+    },
+    "INTERCEPT": {
+      "label": "Intercept",
+      "key": "I",
+      "engages": true,
+      "max_range_m": 1500,
+      "out_of_range_factor": 0.25,
+      "fast_speed_mps": 30,
+      "fast_factor": 0.75,
+      "effectiveness": {
+        "quadcopter": 0.8,
+        "hexacopter": 0.8,
+        "fixed_wing": 0.7,
+        "balloon": 0.95,
+        "bird": 0.9,
+        "friendly_aircraft": 0.9
+      }
+    },
+    "TAKE_COVER": { "label": "Take cover", "key": "C", "engages": false }
+  },
+  "expected_responses": {
+    "quadcopter": ["JAM", "INTERCEPT"],
+    "hexacopter": ["JAM", "INTERCEPT"],
+    "fixed_wing": ["INTERCEPT"]
+  },
+  "models": {
+    "quadcopter": { "true_class": "RECON_UAS" },
+    "hexacopter": { "true_class": "ARMED_UAS" },
+    "fixed_wing": { "true_class": "ARMED_UAS" },
+    "balloon": { "true_class": "DECOY" },
+    "bird": { "true_class": "BIRD" },
+    "friendly_aircraft": { "true_class": "FRIENDLY" }
+  }
+}

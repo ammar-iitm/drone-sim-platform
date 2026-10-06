@@ -3,8 +3,9 @@ node_modules/
 __pycache__/
 .pytest_cache/
 *.pyc
-data/*.db
+data/*.db-wal
+data/*.db-shm
 data/*.db-journal
 .DS_Store
 dist/
-test-results/
+.vite/

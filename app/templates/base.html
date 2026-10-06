@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Drone Threat Trainer{% endblock %} · AEGIS</title>
+  <link rel="icon" href="{{ url_for('static', filename='img/favicon.svg') }}" type="image/svg+xml">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/aegis.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body class="{{ 'compact' if compact else '' }} {% block body_class %}{% endblock %}">
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-radar" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><path d="M12 12 19 5"/></g><circle cx="12" cy="12" r="1.6" fill="currentColor"/></symbol>
+    <symbol id="i-mission" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V5l8-2 8 2v15"/><path d="M8 9h8M8 13h8M8 17h5"/></g></symbol>
+    <symbol id="i-sim" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="7"/><path d="M12 2v5M12 17v5M2 12h5M17 12h5"/></g></symbol>
+    <symbol id="i-aar" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h16"/><path d="M6 16l4-5 3 3 5-7"/></g></symbol>
+    <symbol id="s-hostile" viewBox="0 0 12 12"><path d="M6 1 11 11H1Z" fill="currentColor"/></symbol>
+    <symbol id="s-unknown" viewBox="0 0 12 12"><path d="M6 0.5 11.5 6 6 11.5 0.5 6Z" fill="currentColor"/></symbol>
+    <symbol id="s-friendly" viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" fill="currentColor"/></symbol>
+    <symbol id="s-benign" viewBox="0 0 12 12"><rect x="1.5" y="1.5" width="9" height="9" fill="currentColor"/></symbol>
+  </svg>
+
+  <header class="cmdbar">
+    <div class="cmdbar-left">
+      <a class="brand" href="{{ url_for('views.mission') }}">
+        <svg aria-hidden="true"><use href="#i-radar"/></svg>
+        <span class="brand-name">AEGIS // Drone Threat Trainer</span>
+      </a>
+      <span class="chip">Unclassified // Exercise use only</span>
+    </div>
+    <div class="cmdbar-right">{% block cmdbar %}{% endblock %}</div>
+  </header>
+
+  <aside class="rail" aria-label="Main navigation">
+    <div>
+      <div class="rail-head"><span class="label">Operations rail</span><span class="label green">Offline</span></div>
+      <nav>
+        <a href="{{ url_for('views.mission') }}" {% if active == 'mission' %}aria-current="page"{% endif %} title="Mission select">
+          <svg aria-hidden="true"><use href="#i-mission"/></svg><span>Mission select</span></a>
+        <a href="{{ url_for('views.sim') }}" {% if active == 'sim' %}aria-current="page"{% endif %} title="Simulator">
+          <svg aria-hidden="true"><use href="#i-sim"/></svg><span>Simulator</span></a>
+        <a href="{{ url_for('views.dashboard') }}" {% if active == 'dashboard' %}aria-current="page"{% endif %} title="AAR dashboard">
+          <svg aria-hidden="true"><use href="#i-aar"/></svg><span>AAR dashboard</span></a>
+      </nav>
+    </div>
+    <div class="rail-foot">
+      <div class="row label"><span>Store</span><span class="green">SQLite local</span></div>
+      <div class="meter"><span style="width:100%"></span></div>
+      <div class="row label"><span>Scoring</span><span>Server</span></div>
+    </div>
+  </aside>
+
+  {% block content %}{% endblock %}
+  {% block scripts %}{% endblock %}
+</body>
+</html>

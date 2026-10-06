@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Simulator{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/sim.css') }}">
+{% endblock %}
+{% block cmdbar %}
+<span class="chip"><span class="dot" id="link-dot"></span>Link <strong id="link">Local</strong></span>
+<span class="chip cyan">T+ <strong id="clock">00:00</strong></span>
+<span class="chip amber" id="speed-chip" hidden>Fast-forward <strong id="speed"></strong></span>
+<span class="chip">FPS <strong id="fps">--</strong></span>
+{% endblock %}
+{% block content %}
+<main class="sim" id="sim">
+  <section class="opbar sim-opbar" aria-label="Exercise status">
+    <div class="group">
+      <div class="kv"><span class="label">Evaluation subject</span><span class="value" id="trainee">--</span></div>
+      <div class="kv"><span class="label">Scenario</span><span class="value cyan" id="scenario-name">Loading…</span></div>
+      <div class="kv"><span class="label">Environment</span><span class="value" id="env">--</span></div>
+    </div>
+    <div class="group">
+      <div class="kv"><span class="label">Sim elapsed</span><span class="value-lg green mono" id="elapsed">00:00 / 00:00</span></div>
+      <div class="kv"><span class="label">Sensor</span><span class="value amber" id="sensor-readout">DAY EO</span></div>
+      <button class="btn" id="btn-sensor" type="button">Sensor <kbd>S</kbd></button>
+      <button class="btn" id="btn-mute" type="button" aria-pressed="false">Sound on <kbd>M</kbd></button>
+      <button class="btn" id="btn-pause" type="button">Pause <kbd>P</kbd></button>
+      <button class="btn danger" id="btn-end" type="button">End <kbd>Esc</kbd></button>
+    </div>
+  </section>
+
+  <div class="sim-main">
+    <section class="panel view-panel">
+      <div class="panel-head">
+        <h2 class="panel-title"><span class="tag">DISP</span><span id="mode-title">Day EO</span> // Observation post</h2>
+        <span class="label" id="degr-label">Degradation 0</span>
+      </div>
+      <div class="view" id="view" tabindex="0" aria-label="Sensor view. Click or press Space to mark a contact.">
+        <canvas id="gl" class="gl"></canvas>
+        <canvas id="noise" class="layer"></canvas>
+        <div class="vignette layer" id="vignette"></div>
+        <canvas id="overlay" class="layer"></canvas>
+        <canvas id="radar-big" class="layer radar-big" hidden aria-label="Radar console. Click a track to mark it."></canvas>
+        <svg class="reticle" id="reticle" viewBox="0 0 100 100" aria-hidden="true">
+          <circle cx="50" cy="50" r="16"/><path d="M50 22v14M50 64v14M22 50h14M64 50h14"/>
+        </svg>
+        <div class="hud-bl mono"><span id="brg">BRG 000°</span> · <span id="elev">ELV +0°</span> · <span id="zoom">ZOOM 1x</span></div>
+        <div class="hud-tl label" id="hud-mode">Day EO</div>
+        <div class="alert" id="alert" role="alert" hidden></div>
+      </div>
+    </section>
+
+    <aside class="side">
+      <section class="panel radar-panel">
+        <div class="panel-head"><h2 class="panel-title"><span class="tag">RDR</span>Radar</h2>
+          <div class="radar-tools">
+            <button class="btn mini" type="button" id="btn-range">Range <kbd>]</kbd></button>
+            <button class="btn mini" type="button" id="btn-console">Console <kbd>Q</kbd></button>
+          </div></div>
+        <div class="label radar-status" id="radar-status">30 RPM</div>
+        <div class="radar-wrap" id="radar-wrap"><canvas id="radar" aria-label="Radar scope. Click a track to mark it."></canvas></div>
+        <div class="track-table" id="track-table" hidden></div>
+      </section>
+      <section class="panel contacts-panel">
+        <div class="panel-head"><h2 class="panel-title"><span class="tag">TRK</span>Contacts</h2>
+          <span class="label"><span class="key">Tab</span> cycle</span></div>
+        <ul class="contact-list" id="contacts" aria-live="polite"></ul>
+      </section>
+    </aside>
+  </div>
+
+  <section class="actions" aria-label="Decisions">
+    <div class="action-row">
+      <span class="label row-label">Classify <span id="sel-label" class="cyan">no contact selected</span></span>
+      <div class="buttons" id="classify-buttons"></div>
+    </div>
+    <div class="action-row">
+      <span class="label row-label">Respond</span>
+      <div class="buttons" id="respond-buttons"></div>
+    </div>
+  </section>
+
+  <div class="overlay-screen" id="screen" role="dialog" aria-modal="true" aria-labelledby="screen-title">
+    <div class="screen-card" id="screen-card"><h2 id="screen-title" class="panel-title">Loading scenario…</h2></div>
+  </div>
+</main>
+{% endblock %}
+{% block scripts %}
+<script type="module" src="{{ url_for('static', filename='js/sim/main.js') }}"></script>
+{% endblock %}

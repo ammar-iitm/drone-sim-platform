@@ -1,0 +1,21 @@
+{
+  "id": "s2-night-loiter",
+  "order": 2,
+  "name": "Night Loitering Drone",
+  "objective": "Recognise an autonomous fixed-wing loitering drone at night. It does not need a radio link, so jamming will not stop it. Intercept it before it dives.",
+  "threat_summary": "One fixed-wing loitering drone",
+  "seed": 202,
+  "duration_s": 120,
+  "environment": { "time_of_day": "night", "terrain": "rural", "terrain_seed": 7731, "degradation": 0 },
+  "contacts": [
+    {
+      "model": "fixed_wing", "threat": "hostile", "spawn_t": 12, "speed_mps": 32,
+      "waypoints": [
+        { "brg": 200, "rng": 2900, "alt": 230 },
+        { "brg": 225, "rng": 1400, "alt": 200 },
+        { "brg": 210, "rng": 550, "alt": 140 },
+        { "brg": 200, "rng": 30, "alt": 12 }
+      ]
+    }
+  ]
+}

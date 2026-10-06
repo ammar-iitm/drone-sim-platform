@@ -1,0 +1,20 @@
+{
+  "id": "s6-saturation-swarm",
+  "order": 6,
+  "name": "Saturation Swarm",
+  "objective": "Prioritise and triage under overload. Eight drones arrive from two axes at night with two decoys among them. Work the closest real threats first.",
+  "threat_summary": "Swarm of eight from two axes, plus two decoys",
+  "seed": 606,
+  "duration_s": 200,
+  "environment": { "time_of_day": "night", "terrain": "urban", "terrain_seed": 6061, "degradation": 1 },
+  "contacts": [
+    { "swarm": "A", "count": 4, "model": "quadcopter", "spawn_t": 20, "speed_mps": 17, "spacing_m": 30,
+      "waypoints": [ { "brg": 20, "rng": 2300, "alt": 100 }, { "brg": 25, "rng": 1100, "alt": 90 }, { "brg": 20, "rng": 30, "alt": 25 } ] },
+    { "swarm": "B", "count": 4, "model": "quadcopter", "spawn_t": 35, "speed_mps": 17, "spacing_m": 30,
+      "waypoints": [ { "brg": 140, "rng": 2300, "alt": 110 }, { "brg": 130, "rng": 1100, "alt": 90 }, { "brg": 140, "rng": 30, "alt": 25 } ] },
+    { "model": "balloon", "threat": "decoy", "spawn_t": 5, "speed_mps": 4,
+      "waypoints": [ { "brg": 30, "rng": 1500, "alt": 300 }, { "brg": 35, "rng": 500, "alt": 250 } ] },
+    { "model": "balloon", "threat": "decoy", "spawn_t": 10, "speed_mps": 4,
+      "waypoints": [ { "brg": 135, "rng": 1500, "alt": 280 }, { "brg": 128, "rng": 500, "alt": 240 } ] }
+  ]
+}
