@@ -67,7 +67,8 @@ export class Radar {
 
   /** Probability of detecting a contact on one pass of the beam. */
   pd(c, r, alt) {
-    const r50 = R0 * Math.pow(RCS_M2[c.model], 0.25) * (1 - 0.12 * this.env.degradation);
+    // Radar sees through fog, so weather costs it little range; noise, clutter and dropout do the damage.
+    const r50 = R0 * Math.pow(RCS_M2[c.model], 0.25) * (1 - 0.04 * this.env.degradation);
     let p = 1 / (1 + Math.pow(r / r50, 8));
     if (alt < 40 && r > 300) p *= this.urban ? 0.35 : 0.6; // ground clutter and masking
     return p * (1 - this.env.radar_dropout);

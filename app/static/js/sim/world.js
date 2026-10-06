@@ -159,7 +159,8 @@ export class World {
       colors.push(c.r, c.g, c.b);
     }
     geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-    this.scene.add(new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.BackSide, fog: false, depthWrite: false })));
+    this.sky = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.BackSide, fog: false, depthWrite: false }));
+    this.scene.add(this.sky);
     if (this.look.stars) {
       const rand = mulberry32(this.env.terrain_seed ^ 0x51a5);
       const pts = [];
@@ -282,6 +283,10 @@ export class World {
     this.contactMat.fog = !thermal;
     this.contactMat.needsUpdate = true;
     if (this.stars) this.stars.visible = !thermal;
+    // White-hot thermal: cold sky reads dark, the ground a cool mid-grey, warm contacts bright.
+    this.sky.visible = !thermal;
+    this.scene.background = thermal ? new THREE.Color(0x161616) : null;
+    this.scene.fog.color.set(thermal ? 0x303030 : this.look.fog);
     // Thermal shows the background as cool, even greys whatever the time of day.
     this.hemi.intensity = mode === 'nv' ? Math.max(1.4, this.look.amb * 3) : thermal ? 0.9 : this.look.amb;
     this.sun.intensity = thermal ? 0.3 : this.look.sunI;

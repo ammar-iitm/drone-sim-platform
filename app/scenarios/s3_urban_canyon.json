@@ -2,18 +2,54 @@
   "id": "s3-urban-canyon",
   "order": 3,
   "name": "Urban Canyon",
-  "objective": "Detect fast in a short window. A quadcopter flies low between buildings and is only visible for a few seconds at a time.",
+  "objective": "Detect fast in a short window. A quadcopter flies low between buildings, pops above the roofline for a few seconds mid-route, then stays hidden until its final approach. Catch it in the first window.",
   "threat_summary": "One quadcopter between buildings",
   "seed": 303,
   "duration_s": 100,
-  "environment": { "time_of_day": "day", "terrain": "urban", "terrain_seed": 5120, "degradation": 0 },
+  "environment": {
+    "time_of_day": "day",
+    "terrain": "urban",
+    "terrain_seed": 5120,
+    "degradation": 0
+  },
   "contacts": [
     {
-      "model": "quadcopter", "threat": "hostile", "spawn_t": 20, "speed_mps": 16, "par_detect_s": 10,
+      "model": "quadcopter",
+      "threat": "hostile",
+      "spawn_t": 20,
+      "speed_mps": 16,
+      "par_detect_s": 36,
       "waypoints": [
-        { "brg": 120, "rng": 950, "alt": 35 },
-        { "brg": 110, "rng": 420, "alt": 30 },
-        { "brg": 100, "rng": 40, "alt": 22 }
+        {
+          "brg": 120,
+          "rng": 950,
+          "alt": 14
+        },
+        {
+          "brg": 118,
+          "rng": 760,
+          "alt": 14
+        },
+        {
+          "brg": 116,
+          "rng": 680,
+          "alt": 55
+        },
+        {
+          "brg": 113,
+          "rng": 600,
+          "alt": 14
+        },
+        {
+          "brg": 110,
+          "rng": 420,
+          "alt": 14
+        },
+        {
+          "brg": 100,
+          "rng": 40,
+          "alt": 12
+        }
       ]
     }
   ]

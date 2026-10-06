@@ -18,7 +18,7 @@ const MODE_NAME = { eo: 'Day EO', nv: 'Night vision', thermal: 'Thermal' };
 const MODE_FILTER = {
   eo: 'none',
   nv: 'grayscale(1) sepia(1) hue-rotate(62deg) saturate(3.5) brightness(1.35) contrast(1.1)',
-  thermal: 'grayscale(1) contrast(1.6) brightness(0.85)',
+  thermal: 'grayscale(1) contrast(1.2) brightness(1.6)',
 };
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const round3 = (t) => Math.round(t * 1000) / 1000;
@@ -34,6 +34,7 @@ const S = {
   t: 0, acc: 0, last: 0, phase: 'loading', // loading | briefing | running | paused | confirm | submitting | done
   yaw: 0, pitch: 4, zoomIdx: 0, mode: 'eo', radarMode: false,
   status: new Map(),  // id -> { neutralisedT, breached, attempts, left }
+  scatter: new Map(), // swarm group -> scenario time it was first engaged
   marked: new Map(),  // id -> { state, chosen, last, markedT }
   selected: null, events: [], held: new Set(),
   sound: new Sound(),
@@ -248,6 +249,7 @@ function respond(resp) {
   const spec = S.rubric.responses[resp];
   const m = S.marked.get(id);
   if (spec.engages) {
+    if (c.swarm && !S.scatter.has(c.swarm.group)) S.scatter.set(c.swarm.group, ev.t);
     const st = S.status.get(id);
     const eff = effectiveness(resp, c, ev.t);
     const ok = rollFor(S.scenario.seed, id, st.attempts) < eff;
@@ -469,6 +471,13 @@ function drawFrame() {
     const mesh = w.meshes.get(c.id);
     if (!isAlive(c, t) || !positionAt(c, t, tmp)) { mesh.visible = false; continue; }
     w.wobble(c, t, tmp);
+    // Swarm separation: once any member is engaged, the group spreads out over 3 s (visual only;
+    // the server scores the formation path, and 40 m is well inside every scoring threshold).
+    const t0 = c.swarm && S.scatter.get(c.swarm.group);
+    if (typeof t0 === 'number' && t >= t0) {
+      const f = Math.min(1, (t - t0) / 3), a = (c.wobble_seed % 360) * Math.PI / 180;
+      tmp[0] += Math.cos(a) * 40 * f; tmp[1] += 10 * f * Math.sin(a * 3); tmp[2] += Math.sin(a) * 40 * f;
+    }
     mesh.position.set(tmp[0], tmp[1], tmp[2]);
     const d = mesh.position.distanceTo(cam.position);
     mesh.visible = d < vr * 1.05;
@@ -765,4 +774,14 @@ boot();
 window.__sim = S; // exposed for the browser tests
 // Test hooks: the same decision functions the keyboard and mouse call.
 window.__simApi = { mark: (id) => mark(contactById(id), 'radar'), classify, respond, select: (id) => select(id),
-  contactById, isAlive, range: (id) => rangeAt(contactById(id), S.t) };
+  contactById, isAlive, range: (id) => rangeAt(contactById(id), S.t),
+  /** Clear line of sight from the post to where a contact is at scenario time t (null if not flying). */
+  lineOfSight(id, t) {
+    if (!positionAt(contactById(id), t, tmp)) return null;
+    const cam = S.world.camera.position;
+    const dir = new THREE.Vector3(tmp[0], tmp[1], tmp[2]).sub(cam);
+    const d = dir.length();
+    raycaster.set(cam, dir.normalize());
+    raycaster.far = d - 3;
+    return raycaster.intersectObjects(S.world.occluders, false).length === 0;
+  } };

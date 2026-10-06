@@ -100,3 +100,14 @@ def test_scripted_catalogue_matches_prd():
     swarm = s["s6-saturation-swarm"]["contacts"]
     assert sum(1 for c in swarm if c["swarm"]) == 8 and sum(1 for c in swarm if c["threat"] == "decoy") == 2
     assert {c["swarm"]["group"] for c in swarm if c["swarm"]} == {"A", "B"}
+
+
+@pytest.mark.parametrize("level,expected", [
+    (0, {"noise": 0.0, "fog": 0.0, "visual_range_m": 3000, "radar_dropout": 0.0}),
+    (1, {"noise": 0.1, "fog": 0.15, "visual_range_m": 2200, "radar_dropout": 0.08}),
+    (2, {"noise": 0.25, "fog": 0.35, "visual_range_m": 1500, "radar_dropout": 0.18}),
+    (3, {"noise": 0.45, "fog": 0.6, "visual_range_m": 900, "radar_dropout": 0.30}),
+])
+def test_four_degradation_levels_match_visual_design_table(level, expected):
+    env = scen.generate({"seed": 3, "degradation": level})["environment"]
+    assert {k: env[k] for k in expected} == expected

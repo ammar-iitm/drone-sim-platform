@@ -40,15 +40,15 @@ These cover requirements F1 to F9. Build the walking skeleton first: one contact
 
 - [x] 3D scene renders with sky, lighting and terrain for day, dusk and night
 - [x] Rural terrain from a seeded height field and urban terrain from seeded blocks
-- [ ] Look, zoom, mark, classify and respond controls work by mouse and keyboard
+- [x] Look, zoom, mark, classify and respond controls work by mouse and keyboard
 - [x] Contacts fly their waypoint paths with seeded wobble
 - [ ] All six contact types render with distinct silhouettes and motion
 - [ ] Swarm members follow a leader with formation offsets and separation
-- [ ] Day, night vision and thermal modes are clearly different, and switching takes under a second
-- [ ] Four degradation levels change noise, fog, visible range and radar dropout
-- [ ] Radar shows tracks with latency and noise, and never reveals the true class
-- [ ] Marking empty sky logs a false alarm
-- [ ] A contact reaching the inner ring logs a breach
+- [x] Day, night vision and thermal modes are clearly different, and switching takes under a second
+- [x] Four degradation levels change noise, fog, visible range and radar dropout
+- [x] Radar shows tracks with latency and noise, and never reveals the true class
+- [x] Marking empty sky logs a false alarm
+- [x] A contact reaching the inner ring logs a breach
 - [x] Responses apply their effectiveness roll using the scenario's seeded generator
 - [x] Every action is stamped with scenario time and added to the event log
 - [x] The finished session is submitted to the server and the score screen shows the tree reasons
@@ -61,14 +61,14 @@ These cover requirements F10 to F12. Each scripted scenario should be played end
 
 - [x] Scenario 1, Dawn Recon Pass, plays through and scores correctly
 - [x] Scenario 2, Night Loitering Drone, shows that jamming is weak against it
-- [ ] Scenario 3, Urban Canyon, gives a short detection window behind buildings
+- [x] Scenario 3, Urban Canyon, gives a short detection window behind buildings
 - [x] Scenario 4, Mixed Traffic, punishes engaging birds or the friendly aircraft
-- [ ] Scenario 5, Fog and Noise, forces reliance on radar and cues
+- [x] Scenario 5, Fog and Noise, forces reliance on radar and cues
 - [x] Scenario 6, Saturation Swarm, overloads the trainee with eight drones and two decoys
 - [x] Each scripted scenario shows its learning objective on the start screen
-- [ ] The instructor can set time of day, terrain, threat mix, swarm size, degradation and seed
-- [ ] Difficulty slider changes all the linked knobs together
-- [ ] A seed shown on the score screen can be reused to replay the same scenario
+- [x] The instructor can set time of day, terrain, threat mix, swarm size, degradation and seed
+- [x] Difficulty slider changes all the linked knobs together
+- [x] A seed shown on the score screen can be reused to replay the same scenario
 
 ## AAR dashboard
 
@@ -80,7 +80,7 @@ These cover requirements F17 to F21 and the layout in the Visual Design doc.
 - [x] Chart colours match the validated palette, and blue always means detection
 - [x] Unit comparison bars sorted by score
 - [x] Confusion matrix of true class against chosen class
-- [ ] Sortable session table with a link to each session review
+- [x] Sortable session table with a link to each session review
 - [x] Session review shows the event timeline with decision paths, reasons and points
 - [ ] Every chart has hover details and a table view
 - [ ] Light and dark themes both read correctly
@@ -106,12 +106,12 @@ Nothing should be called done until these pass on the demo laptop.
 ## Demo and submission
 
 - [x] Seed a demo cohort of trainees with several sessions each so the dashboard shows real trends
-- [ ] Write a three to five minute walkthrough script: scenario, decision, score, dashboard
+- [x] Write a three to five minute walkthrough script: scenario, decision, score, dashboard
 - [ ] Rehearse the demo twice from a clean start, including one deliberate mistake to show the tree reason
 - [ ] Prepare a fallback: a recorded screen capture in case the live demo fails
 - [x] Write the README with install and run steps, folder layout and how to edit the rubric
-- [ ] State assumptions and limits plainly: public-source rubric, abstract responses, no real weapon modelling
-- [ ] Map each of the three required outcomes in the problem statement to where it appears in the demo
+- [x] State assumptions and limits plainly: public-source rubric, abstract responses, no real weapon modelling
+- [x] Map each of the three required outcomes in the problem statement to where it appears in the demo
 - [ ] Package the project folder and test it on a second machine
 - [ ] Re-read the problem statement one last time and tick off each outcome
 - [ ] Submit through the SIH portal and keep a copy of the confirmation
