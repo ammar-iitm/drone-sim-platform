@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "on-primary": "#003911", "secondary": "#bdf4ff", "surface-bright": "#38393c", "surface": "#121316", "tertiary-fixed": "#ffddb8", "on-tertiary": "#472a00", "error": "#ffb4ab", "background": "#121316", "error-container": "#93000a", "on-primary-fixed": "#002107", "outline-variant": "#3b4b3a", "inverse-primary": "#006e27", "surface-container": "#1f1f23", "on-primary-fixed-variant": "#00531b", "on-secondary-container": "#00616d", "tertiary": "#fff9f6", "outline": "#849581", "on-background": "#e3e2e6", "secondary-container": "#00e3fd", "surface-container-high": "#292a2d", "tertiary-container": "#ffd7aa", "surface-dim": "#121316", "on-secondary": "#00363d", "secondary-fixed-dim": "#00daf3", "tertiary-fixed-dim": "#ffb95f", "on-surface-variant": "#b9ccb5", "inverse-on-surface": "#2f3034", "secondary-fixed": "#9cf0ff", "on-tertiary-container": "#895600", "on-error": "#690005", "surface-tint": "#00e55b", "surface-container-lowest": "#0d0e11", "inverse-surface": "#e3e2e6", "primary-fixed": "#6bff83", "on-error-container": "#ffdad6", "primary": "#edffe8", "on-tertiary-fixed": "#2a1700", "primary-container": "#00ff66", "surface-container-highest": "#343538", "primary-fixed-dim": "#00e55b", "on-secondary-fixed": "#001f24", "surface-variant": "#343538", "on-secondary-fixed-variant": "#004f58", "on-primary-container": "#007128", "on-tertiary-fixed-variant": "#653e00", "on-surface": "#e3e2e6", "surface-container-low": "#1b1b1f" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "gutter-mobile": "0.25rem", "margin": "0.75rem", "margin-mobile": "0.5rem", "space-lg": "0.75rem", "space-xl": "1rem", "space-xs": "0.125rem", "space-sm": "0.25rem", "gutter": "0.5rem", "space-md": "0.5rem" }, "fontFamily": { "headline-lg": ["Inter"], "body-lg": ["Inter"], "label-lg": ["Space Mono"], "headline-sm": ["Inter"], "telemetry-critical": ["Space Mono"], "body-md": ["Inter"], "headline-xl": ["Inter"], "body-sm": ["Inter"], "telemetry-data": ["Space Mono"], "label-md": ["Space Mono"], "label-sm": ["Space Mono"], "headline-md": ["Inter"] }, "fontSize": { "headline-lg": ["24px", {"lineHeight": "30px", "fontWeight": "600"}], "body-lg": ["14px", {"lineHeight": "20px", "fontWeight": "400"}], "label-lg": ["13px", {"lineHeight": "16px", "fontWeight": "700"}], "headline-sm": ["15px", {"lineHeight": "20px", "fontWeight": "600"}], "telemetry-critical": ["20px", {"lineHeight": "24px", "fontWeight": "700"}], "body-md": ["13px", {"lineHeight": "18px", "fontWeight": "400"}], "headline-xl": ["32px", {"lineHeight": "38px", "fontWeight": "700"}], "body-sm": ["11px", {"lineHeight": "16px", "fontWeight": "400"}], "telemetry-data": ["14px", {"lineHeight": "18px", "fontWeight": "700"}], "label-md": ["11px", {"lineHeight": "14px", "fontWeight": "400"}], "label-sm": ["9px", {"lineHeight": "12px", "fontWeight": "400"}], "headline-md": ["18px", {"lineHeight": "24px", "fontWeight": "600"}] } } } };</script></head><body class="bg-surface font-body-md text-on-surface antialiased"><header class="fixed top-0 left-0 right-0 h-14 bg-surface-container-low border-b border-outline-variant z-50 flex items-center justify-between px-space-md"><div class="flex items-center gap-space-md"><div class="flex items-center gap-space-sm pl-space-xs"><span class="material-symbols-outlined text-primary-container text-[20px]">radar</span><span class="font-label-lg text-label-lg tracking-wider text-primary uppercase">AEGIS // C2 SIMULATION</span></div><span class="px-space-sm py-space-xs bg-surface-container text-on-surface-variant font-label-sm text-label-sm border border-outline-variant uppercase">UNCLASSIFIED // EXERCISE USE ONLY</span></div><div class="flex items-center gap-space-lg"><div class="flex items-center gap-space-sm px-space-sm py-space-xs bg-surface-container-lowest border border-outline-variant"><span class="w-2 h-2 rounded-full bg-primary-container animate-pulse"></span><span class="font-label-sm text-label-sm text-on-surface-variant uppercase">DEFCON</span><span class="font-telemetry-data text-telemetry-data text-primary-container font-bold">4-READY</span></div><div class="flex items-center gap-space-xs font-label-md text-label-md px-space-sm py-space-xs bg-surface-container-lowest border border-outline-variant"><span class="material-symbols-outlined text-[16px] text-secondary-container">timer</span><span class="text-on-surface-variant font-label-sm text-label-sm">T+</span><span class="font-telemetry-data text-telemetry-data text-secondary-container">02:44:18.4Z</span></div><div class="flex items-center gap-space-sm"><button class="flex items-center gap-space-xs px-space-sm py-space-xs border border-outline-variant hover:bg-surface-container hover:text-on-surface text-on-surface-variant transition-colors" title="Audio/Comms Channel" type="button"><span class="material-symbols-outlined text-[16px]">volume_up</span><span class="font-label-sm text-label-sm uppercase">NET-1 CH-A</span></button><div class="px-space-sm py-space-xs bg-surface-container border border-outline-variant"><span class="font-label-sm text-label-sm text-on-surface-variant uppercase">INST: </span><span class="font-label-sm text-label-sm text-primary">MAJ. VANCE [TAC-01]</span></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><aside class="fixed left-0 top-14 bottom-0 w-60 bg-surface-container-low border-r border-outline-variant z-40 flex flex-col justify-between"><div class="flex flex-col"><div class="px-space-md py-space-sm border-b border-outline-variant bg-surface-container-lowest flex items-center justify-between"><span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">C2 OPERATIONAL RAIL</span><span class="font-label-sm text-label-sm text-primary-container font-bold">ONLINE</span></div><nav class="flex flex-col py-space-xs"><a class="flex items-center px-space-md py-space-md text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all font-label-md text-label-md uppercase" data-path="live-instructor-dashboard" href="#"><span>Live Dashboard</span></a><a class="flex items-center px-space-md py-space-md text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all font-label-md text-label-md uppercase" data-path="scenario-builder" href="#"><span>Scenario Builder</span></a><a class="flex items-center px-space-md py-space-md text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all font-label-md text-label-md uppercase" data-path="aar-reports" href="#"><span>AAR Reports</span></a><a class="flex items-center px-space-md py-space-md bg-surface-container text-primary-container font-bold border-l-2 border-primary-container font-label-md text-label-md uppercase" data-path="unit-roster" href="#roster-section"><span>Unit Roster</span></a></nav></div><div class="p-space-md border-t border-outline-variant bg-surface-container-lowest flex flex-col gap-space-xs"><div class="flex justify-between items-center text-on-surface-variant font-label-sm text-label-sm"><span class="uppercase">SWARM TELEM</span><span class="text-primary-container font-telemetry-data text-telemetry-data">48 UCAV</span></div><div class="w-full bg-surface-container-highest h-1"><div class="bg-primary-container h-1 w-3/4"></div></div><div class="flex justify-between items-center text-on-surface-variant font-label-sm text-label-sm mt-space-xs"><span>GRID REF: 38TLN 4289</span><span>LATENCY: 12ms</span></div></div></aside><div class="pl-60"><main class="w-full pt-14 bg-surface min-h-screen"><div class="flex flex-col w-full">
+<!-- TOP OPERATIONAL CONTROL & BANNER -->
+<section class="w-full bg-surface-container-low px-space-md py-space-sm">
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-md">
+<!-- Title & Echelon Context -->
+<div class="flex flex-col">
+<div class="flex items-center gap-space-sm">
+<span class="w-2 h-2 bg-primary-container"></span>
+<span class="font-label-sm text-label-sm uppercase text-on-surface-variant tracking-wider">STANAG 4586 LVL-4 AUDIT // TAC-EVAL 24.8</span>
+<span class="px-space-xs py-0.5 bg-surface-container-highest text-secondary font-label-sm text-label-sm tracking-widest">[CR-COMPARISON]</span>
+</div>
+<h1 class="font-headline-md text-headline-md tracking-tight text-primary uppercase mt-0.5">
+          Squadron Readiness Matrix <span class="text-on-surface-variant font-headline-sm text-headline-sm">// 104th Tactical UAS Intercept Squadron</span>
+</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase">
+          Echelon: Battalion C2 Tactical Command • Flight-Level Differential &amp; Combat Doctrine Certification
+        </p>
+</div>
+<!-- Action & Filter Bar -->
+<div class="flex flex-wrap items-center gap-space-xs">
+<!-- Timeframe Segmented Selector -->
+<div class="flex items-center bg-surface-container-lowest p-space-xs">
+<button class="px-space-sm py-1 font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface" type="button">30 DAYS</button>
+<button class="px-space-sm py-1 font-label-sm text-label-sm bg-surface-container-highest text-primary-container font-bold" type="button">90 DAYS</button>
+<button class="px-space-sm py-1 font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface" type="button">ANNUAL</button>
+</div>
+<button class="flex items-center gap-space-xs px-space-sm py-1 bg-surface-container hover:bg-surface-container-high text-on-surface font-label-sm text-label-sm uppercase transition-colors" type="button">
+<span class="material-symbols-outlined text-[15px] text-secondary-container">file_download</span>
+<span>Defense Audit</span>
+</button>
+<button class="flex items-center gap-space-xs px-space-sm py-1 bg-surface-container hover:bg-surface-container-high text-on-surface font-label-sm text-label-sm uppercase transition-colors" type="button">
+<span class="material-symbols-outlined text-[15px] text-primary-container">swap_horizontal_circle</span>
+<span>Re-Balance Roster</span>
+</button>
+<button class="flex items-center gap-space-xs px-space-sm py-1 bg-primary-container text-on-primary font-label-sm text-label-sm font-bold uppercase transition-colors shadow-sm" type="button">
+<span class="material-symbols-outlined text-[15px]">play_arrow</span>
+<span>Simulate Deploy</span>
+</button>
+</div>
+</div>
+<!-- Fleet-Wide Global Metrics Strip -->
+<div class="grid grid-cols-2 md:grid-cols-5 gap-space-xs mt-space-sm pt-space-xs">
+<div class="bg-surface-container-lowest p-space-sm flex flex-col justify-between">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Fleet Combat Qual</span>
+<div class="flex items-baseline justify-between mt-1">
+<span class="font-telemetry-critical text-telemetry-critical text-primary-container">68.0%</span>
+<span class="font-label-sm text-label-sm text-tertiary-fixed-dim">[20/28 CR-1]</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1 mt-1">
+<div class="bg-primary-container h-1 w-[68%]"></div>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-space-sm flex flex-col justify-between">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Total Sorties (L90D)</span>
+<div class="flex items-baseline justify-between mt-1">
+<span class="font-telemetry-critical text-telemetry-critical text-secondary-container">184</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">98.2% COMPL</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1 mt-1">
+<div class="bg-secondary-container h-1 w-[98%]"></div>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-space-sm flex flex-col justify-between">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Kinetic Intercept Rate</span>
+<div class="flex items-baseline justify-between mt-1">
+<span class="font-telemetry-critical text-telemetry-critical text-primary-container">89.2%</span>
+<span class="font-label-sm text-label-sm text-primary-container">+3.4% VS STANAG</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1 mt-1">
+<div class="bg-primary-container h-1 w-[89%]"></div>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-space-sm flex flex-col justify-between">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">EW Jamming Efficiency</span>
+<div class="flex items-baseline justify-between mt-1">
+<span class="font-telemetry-critical text-telemetry-critical text-secondary-container">84.6%</span>
+<span class="font-label-sm text-label-sm text-secondary-container font-label-sm">STABLE</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1 mt-1">
+<div class="bg-secondary-container h-1 w-[84%]"></div>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-space-sm flex flex-col justify-between col-span-2 md:col-span-1">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Avg Stress Recovery</span>
+<div class="flex items-baseline justify-between mt-1">
+<span class="font-telemetry-critical text-telemetry-critical text-tertiary-fixed-dim">10.8s</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">TARGET &lt;10.0s</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1 mt-1">
+<div class="bg-tertiary-fixed-dim h-1 w-[72%]"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- 3-COLUMN HERO COMPARISON GRID -->
+<section class="p-space-md grid grid-cols-1 lg:grid-cols-3 gap-space-md">
+<!-- FLIGHT-A: PHANTOMS -->
+<div class="bg-surface-container-low p-space-md relative flex flex-col justify-between shadow-md border border-transparent hover:border-primary-container/40 transition-colors">
+<!-- Corner Bracket Accents -->
+<div class="absolute top-0 left-0 w-2 h-2 bg-primary-container"></div>
+<div class="absolute top-0 right-0 w-2 h-2 bg-primary-container"></div>
+<div>
+<!-- Card Header -->
+<div class="flex items-start justify-between pb-space-sm bg-surface-container-lowest -mx-space-md -mt-space-md p-space-sm px-space-md">
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 bg-primary-container"></span>
+<span class="font-label-sm text-label-sm text-primary-container font-bold tracking-wider">UNIT: FLIGHT-A</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">["PHANTOMS"]</span>
+</div>
+<span class="font-headline-sm text-headline-sm text-primary mt-0.5">Kinetic Air Superiority</span>
+</div>
+<span class="px-space-sm py-0.5 bg-surface-container-high text-primary-container font-label-sm text-label-sm font-bold uppercase">
+            CR-1 FULL
+          </span>
+</div>
+<!-- Commander & Sub-details -->
+<div class="mt-space-sm grid grid-cols-2 gap-space-sm bg-surface-container-lowest p-space-sm">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Flight Lead</span>
+<span class="font-label-md text-label-md text-on-surface">Capt. R. Sterling</span>
+<span class="font-label-sm text-label-sm text-primary-container">[TRN-7104] CR-1</span>
+</div>
+<!-- Interactive Pilot Allocation -->
+<button class="flex flex-col text-left group p-1 -m-1 hover:bg-surface-container transition-colors border border-dashed border-outline-variant hover:border-primary-container" onclick="selectFlightFilter('flight-a')" title="Click to inspect Flight-A Pilots" type="button">
+<div class="flex items-center justify-between w-full">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase group-hover:text-primary-container">Pilot Allocation</span>
+<span class="material-symbols-outlined text-[13px] text-primary-container">open_in_new</span>
+</div>
+<span class="font-label-md text-label-md text-primary font-bold">9 Active Pilots</span>
+<span class="font-label-sm text-label-sm text-primary-container">8 CR-1 Full / 1 CR-2</span>
+</button>
+</div>
+<!-- Readiness Score Radial / KPI Banner -->
+<div class="mt-space-sm flex items-center justify-between bg-surface-container p-space-sm">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Readiness Score</span>
+<span class="font-telemetry-critical text-telemetry-critical text-primary-container">93.4%</span>
+<span class="font-label-sm text-label-sm text-primary uppercase">Combat Mission Ready</span>
+</div>
+<!-- Inline Mini Visual Meter -->
+<div class="w-16 h-16 flex items-center justify-center relative">
+<svg class="w-14 h-14 -rotate-90" viewbox="0 0 36 36">
+<path class="text-surface-container-highest" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3"></path>
+<path class="text-primary-container" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="93, 100" stroke-linecap="square" stroke-width="3"></path>
+</svg>
+<span class="absolute font-label-sm text-label-sm font-bold text-primary">93%</span>
+</div>
+</div>
+<!-- Telemetry KPIs -->
+<div class="mt-space-sm space-y-space-xs">
+<div class="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm bg-surface-container-lowest px-space-sm py-1">
+<span>SWARM INTERCEPT RATE</span>
+<span class="font-telemetry-data text-telemetry-data text-primary-container">94.2%</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm bg-surface-container-lowest px-space-sm py-1">
+<span>SENSOR-TO-SHOOT LATENCY</span>
+<span class="font-telemetry-data text-telemetry-data text-primary">1.82s</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm bg-surface-container-lowest px-space-sm py-1">
+<span>SCENARIO SUCCESS RATE</span>
+<span class="font-telemetry-data text-telemetry-data text-primary-container">96.0%</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm bg-surface-container-lowest px-space-sm py-1">
+<span>PRIMARY DOCTRINE</span>
+<span class="font-label-sm text-label-sm text-on-surface truncate">Kinetic CIWS / Salvo</span>
+</div>
+</div>
+</div>
+<!-- Action Footer with Interactive Trigger -->
+<div class="mt-space-md pt-space-sm bg-surface-container-lowest -mx-space-md -mb-space-md p-space-sm px-space-md flex items-center justify-between gap-space-xs">
+<span class="font-label-sm text-label-sm text-primary-container flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">verified</span> STANAG CLEARED
+        </span>
+<div class="flex items-center gap-space-xs">
+<button class="px-space-sm py-0.5 bg-primary-container/20 border border-primary-container/60 hover:bg-primary-container hover:text-on-primary text-primary-container font-label-sm text-label-sm uppercase font-bold transition-all flex items-center gap-1" onclick="selectFlightFilter('flight-a')" type="button">
+<span class="material-symbols-outlined text-[12px]">group</span>
+<span>Roster [9]</span>
+</button>
+<button class="px-space-sm py-0.5 bg-surface-container-high hover:bg-surface-bright text-on-surface font-label-sm text-label-sm uppercase" type="button">
+            Audit Logs
+          </button>
+</div>
+</div>
+</div>
+<!-- FLIGHT-B: TALONS (WARNING/DEFICIT) -->
+<div class="bg-surface-container-low p-space-md relative flex flex-col justify-between shadow-md border border-transparent hover:border-error/40 transition-colors">
+<!-- Amber/Crimson Alert Bracket -->
+<div class="absolute top-0 left-0 w-2 h-2 bg-error"></div>
+<div class="absolute top-0 right-0 w-2 h-2 bg-error"></div>
+<div>
+<!-- Card Header -->
+<div class="flex items-start justify-between pb-space-sm bg-surface-container-lowest -mx-space-md -mt-space-md p-space-sm px-space-md">
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 bg-error animate-pulse"></span>
+<span class="font-label-sm text-label-sm text-error font-bold tracking-wider">UNIT: FLIGHT-B</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">["TALONS"]</span>
+</div>
+<span class="font-headline-sm text-headline-sm text-primary mt-0.5">Swarm &amp; Multi-Axis Defense</span>
+</div>
+<span class="px-space-sm py-0.5 bg-error-container text-on-error-container font-label-sm text-label-sm font-bold uppercase">
+            DEFICIT / WATCH
+          </span>
+</div>
+<!-- Commander & Sub-details -->
+<div class="mt-space-sm grid grid-cols-2 gap-space-sm bg-surface-container-lowest p-space-sm">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Flight Lead</span>
+<span class="font-label-md text-label-md text-on-surface">Lt. J. Miller</span>
+<span class="font-label-sm text-label-sm text-tertiary-fixed-dim">[TRN-8842] CR-2 PROV</span>
+</div>
+<!-- Interactive Pilot Allocation -->
+<button class="flex flex-col text-left group p-1 -m-1 hover:bg-surface-container transition-colors border border-dashed border-outline-variant hover:border-error" onclick="selectFlightFilter('flight-b')" title="Click to inspect Flight-B Pilots" type="button">
+<div class="flex items-center justify-between w-full">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase group-hover:text-error">Pilot Allocation</span>
+<span class="material-symbols-outlined text-[13px] text-error">open_in_new</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface font-bold">10 Active Pilots</span>
+<span class="font-label-sm text-label-sm text-error font-bold">5 CR-1 / 3 CR-2 / 2 CR-3</span>
+</button>
+</div>
+<!-- Readiness Score Radial / KPI Banner -->
+<div class="mt-space-sm flex items-center justify-between bg-surface-container p-space-sm">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Readiness Score</span>
+<span class="font-telemetry-critical text-telemetry-critical text-tertiary-fixed-dim">76.8%</span>
+<span class="font-label-sm text-label-sm text-error uppercase">Restricted Escort Only</span>
+</div>
+<div class="w-16 h-16 flex items-center justify-center relative">
+<svg class="w-14 h-14 -rotate-90" viewbox="0 0 36 36">
+<path class="text-surface-container-highest" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3"></path>
+<path class="text-tertiary-fixed-dim" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="77, 100" stroke-linecap="square" stroke-width="3"></path>
+</svg>
+<span class="absolute font-label-sm text-label-sm font-bold text-tertiary-fixed-dim">77%</span>
+</div>
+</div>
+<!-- Telemetry KPIs -->
+<div class="mt-space-sm space-y-space-xs">
+<div class="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm bg-surface-container-lowest px-space-sm py-1">
+<span>SWARM INTERCEPT RATE</span>
+<span class="font-telemetry-data text-telemetry-data text-tertiary-fixed-dim">84.5%</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm bg-surface-container-lowest px-space-sm py-1">
+<span>SENSOR-TO-SHOOT LATENCY</span>
+<span class="font-telemetry-data text-telemetry-data text-error">2.34s (+0.52s)</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm bg-surface-container-lowest px-space-sm py-1">
+<span>SCENARIO SUCCESS RATE</span>
+<span class="font-telemetry-data text-telemetry-data text-tertiary-fixed-dim">78.0%</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm bg-surface-container-lowest px-space-sm py-1">
+<span>VULNERABILITY DETECTED</span>
+<span class="font-label-sm text-label-sm text-error font-bold">IFF Spoof Fail (4 Pilots)</span>
+</div>
+</div>
+</div>
+<!-- Action Footer with Interactive Trigger -->
+<div class="mt-space-md pt-space-sm bg-surface-container-lowest -mx-space-md -mb-space-md p-space-sm px-space-md flex items-center justify-between gap-space-xs">
+<span class="font-label-sm text-label-sm text-error flex items-center gap-1 font-bold">
+<span class="material-symbols-outlined text-[14px]">warning</span> REMEDIATION REQ
+        </span>
+<div class="flex items-center gap-space-xs">
+<button class="px-space-sm py-0.5 bg-error-container text-on-error-container border border-error/60 hover:bg-error hover:text-surface font-label-sm text-label-sm uppercase font-bold transition-all flex items-center gap-1" onclick="selectFlightFilter('flight-b')" type="button">
+<span class="material-symbols-outlined text-[12px]">group</span>
+<span>Roster [10]</span>
+</button>
+<button class="px-space-sm py-0.5 bg-surface-container-high hover:bg-surface-bright text-on-surface font-label-sm text-label-sm uppercase" type="button">
+            Recert Track
+          </button>
+</div>
+</div>
+</div>
+<!-- FLIGHT-C: REAPERS (EW/OPERATIONAL) -->
+<div class="bg-surface-container-low p-space-md relative flex flex-col justify-between shadow-md border border-transparent hover:border-secondary-container/40 transition-colors">
+<!-- Cyan Corner Bracket -->
+<div class="absolute top-0 left-0 w-2 h-2 bg-secondary-container"></div>
+<div class="absolute top-0 right-0 w-2 h-2 bg-secondary-container"></div>
+<div>
+<!-- Card Header -->
+<div class="flex items-start justify-between pb-space-sm bg-surface-container-lowest -mx-space-md -mt-space-md p-space-sm px-space-md">
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 bg-secondary-container"></span>
+<span class="font-label-sm text-label-sm text-secondary-container font-bold tracking-wider">UNIT: FLIGHT-C</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">["REAPERS"]</span>
+</div>
+<span class="font-headline-sm text-headline-sm text-primary mt-0.5">EW &amp; Long-Range Ingress</span>
+</div>
+<span class="px-space-sm py-0.5 bg-surface-container-high text-secondary-container font-label-sm text-label-sm font-bold uppercase">
+            EW CERTIFIED
+          </span>
+</div>
+<!-- Commander & Sub-details -->
+<div class="mt-space-sm grid grid-cols-2 gap-space-sm bg-surface-container-lowest p-space-sm">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Flight Lead</span>
+<span class="font-label-md text-label-md text-on-surface">WO1 K. Tarasov</span>
+<span class="font-label-sm text-label-sm text-secondary-container">[TRN-8339] CR-1</span>
+</div>
+<!-- Interactive Pilot Allocation -->
+<button class="flex flex-col text-left group p-1 -m-1 hover:bg-surface-container transition-colors border border-dashed border-outline-variant hover:border-secondary-container" onclick="selectFlightFilter('flight-c')" title="Click to inspect Flight-C Pilots" type="button">
+<div class="flex items-center justify-between w-full">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase group-hover:text-secondary-container">Pilot Allocation</span>
+<span class="material-symbols-outlined text-[13px] text-secondary-container">open_in_new</span>
+</div>
+<span class="font-label-md text-label-md text-secondary-container font-bold">9 Active Pilots</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">7 CR-1 / 2 CR-2</span>
+</button>
+</div>
+<!-- Readiness Score Radial / KPI Banner -->
+<div class="mt-space-sm flex items-center justify-between bg-surface-container p-space-sm">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Readiness Score</span>
+<span class="font-telemetry-critical text-telemetry-critical text-secondary-container">88.1%</span>
+<span class="font-label-sm text-label-sm text-secondary uppercase">Operational Directed</span>
+</div>
+<div class="w-16 h-16 flex items-center justify-center relative">
+<svg class="w-14 h-14 -rotate-90" viewbox="0 0 36 36">
+<path class="text-surface-container-highest" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3"></path>
+<path class="text-secondary-container" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="88, 100" stroke-linecap="square" stroke-width="3"></path>
+</svg>
+<span class="absolute font-label-sm text-label-sm font-bold text-secondary-container">88%</span>
+</div>
+</div>
+<!-- Telemetry KPIs -->
+<div class="mt-space-sm space-y-space-xs">
+<div class="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm bg-surface-container-lowest px-space-sm py-1">
+<span>EW DISRUPTION EFFICIENCY</span>
+<span class="font-telemetry-data text-telemetry-data text-secondary-container">91.8%</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm bg-surface-container-lowest px-space-sm py-1">
+<span>SENSOR-TO-SHOOT LATENCY</span>
+<span class="font-telemetry-data text-telemetry-data text-primary">2.10s</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm bg-surface-container-lowest px-space-sm py-1">
+<span>SCENARIO SUCCESS RATE</span>
+<span class="font-telemetry-data text-telemetry-data text-secondary-container">89.0%</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm bg-surface-container-lowest px-space-sm py-1">
+<span>PRIMARY DOCTRINE</span>
+<span class="font-label-sm text-label-sm text-on-surface truncate">Directed RF Strobe / Jammer</span>
+</div>
+</div>
+</div>
+<!-- Action Footer with Interactive Trigger -->
+<div class="mt-space-md pt-space-sm bg-surface-container-lowest -mx-space-md -mb-space-md p-space-sm px-space-md flex items-center justify-between gap-space-xs">
+<span class="font-label-sm text-label-sm text-secondary-container flex items-center gap-1 font-bold">
+<span class="material-symbols-outlined text-[14px]">shield</span> EW VALIDATED
+        </span>
+<div class="flex items-center gap-space-xs">
+<button class="px-space-sm py-0.5 bg-secondary-container/20 border border-secondary-container/60 hover:bg-secondary-container hover:text-on-secondary text-secondary-container font-label-sm text-label-sm uppercase font-bold transition-all flex items-center gap-1" onclick="selectFlightFilter('flight-c')" type="button">
+<span class="material-symbols-outlined text-[12px]">group</span>
+<span>Roster [9]</span>
+</button>
+<button class="px-space-sm py-0.5 bg-surface-container-high hover:bg-surface-bright text-on-surface font-label-sm text-label-sm uppercase" type="button">
+          EW Matrix
+        </button>
+</div>
+</div>
+</div>
+</section>
+<!-- INTERACTIVE FLIGHT PILOT INSPECTION & QUALIFICATION ROSTER -->
+<section class="px-space-md pb-space-md" id="roster-section">
+<div class="bg-surface-container-low p-space-md shadow-md border-t-2 border-primary-container">
+<!-- Header & Global Roster Controls -->
+<div class="flex flex-col lg:flex-row lg:items-center justify-between pb-space-xs bg-surface-container-lowest -mx-space-md -mt-space-md p-space-sm px-space-md gap-space-sm">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary-container text-[20px]">badge</span>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-primary uppercase font-bold tracking-wider">Flight Pilot Inspection &amp; Qualification Roster</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-mono">PERSONNEL READINESS AUDIT // STANAG 4586 LEVEL-4 OPERATOR CERT</span>
+</div>
+</div>
+<div class="flex items-center gap-space-sm">
+<span class="font-label-sm text-label-sm text-on-surface-variant font-mono uppercase" id="roster-showing-count">SHOWING 28 / 28 PILOTS</span>
+<button class="px-space-sm py-1 bg-surface-container-high hover:bg-surface-bright text-on-surface font-label-sm text-label-sm uppercase flex items-center gap-1" onclick="resetFilters()" type="button">
+<span class="material-symbols-outlined text-[13px]">refresh</span>
+<span>Reset Filters</span>
+</button>
+</div>
+</div>
+<!-- Flight Pills + Status Filters + Live Summary Telemetry Box -->
+<div class="mt-space-md flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-space-md bg-surface-container-lowest p-space-sm border border-outline-variant">
+<!-- Flight Filter Tabs -->
+<div class="flex flex-wrap items-center gap-space-xs">
+<span class="font-label-sm text-label-sm text-on-surface-variant font-mono uppercase pr-1">FLIGHT:</span>
+<button class="flight-pill px-space-sm py-1 font-label-sm text-label-sm border border-primary-container bg-primary-container text-on-primary font-bold transition-all" data-flight="all" onclick="selectFlightFilter('all')" type="button">
+  ALL SQUADRON (28)
+</button>
+<button class="flight-pill px-space-sm py-1 font-label-sm text-label-sm border border-outline-variant bg-surface-container text-on-surface hover:border-primary-container transition-all" data-flight="flight-a" onclick="selectFlightFilter('flight-a')" type="button">
+  FLIGHT-A 'PHANTOMS' (9)
+</button>
+<button class="flight-pill px-space-sm py-1 font-label-sm text-label-sm border border-outline-variant bg-surface-container text-on-surface hover:border-error transition-all" data-flight="flight-b" onclick="selectFlightFilter('flight-b')" type="button">
+  FLIGHT-B 'TALONS' (10)
+</button>
+<button class="flight-pill px-space-sm py-1 font-label-sm text-label-sm border border-outline-variant bg-surface-container text-on-surface hover:border-secondary-container transition-all" data-flight="flight-c" onclick="selectFlightFilter('flight-c')" type="button">
+  FLIGHT-C 'REAPERS' (9)
+</button>
+</div>
+<!-- Status Filters -->
+<div class="flex flex-wrap items-center gap-space-xs">
+<span class="font-label-sm text-label-sm text-on-surface-variant font-mono uppercase pr-1">RATING:</span>
+<button class="status-pill px-space-sm py-1 font-label-sm text-label-sm border border-primary-container bg-surface-container-high text-primary-container font-bold transition-all" data-status="all" onclick="selectStatusFilter('all')" type="button">
+  ALL STATUS
+</button>
+<button class="status-pill px-space-sm py-1 font-label-sm text-label-sm border border-outline-variant bg-surface-container text-on-surface hover:border-primary-container transition-all" data-status="CR-1" onclick="selectStatusFilter('CR-1')" type="button">
+  CR-1 FULL
+</button>
+<button class="status-pill px-space-sm py-1 font-label-sm text-label-sm border border-outline-variant bg-surface-container text-on-surface hover:border-tertiary-fixed-dim transition-all" data-status="CR-2" onclick="selectStatusFilter('CR-2')" type="button">
+  CR-2 PROV
+</button>
+<button class="status-pill px-space-sm py-1 font-label-sm text-label-sm border border-outline-variant bg-surface-container text-on-surface hover:border-error transition-all" data-status="CR-3" onclick="selectStatusFilter('CR-3')" type="button">
+  CR-3 DEFICIT
+</button>
+</div>
+</div>
+<!-- Active Flight Dynamic Telemetry Strip -->
+<div class="mt-space-sm grid grid-cols-2 md:grid-cols-4 gap-space-xs" id="roster-telemetry-strip">
+<div class="bg-surface-container p-space-sm flex flex-col justify-between border-l-2 border-primary-container">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Echelon Sub-Group</span>
+<span class="font-label-md text-label-md text-primary font-bold mt-1" id="telem-flight-name">ALL SQUADRON (104th)</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant" id="telem-flight-echelon">STANAG Profile: Joint Ops</span>
+</div>
+<div class="bg-surface-container p-space-sm flex flex-col justify-between border-l-2 border-secondary-container">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Avg Reaction Latency</span>
+<div class="flex items-baseline gap-space-xs mt-1">
+<span class="font-telemetry-critical text-telemetry-critical text-secondary-container" id="telem-avg-latency">2.08s</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">NOMINAL</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant" id="telem-latency-delta">Within 2.50s standard</span>
+</div>
+<div class="bg-surface-container p-space-sm flex flex-col justify-between border-l-2 border-primary-container">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">IFF Discrimination Qual</span>
+<div class="flex items-baseline gap-space-xs mt-1">
+<span class="font-telemetry-critical text-telemetry-critical text-primary-container" id="telem-iff-rate">81.4%</span>
+<span class="font-label-sm text-label-sm text-tertiary-fixed-dim" id="telem-iff-status">22/28 CERT</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant" id="telem-iff-benchmark">Benchmark &gt;80%</span>
+</div>
+<div class="bg-surface-container p-space-sm flex flex-col justify-between border-l-2 border-error">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Deficit / Watch Flag</span>
+<div class="flex items-baseline gap-space-xs mt-1">
+<span class="font-telemetry-critical text-telemetry-critical text-error" id="telem-deficit-count">2 CR-3 / 6 CR-2</span>
+<span class="font-label-sm text-label-sm text-error font-bold" id="telem-recert-badge">RECERT REQ</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant" id="telem-deficit-desc">IFF Spoof Remediation Track</span>
+</div>
+</div>
+<!-- Pilots Grid Cards -->
+<div class="mt-space-md grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-space-sm" id="pilot-cards-container">
+<!-- PILOT 1 (Flight A Lead) -->
+<div class="pilot-card bg-surface-container-lowest p-space-sm border border-outline-variant hover:border-primary-container transition-all flex flex-col justify-between" data-flight="flight-a" data-name="Sterling" data-status="CR-1">
+<div>
+<div class="flex items-start justify-between">
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 bg-primary-container"></span>
+<span class="font-label-sm text-label-sm text-primary-container font-mono font-bold">FLIGHT-A // LEAD</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-mono">[TRN-7104]</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-background mt-0.5">Capt. R. Sterling</h3>
+<span class="font-label-sm text-label-sm text-secondary font-mono">CALLSIGN: "AEGIS-01"</span>
+</div>
+<span class="px-space-xs py-0.5 bg-surface-container-high border border-primary-container/40 text-primary-container font-label-sm text-label-sm font-bold font-mono">CR-1 FULL</span>
+</div>
+<div class="mt-space-xs py-space-xs px-space-sm bg-surface-container flex items-center justify-between text-label-sm font-label-sm">
+<span class="text-on-surface-variant">SPEC:</span>
+<span class="text-primary font-bold">Kinetic Swarm CIWS / Salvo Lead</span>
+</div>
+<div class="mt-space-xs grid grid-cols-4 gap-space-xs text-center font-mono">
+<div class="bg-surface-container p-1"><span class="block text-[10px] text-on-surface-variant">SORTIES</span><span class="text-label-md text-primary font-bold">24</span></div>
+<div class="bg-surface-container p-1"><span class="block text-[10px] text-on-surface-variant">INTERCEPT</span><span class="text-label-md text-primary-container font-bold">98.2%</span></div>
+<div class="bg-surface-container p-1"><span class="block text-[10px] text-on-surface-variant">IFF DISCR</span><span class="text-label-md text-primary-container font-bold">96%</span></div>
+<div class="bg-surface-container p-1"><span class="block text-[10px] text-on-surface-variant">LATENCY</span><span class="text-label-md text-primary font-bold">1.54s</span></div>
+</div>
+</div>
+<div class="mt-space-sm pt-space-xs border-t border-outline-variant flex items-center justify-between gap-space-xs">
+<span class="font-label-sm text-label-sm text-primary-container flex items-center gap-1 font-mono">
+<span class="material-symbols-outlined text-[12px]">verified</span> COMBAT MISSION READY
+</span>
+<div class="flex items-center gap-1">
+<button class="px-space-xs py-0.5 bg-surface-container-high hover:bg-surface-bright text-on-surface font-label-sm text-label-sm uppercase font-mono" onclick="alert('Viewing Dossier: Capt. R. Sterling (AEGIS-01) - Cleared Tier-1 Operations.')" type="button">Dossier</button>
+<button class="px-space-xs py-0.5 bg-surface-container-high hover:bg-primary-container hover:text-on-primary text-secondary font-label-sm text-label-sm uppercase font-mono" onclick="alert('Re-Test not required. Pilot holds current CR-1 rating.')" type="button">Audit</button>
+</div>
+</div>
+</div>
+<!-- PILOT 2 (Flight A) -->
+<div class="pilot-card bg-surface-container-lowest p-space-sm border border-outline-variant hover:border-primary-container transition-all flex flex-col justify-between" data-flight="flight-a" data-name="Chen" data-status="CR-1">
+<div>
+<div class="flex items-start justify-between">
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 bg-primary-container"></span>
+<span class="font-label-sm text-label-sm text-primary-container font-mono font-bold">FLIGHT-A // WINGMAN</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-mono">[TRN-7112]</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-background mt-0.5">2nd Lt. M. Chen</h3>
+<span class="font-label-sm text-label-sm text-secondary font-mono">CALLSIGN: "VIPER-4"</span>
+</div>
+<span class="px-space-xs py-0.5 bg-surface-container-high border border-primary-container/40 text-primary-container font-label-sm text-label-sm font-bold font-mono">CR-1 FULL</span>
+</div>
+<div class="mt-space-xs py-space-xs px-space-sm bg-surface-container flex items-center justify-between text-label-sm font-label-sm">
+<span class="text-on-surface-variant">SPEC:</span>
+<span class="text-primary font-bold">Sensor-to-Shoot High Latency Ingress</span>
+</div>
+<div class="mt-space-xs grid grid-cols-4 gap-space-xs text-center font-mono">
+<div class="bg-surface-container p-1"><span class="block text-[10px] text-on-surface-variant">SORTIES</span><span class="text-label-md text-primary font-bold">21</span></div>
+<div class="bg-surface-container p-1"><span class="block text-[10px] text-on-surface-variant">INTERCEPT</span><span class="text-label-md text-primary-container font-bold">94.6%</span></div>
+<div class="bg-surface-container p-1"><span class="block text-[10px] text-on-surface-variant">IFF DISCR</span><span class="text-label-md text-primary-container font-bold">92%</span></div>
+<div class="bg-surface-container p-1"><span class="block text-[10px] text-on-surface-variant">LATENCY</span><span class="text-label-md text-primary font-bold">1.76s</span></div>
+</div>
+</div>
+<div class="mt-space-sm pt-space-xs border-t border-outline-variant flex items-center justify-between gap-space-xs">
+<span class="font-label-sm text-label-sm text-primary-container flex items-center gap-1 font-mono">
+<span class="material-symbols-outlined text-[12px]">verified</span> COMBAT MISSION READY
+</span>
+<div class="flex items-center gap-1">
+<button class="px-space-xs py-0.5 bg-surface-container-high hover:bg-surface-bright text-on-surface font-label-sm text-label-sm uppercase font-mono" onclick="alert('Viewing Dossier: 2nd Lt. M. Chen (VIPER-4)')" type="button">Dossier</button>
+<button class="px-space-xs py-0.5 bg-surface-container-high hover:bg-primary-container hover:text-on-primary text-secondary font-label-sm text-label-sm uppercase font-mono" onclick="alert('Pilot Chen attached to Phantoms Wing-1.')" type="button">Profile</button>
+</div>
+</div>
+</div>
+<!-- PILOT 3 (Flight A Prov) -->
+<div class="pilot-card bg-surface-container-lowest p-space-sm border border-outline-variant hover:border-tertiary-fixed-dim transition-all flex flex-col justify-between" data-flight="flight-a" data-name="Patel" data-status="CR-2">
+<div>
+<div class="flex items-start justify-between">
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 bg-tertiary-fixed-dim"></span>
+<span class="font-label-sm text-label-sm text-tertiary-fixed-dim font-mono font-bold">FLIGHT-A // ROTATION</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-mono">[TRN-7189]</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-background mt-0.5">Ens. D. Patel</h3>
+<span class="font-label-sm text-label-sm text-secondary font-mono">CALLSIGN: "HALO-09"</span>
+</div>
+<span class="px-space-xs py-0.5 bg-surface-container-high border border-tertiary-fixed-dim/50 text-tertiary-fixed-dim font-label-sm text-label-sm font-bold font-mono">CR-2 PROV</span>
+</div>
+<div class="mt-space-xs py-space-xs px-space-sm bg-surface-container flex items-center justify-between text-label-sm font-label-sm">
+<span class="text-on-surface-variant">SPEC:</span>
+<span class="text-on-surface font-bold">Kinetic Point Defense Escort</span>
+</div>
+<div class="mt-space-xs grid grid-cols-4 gap-space-xs text-center font-mono">
+<div class="bg-surface-container p-1"><span class="block text-[10px] text-on-surface-variant">SORTIES</span><span class="text-label-md text-primary font-bold">14</span></div>
+<div class="bg-surface-container p-1"><span class="block text-[10px] text-on-surface-variant">INTERCEPT</span><span class="text-label-md text-primary-container font-bold">89.0%</span></div>
+<div class="bg-surface-container p-1"><span class="block text-[10px] text-on-surface-variant">IFF DISCR</span><span class="text-label-md text-tertiary-fixed-dim font-bold">84%</span></div>
+<div class="bg-surface-container p-1"><span class="block text-[10px] text-on-surface-variant">LATENCY</span><span class="text-label-md text-tertiary-fixed-dim font-bold">2.12s</span></div>
+</div>
+</div>
+<div class="mt-space-sm pt-space-xs border-t border-outline-variant flex items-center justify-between gap-space-xs">
+<span class="font-label-sm text-label-sm text-tertiary-fixed-dim flex items-center gap-1 font-mono">
+<span class="material-symbols-outlined text-[12px]">schedule</span> PROVISIONAL STATUS
+</span>
+<div class="flex items-center gap-1">
+<button class="px-space-xs py-0.5 bg-surface-container-high hover:bg-surface-bright text-on-surface font-label-sm text-label-sm uppercase font-mono" onclick="alert('Viewing Dossier: Ens. D. Patel (HALO-09)')" type="button">Dossier</button>
+<button class="px-space-xs py-0.5 bg-surface-container-high hover:bg-tertiary-container hover:text-on-tertiary-container text-tertiary-fixed-dim font-label-sm text-label-sm uppercase font-mono" onclick="alert('Scheduling Solo Escort Evaluation for Ens. Patel')" type="button">Sched Re-Test</button>
+</div>
+</div>
+</div>
+<!-- PILOT 4 (Flight B Lead) -->
+<div class="pilot-card bg-surface-container-lowest p-space-sm border border-outline-variant hover:border-error transition-all flex flex-col justify-between" data-flight="flight-b" data-name="Miller" data-status="CR-2">
+<div>
+<div class="flex items-start justify-between">
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 bg-error"></span>
+<span class="font-label-sm text-label-sm text-error font-mono font-bold">FLIGHT-B // LEAD</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-mono">[TRN-8842]</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-background mt-0.5">Lt. J. Miller</h3>
+<span class="font-label-sm text-label-sm text-secondary font-mono">CALLSIGN: "TALON-LEAD"</span>
+</div>
+<span class="px-space-xs py-0.5 bg-error-container text-on-error-container font-label-sm text-label-sm font-bold font-mono">CR-2 PROV</span>
+</div>
+<div class="mt-space-xs py-space-xs px-space-sm bg-surface-container flex items-center justify-between text-label-sm font-label-sm">
+<span class="text-on-surface-variant">SPEC:</span>
+<span class="text-on-surface font-bold">Multi-Axis Low-Alt Intercept</span>
+</div>
+<div class="mt-space-xs grid grid-cols-4 gap-space-xs text-center font-mono">
+<div class="bg-surface-container p-1"><span class="block text-[10px] text-on-surface-variant">SORTIES</span><span class="text-label-md text-primary font-bold">19</span></div>
+<div class="bg-surface-container p-1"><span class="block text-[10px] text-on-surface-variant">INTERCEPT</span><span class="text-label-md text-tertiary-fixed-dim font-bold">85.4%</span></div>
+<div class="bg-surface-container p-1"><span class="block text-[10px] text-on-surface-variant">IFF DISCR</span><span class="text-label-md text-error font-bold">68%</span></div>
+<div class="bg-surface-container p-1"><span class="block text-[10px] text-on-surface-variant">LATENCY</span><span class="text-label-md text-error font-bold">2.28s</span></div>
+</div>
+</div>
+<div class="mt-space-sm pt-space-xs border-t border-outline-variant flex items-center justify-between gap-space-xs">
+<span class="font-label-sm text-label-sm text-error flex items-center gap-1 font-mono">
+<span class="material-symbols-outlined text-[12px]">warning</span> REMEDIATION FLAG
+</span>
+<div class="flex items-center gap-1">
+<button class="px-space-xs py-0.5 bg-surface-container-high hover:bg-surface-bright text-on-surface font-label-sm text-label-sm uppercase font-mono" onclick="alert('Viewing Dossier: Lt. J. Miller (TALON-LEAD)')" type="button">Dossier</button>
+<button class="px-space-xs py-0.5 bg-error-container hover:bg-error hover:text-surface text-on-error-container font-label-sm text-label-sm uppercase font-mono font-bold" onclick="alert('Scheduled intensive Mode-4 Anti-Spoof Re-Test with Evaluator Vance.')" type="button">Sched Re-Test</button>
+</div>
+</div>
+</div>
+<!-- PILOT 5 (Flight B Deficit) -->
+<div class="pilot-card bg-surface-container-lowest p-space-sm border border-outline-variant hover:border-error transition-all flex flex-col justify-between" data-flight="flight-b" data-name="Briggs" data-status="CR-3">
+<div>
+<div class="flex items-start justify-between">
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 bg-error animate-pulse"></span>
+<span class="font-label-sm text-label-sm text-error font-mono font-bold">FLIGHT-B // CRITICAL DEFICIT</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-mono">[TRN-8861]</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-error mt-0.5">Capt. T. Briggs</h3>
+<span class="font-label-sm text-label-sm text-secondary font-mono">CALLSIGN: "RAZOR-07"</span>
+</div>
+<span class="px-space-xs py-0.5 bg-error-container text-on-error-container font-label-sm text-label-sm font-bold font-mono">CR-3 DEFICIT</span>
+</div>
+<div class="mt-space-xs py-space-xs px-space-sm bg-surface-container flex items-center justify-between text-label-sm font-label-sm">
+<span class="text-on-surface-variant">SPEC:</span>
+<span class="text-error font-bold">Swarm Suppression [HOLD REQ]</span>
+</div>
+<div class="mt-space-xs grid grid-cols-4 gap-space-xs text-center font-mono">
+<div class="bg-surface-container p-1"><span class="block text-[10px] text-on-surface-variant">SORTIES</span><span class="text-label-md text-primary font-bold">12</span></div>
+<div class="bg-surface-container p-1"><span class="block text-[10px] text-on-surface-variant">INTERCEPT</span><span class="text-label-md text-error font-bold">71.0%</span></div>
+<div class="bg-surface-container p-1"><span class="block text-[10px] text-on-surface-variant">IFF DISCR</span><span class="text-label-md text-error font-bold">54%</span></div>
+<div class="bg-surface-container p-1"><span class="block text-[10px] text-on-surface-variant">LATENCY</span><span class="text-label-md text-error font-bold">2.65s</span></div>
+</div>
+</div>
+<div class="mt-space-sm pt-space-xs border-t border-outline-variant flex items-center justify-between gap-space-xs">
+<span class="font-label-sm text-label-sm text-error flex items-center gap-1 font-mono font-bold">
+<span class="material-symbols-outlined text-[12px]">block</span> FLIGHT LOCKOUT ACTIVE
+</span>
+<div class="flex items-center gap-1">
+<button class="px-space-xs py-0.5 bg-surface-container-high hover:bg-surface-bright text-on-surface font-label-sm text-label-sm uppercase font-mono" onclick="alert('Viewing Dossier: Capt. T. Briggs. Lockout enforced per STANAG Directive 03.')" type="button">Dossier</button>
+<button class="px-space-xs py-0.5 bg-error text-surface font-label-sm text-label-sm uppercase font-mono font-bold" onclick="alert('Enqueuing pilot Briggs into Anti-Spoof Sim Deck B.')" type="button">Recert Now</button>
+</div>
+</div>
+</div>
+<!-- PILOT 6 (Flight B Deficit 2) -->
+<div class="pilot-card bg-surface-container-lowest p-space-sm border border-outline-variant hover:border-error transition-all flex flex-col justify-between" data-flight="flight-b" data-name="Kowalski" data-status="CR-3">
+<div>
+<div class="flex items-start justify-between">
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 bg-error animate-pulse"></span>
+<span class="font-label-sm text-label-sm text-error font-mono font-bold">FLIGHT-B // CRITICAL DEFICIT</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-mono">[TRN-8874]</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-error mt-0.5">Lt. S. Kowalski</h3>
+<span class="font-label-sm text-label-sm text-secondary font-mono">CALLSIGN: "TALON-05"</span>
+</div>
+<span class="px-space-xs py-0.5 bg-error-container text-on-error-container font-label-sm text-label-sm font-bold font-mono">CR-3 DEFICIT</span>
+</div>
+<div class="mt-space-xs py-space-xs px-space-sm bg-surface-container flex items-center justify-between text-label-sm font-label-sm">
+<span class="text-on-surface-variant">SPEC:</span>
+<span class="text-error font-bold">Close-Proximity Drone Engagement</span>
+</div>
+<div class="mt-space-xs grid grid-cols-4 gap-space-xs text-center font-mono">
+<div class="bg-surface-container p-1"><span class="block text-[10px] text-on-surface-variant">SORTIES</span><span class="text-label-md text-primary font-bold">11</span></div>
+<div class="bg-surface-container p-1"><span class="block text-[10px] text-on-surface-variant">INTERCEPT</span><span class="text-label-md text-error font-bold">69.5%</span></div>
+<div class="bg-surface-container p-1"><span class="block text-[10px] text-on-surface-variant">IFF DISCR</span><span class="text-label-md text-error font-bold">58%</span></div>
+<div class="bg-surface-container p-1"><span class="block text-[10px] text-on-surface-variant">LATENCY</span><span class="text-label-md text-error font-bold">2.70s</span></div>
+</div>
+</div>
+<div class="mt-space-sm pt-space-xs border-t border-outline-variant flex items-center justify-between gap-space-xs">
+<span class="font-label-sm text-label-sm text-error flex items-center gap-1 font-mono font-bold">
+<span class="material-symbols-outlined text-[12px]">block</span> FLIGHT LOCKOUT ACTIVE
+</span>
+<div class="flex items-center gap-1">
+<button class="px-space-xs py-0.5 bg-surface-container-high hover:bg-surface-bright text-on-surface font-label-sm text-label-sm uppercase font-mono" onclick="alert('Viewing Dossier: Lt. S. Kowalski.')" type="button">Dossier</button>
+<button class="px-space-xs py-0.5 bg-error text-surface font-label-sm text-label-sm uppercase font-mono font-bold" onclick="alert('Enqueuing pilot Kowalski for Decoy Discrimination drill.')" type="button">Recert Now</button>
+</div>
+</div>
+</div>
+<!-- PILOT 7 (Flight C Lead - EW Master) -->
+<div class="pilot-card bg-surface-container-lowest p-space-sm border border-outline-variant hover:border-secondary-container transition-all flex flex-col justify-between" data-flight="flight-c" data-name="Tarasov" data-status="CR-1">
+<div>
+<div class="flex items-start justify-between">
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 bg-secondary-container"></span>
+<span class="font-label-sm text-label-sm text-secondary-container font-mono font-bold">FLIGHT-C // LEAD &amp; EW DIR</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-mono">[TRN-8339]</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-background mt-0.5">WO1 K. Tarasov</h3>
+<span class="font-label-sm text-label-sm text-secondary font-mono">CALLSIGN: "SPECTRE-LEAD"</span>
+</div>
+<span class="px-space-xs py-0.5 bg-surface-container-high border border-secondary-container/50 text-secondary-container font-label-sm text-label-sm font-bold font-mono">CR-1 FULL</span>
+</div>
+<div class="mt-space-xs py-space-xs px-space-sm bg-surface-container flex items-center justify-between text-label-sm font-label-sm">
+<span class="text-on-surface-variant">SPEC:</span>
+<span class="text-secondary-container font-bold">Directed RF Jammer / Null Beamforming</span>
+</div>
+<div class="mt-space-xs grid grid-cols-4 gap-space-xs text-center font-mono">
+<div class="bg-surface-container p-1"><span class="block text-[10px] text-on-surface-variant">SORTIES</span><span class="text-label-md text-primary font-bold">26</span></div>
+<div class="bg-surface-container p-1"><span class="block text-[10px] text-on-surface-variant">INTERCEPT</span><span class="text-label-md text-secondary-container font-bold">96.8%</span></div>
+<div class="bg-surface-container p-1"><span class="block text-[10px] text-on-surface-variant">IFF DISCR</span><span class="text-label-md text-secondary-container font-bold">98%</span></div>
+<div class="bg-surface-container p-1"><span class="block text-[10px] text-on-surface-variant">LATENCY</span><span class="text-label-md text-secondary font-bold">1.20s</span></div>
+</div>
+</div>
+<div class="mt-space-sm pt-space-xs border-t border-outline-variant flex items-center justify-between gap-space-xs">
+<span class="font-label-sm text-label-sm text-secondary-container flex items-center gap-1 font-mono">
+<span class="material-symbols-outlined text-[12px]">security</span> EW MASTER INSTRUCTOR
+</span>
+<div class="flex items-center gap-1">
+<button class="px-space-xs py-0.5 bg-surface-container-high hover:bg-surface-bright text-on-surface font-label-sm text-label-sm uppercase font-mono" onclick="alert('Viewing Dossier: WO1 K. Tarasov (SPECTRE-LEAD). Top EW Operator.')" type="button">Dossier</button>
+<button class="px-space-xs py-0.5 bg-secondary-container hover:bg-white text-on-secondary font-label-sm text-label-sm uppercase font-mono font-bold" onclick="alert('Directive 01 Executed: Cross-attaching WO1 Tarasov to Flight-B for Anti-Spoof Tutelage.')" type="button">Cross-Attach</button>
+</div>
+</div>
+</div>
+<!-- PILOT 8 (Flight C Wingman) -->
+<div class="pilot-card bg-surface-container-lowest p-space-sm border border-outline-variant hover:border-secondary-container transition-all flex flex-col justify-between" data-flight="flight-c" data-name="Nakamura" data-status="CR-1">
+<div>
+<div class="flex items-start justify-between">
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 bg-secondary-container"></span>
+<span class="font-label-sm text-label-sm text-secondary-container font-mono font-bold">FLIGHT-C // OPERATOR</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-mono">[TRN-8344]</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-background mt-0.5">Capt. H. Nakamura</h3>
+<span class="font-label-sm text-label-sm text-secondary font-mono">CALLSIGN: "SHADOW-03"</span>
+</div>
+<span class="px-space-xs py-0.5 bg-surface-container-high border border-secondary-container/50 text-secondary-container font-label-sm text-label-sm font-bold font-mono">CR-1 FULL</span>
+</div>
+<div class="mt-space-xs py-space-xs px-space-sm bg-surface-container flex items-center justify-between text-label-sm font-label-sm">
+<span class="text-on-surface-variant">SPEC:</span>
+<span class="text-secondary font-bold">Broadband Strobe &amp; RF Countermeasures</span>
+</div>
+<div class="mt-space-xs grid grid-cols-4 gap-space-xs text-center font-mono">
+<div class="bg-surface-container p-1"><span class="block text-[10px] text-on-surface-variant">SORTIES</span><span class="text-label-md text-primary font-bold">18</span></div>
+<div class="bg-surface-container p-1"><span class="block text-[10px] text-on-surface-variant">INTERCEPT</span><span class="text-label-md text-secondary-container font-bold">92.0%</span></div>
+<div class="bg-surface-container p-1"><span class="block text-[10px] text-on-surface-variant">IFF DISCR</span><span class="text-label-md text-secondary-container font-bold">91%</span></div>
+<div class="bg-surface-container p-1"><span class="block text-[10px] text-on-surface-variant">LATENCY</span><span class="text-label-md text-primary font-bold">1.88s</span></div>
+</div>
+</div>
+<div class="mt-space-sm pt-space-xs border-t border-outline-variant flex items-center justify-between gap-space-xs">
+<span class="font-label-sm text-label-sm text-secondary-container flex items-center gap-1 font-mono">
+<span class="material-symbols-outlined text-[12px]">verified</span> EW QUALIFIED
+</span>
+<div class="flex items-center gap-1">
+<button class="px-space-xs py-0.5 bg-surface-container-high hover:bg-surface-bright text-on-surface font-label-sm text-label-sm uppercase font-mono" onclick="alert('Viewing Dossier: Capt. H. Nakamura')" type="button">Dossier</button>
+<button class="px-space-xs py-0.5 bg-surface-container-high hover:bg-surface-bright text-secondary font-label-sm text-label-sm uppercase font-mono" onclick="alert('Operator profile loaded.')" type="button">Profile</button>
+</div>
+</div>
+</div>
+<!-- PILOT 9 (Flight C Prov) -->
+<div class="pilot-card bg-surface-container-lowest p-space-sm border border-outline-variant hover:border-tertiary-fixed-dim transition-all flex flex-col justify-between" data-flight="flight-c" data-name="Larsson" data-status="CR-2">
+<div>
+<div class="flex items-start justify-between">
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 bg-tertiary-fixed-dim"></span>
+<span class="font-label-sm text-label-sm text-tertiary-fixed-dim font-mono font-bold">FLIGHT-C // ROTATION</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-mono">[TRN-8392]</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-background mt-0.5">Lt. E. Larsson</h3>
+<span class="font-label-sm text-label-sm text-secondary font-mono">CALLSIGN: "PULSE-08"</span>
+</div>
+<span class="px-space-xs py-0.5 bg-surface-container-high border border-tertiary-fixed-dim/50 text-tertiary-fixed-dim font-label-sm text-label-sm font-bold font-mono">CR-2 PROV</span>
+</div>
+<div class="mt-space-xs py-space-xs px-space-sm bg-surface-container flex items-center justify-between text-label-sm font-label-sm">
+<span class="text-on-surface-variant">SPEC:</span>
+<span class="text-on-surface font-bold">Telemetry Link &amp; Relay Defense</span>
+</div>
+<div class="mt-space-xs grid grid-cols-4 gap-space-xs text-center font-mono">
+<div class="bg-surface-container p-1"><span class="block text-[10px] text-on-surface-variant">SORTIES</span><span class="text-label-md text-primary font-bold">15</span></div>
+<div class="bg-surface-container p-1"><span class="block text-[10px] text-on-surface-variant">INTERCEPT</span><span class="text-label-md text-tertiary-fixed-dim font-bold">86.2%</span></div>
+<div class="bg-surface-container p-1"><span class="block text-[10px] text-on-surface-variant">IFF DISCR</span><span class="text-label-md text-secondary-container font-bold">88%</span></div>
+<div class="bg-surface-container p-1"><span class="block text-[10px] text-on-surface-variant">LATENCY</span><span class="text-label-md text-tertiary-fixed-dim font-bold">2.25s</span></div>
+</div>
+</div>
+<div class="mt-space-sm pt-space-xs border-t border-outline-variant flex items-center justify-between gap-space-xs">
+<span class="font-label-sm text-label-sm text-tertiary-fixed-dim flex items-center gap-1 font-mono">
+<span class="material-symbols-outlined text-[12px]">schedule</span> PROVISIONAL STATUS
+</span>
+<div class="flex items-center gap-1">
+<button class="px-space-xs py-0.5 bg-surface-container-high hover:bg-surface-bright text-on-surface font-label-sm text-label-sm uppercase font-mono" onclick="alert('Viewing Dossier: Lt. E. Larsson')" type="button">Dossier</button>
+<button class="px-space-xs py-0.5 bg-surface-container-high hover:bg-tertiary-container hover:text-on-tertiary-container text-tertiary-fixed-dim font-label-sm text-label-sm uppercase font-mono" onclick="alert('Scheduling Beamforming recertification test.')" type="button">Sched Re-Test</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Empty State fallback -->
+<div class="hidden mt-space-md p-space-lg bg-surface-container-lowest text-center border border-dashed border-outline-variant" id="roster-empty-state">
+<span class="material-symbols-outlined text-[32px] text-on-surface-variant">person_search</span>
+<p class="font-label-md text-label-md text-on-surface mt-1 uppercase">No Pilots match current flight / status filter combination</p>
+<button class="mt-space-sm px-space-sm py-1 bg-primary-container text-on-primary font-label-sm text-label-sm font-bold uppercase" onclick="resetFilters()" type="button">Clear Filter Constraints</button>
+</div>
+</div>
+</section>
+<!-- 5-PILLAR COMPETENCY RADAR & COMPARATIVE BARS -->
+<section class="px-space-md pb-space-md grid grid-cols-1 lg:grid-cols-12 gap-space-md">
+<!-- Left: Five Pillar Comparison Bars (8 Cols) -->
+<div class="lg:col-span-8 bg-surface-container-low p-space-md shadow-md">
+<div class="flex items-center justify-between pb-space-xs bg-surface-container-lowest -mx-space-md -mt-space-md p-space-sm px-space-md">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary-container text-[18px]">equalizer</span>
+<span class="font-label-md text-label-md text-primary uppercase font-bold">STANAG 4586 Core Competency Pillars (Differential Analysis)</span>
+</div>
+<div class="flex items-center gap-space-md font-label-sm text-label-sm">
+<span class="flex items-center gap-1 cursor-pointer hover:underline" onclick="selectFlightFilter('flight-a')"><span class="w-2.5 h-2.5 bg-primary-container inline-block"></span> Phantoms (A)</span>
+<span class="flex items-center gap-1 cursor-pointer hover:underline" onclick="selectFlightFilter('flight-b')"><span class="w-2.5 h-2.5 bg-error inline-block"></span> Talons (B)</span>
+<span class="flex items-center gap-1 cursor-pointer hover:underline" onclick="selectFlightFilter('flight-c')"><span class="w-2.5 h-2.5 bg-secondary-container inline-block"></span> Reapers (C)</span>
+</div>
+</div>
+<!-- Pillar Breakdown Rows -->
+<div class="mt-space-md space-y-space-md">
+<!-- Pillar 1 -->
+<div class="flex flex-col bg-surface-container-lowest p-space-sm">
+<div class="flex items-center justify-between mb-1">
+<span class="font-label-sm text-label-sm text-primary uppercase font-bold">1. Threat Detection &amp; Ingress Recognition</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-mono">BENCHMARK: 85%</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-xs text-label-sm font-label-sm">
+<!-- Flight A -->
+<div class="flex flex-col">
+<div class="flex justify-between text-on-surface-variant"><span>FLT-A</span><span class="text-primary-container font-bold">96% [EXCEEDS]</span></div>
+<div class="w-full bg-surface-container-highest h-1.5 mt-0.5"><div class="bg-primary-container h-1.5 w-[96%]"></div></div>
+</div>
+<!-- Flight B -->
+<div class="flex flex-col">
+<div class="flex justify-between text-on-surface-variant"><span>FLT-B</span><span class="text-on-surface">88% [PROFICIENT]</span></div>
+<div class="w-full bg-surface-container-highest h-1.5 mt-0.5"><div class="bg-primary h-1.5 w-[88%]"></div></div>
+</div>
+<!-- Flight C -->
+<div class="flex flex-col">
+<div class="flex justify-between text-on-surface-variant"><span>FLT-C</span><span class="text-secondary-container">92% [PROFICIENT]</span></div>
+<div class="w-full bg-surface-container-highest h-1.5 mt-0.5"><div class="bg-secondary-container h-1.5 w-[92%]"></div></div>
+</div>
+</div>
+</div>
+<!-- Pillar 2: IFF Discrimination (CRITICAL DEFICIT IN B) -->
+<div class="flex flex-col bg-surface-container-lowest p-space-sm">
+<div class="flex items-center justify-between mb-1">
+<div class="flex items-center gap-space-xs">
+<span class="font-label-sm text-label-sm text-primary uppercase font-bold">2. IFF Discrimination &amp; Deception Resistance</span>
+<span class="px-1 bg-error-container text-on-error-container font-label-sm text-label-sm font-bold">[CRITICAL SQUADRON GAP]</span>
+</div>
+<span class="font-label-sm text-label-sm text-error font-mono">DELTA: B vs A -27%</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-xs text-label-sm font-label-sm">
+<div class="flex flex-col">
+<div class="flex justify-between text-on-surface-variant"><span>FLT-A</span><span class="text-primary-container font-bold">91% [PROFICIENT]</span></div>
+<div class="w-full bg-surface-container-highest h-1.5 mt-0.5"><div class="bg-primary-container h-1.5 w-[91%]"></div></div>
+</div>
+<div class="flex flex-col">
+<div class="flex justify-between text-error font-bold"><span>FLT-B</span><span>64% [CRITICAL DEFICIT]</span></div>
+<div class="w-full bg-surface-container-highest h-1.5 mt-0.5"><div class="bg-error h-1.5 w-[64%] animate-pulse"></div></div>
+</div>
+<div class="flex flex-col">
+<div class="flex justify-between text-on-surface-variant"><span>FLT-C</span><span class="text-secondary-container">86% [PROFICIENT]</span></div>
+<div class="w-full bg-surface-container-highest h-1.5 mt-0.5"><div class="bg-secondary-container h-1.5 w-[86%]"></div></div>
+</div>
+</div>
+</div>
+<!-- Pillar 3: Swarm CIWS Interception -->
+<div class="flex flex-col bg-surface-container-lowest p-space-sm">
+<div class="flex items-center justify-between mb-1">
+<span class="font-label-sm text-label-sm text-primary uppercase font-bold">3. Swarm Vector &amp; Kinetic CIWS Interception</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-mono">FLT-A LEADS (+9%)</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-xs text-label-sm font-label-sm">
+<div class="flex flex-col">
+<div class="flex justify-between text-on-surface-variant"><span>FLT-A</span><span class="text-primary-container font-bold">95% [EXCEEDS]</span></div>
+<div class="w-full bg-surface-container-highest h-1.5 mt-0.5"><div class="bg-primary-container h-1.5 w-[95%]"></div></div>
+</div>
+<div class="flex flex-col">
+<div class="flex justify-between text-on-surface-variant"><span>FLT-B</span><span class="text-on-surface">86% [PROFICIENT]</span></div>
+<div class="w-full bg-surface-container-highest h-1.5 mt-0.5"><div class="bg-primary h-1.5 w-[86%]"></div></div>
+</div>
+<div class="flex flex-col">
+<div class="flex justify-between text-on-surface-variant"><span>FLT-C</span><span class="text-on-surface-variant">79% [COMPETENT]</span></div>
+<div class="w-full bg-surface-container-highest h-1.5 mt-0.5"><div class="bg-secondary-container h-1.5 w-[79%]"></div></div>
+</div>
+</div>
+</div>
+<!-- Pillar 4: Directed RF & ECM -->
+<div class="flex flex-col bg-surface-container-lowest p-space-sm">
+<div class="flex items-center justify-between mb-1">
+<span class="font-label-sm text-label-sm text-primary uppercase font-bold">4. Directed RF &amp; Electronic Countermeasures</span>
+<span class="font-label-sm text-label-sm text-secondary-container font-mono">FLT-C DOMINANT (+18%)</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-xs text-label-sm font-label-sm">
+<div class="flex flex-col">
+<div class="flex justify-between text-on-surface-variant"><span>FLT-A</span><span class="text-on-surface-variant">78% [COMPETENT]</span></div>
+<div class="w-full bg-surface-container-highest h-1.5 mt-0.5"><div class="bg-primary-container h-1.5 w-[78%]"></div></div>
+</div>
+<div class="flex flex-col">
+<div class="flex justify-between text-on-surface-variant"><span>FLT-B</span><span class="text-on-surface">82% [PROFICIENT]</span></div>
+<div class="w-full bg-surface-container-highest h-1.5 mt-0.5"><div class="bg-primary h-1.5 w-[82%]"></div></div>
+</div>
+<div class="flex flex-col">
+<div class="flex justify-between text-on-surface-variant"><span>FLT-C</span><span class="text-secondary-container font-bold">96% [EXCEEDS]</span></div>
+<div class="w-full bg-surface-container-highest h-1.5 mt-0.5"><div class="bg-secondary-container h-1.5 w-[96%]"></div></div>
+</div>
+</div>
+</div>
+<!-- Pillar 5: Composure & Throttle -->
+<div class="flex flex-col bg-surface-container-lowest p-space-sm">
+<div class="flex items-center justify-between mb-1">
+<span class="font-label-sm text-label-sm text-primary uppercase font-bold">5. High-Stress Multi-Axis Composure &amp; Salvo Throttle</span>
+<span class="font-label-sm text-label-sm text-tertiary-fixed-dim font-mono">FLT-B WATCH STATUS</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-xs text-label-sm font-label-sm">
+<div class="flex flex-col">
+<div class="flex justify-between text-on-surface-variant"><span>FLT-A</span><span class="text-primary-container font-bold">90% [PROFICIENT]</span></div>
+<div class="w-full bg-surface-container-highest h-1.5 mt-0.5"><div class="bg-primary-container h-1.5 w-[90%]"></div></div>
+</div>
+<div class="flex flex-col">
+<div class="flex justify-between text-tertiary-fixed-dim"><span>FLT-B</span><span>72% [WATCH STATUS]</span></div>
+<div class="w-full bg-surface-container-highest h-1.5 mt-0.5"><div class="bg-tertiary-fixed-dim h-1.5 w-[72%]"></div></div>
+</div>
+<div class="flex flex-col">
+<div class="flex justify-between text-on-surface-variant"><span>FLT-C</span><span class="text-secondary-container">84% [PROFICIENT]</span></div>
+<div class="w-full bg-surface-container-highest h-1.5 mt-0.5"><div class="bg-secondary-container h-1.5 w-[84%]"></div></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right: Polygonal Radar Chart Representation & Summary Delta Matrix (4 Cols) -->
+<div class="lg:col-span-4 bg-surface-container-low p-space-md flex flex-col justify-between shadow-md">
+<div>
+<div class="flex items-center justify-between pb-space-xs bg-surface-container-lowest -mx-space-md -mt-space-md p-space-sm px-space-md">
+<span class="font-label-md text-label-md text-primary uppercase font-bold">SQUADRON RADAR GEOMETRY</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">SIM-AXIS</span>
+</div>
+<!-- Inline SVG Radar Visualization -->
+<div class="w-full flex items-center justify-center p-space-md bg-surface-container-lowest mt-space-sm">
+<svg class="w-56 h-56" viewbox="0 0 200 200">
+<!-- Background Web Rings -->
+<polygon class="text-surface-container-highest" fill="none" points="100,20 176,55 147,145 53,145 24,55" stroke="currentColor" stroke-width="1"></polygon>
+<polygon class="text-surface-container-highest" fill="none" points="100,50 148,72 130,128 70,128 52,72" stroke="currentColor" stroke-width="1"></polygon>
+<polygon class="text-surface-container-highest" fill="none" points="100,75 124,86 115,114 85,114 76,86" stroke="currentColor" stroke-width="1"></polygon>
+<!-- Axis lines -->
+<line class="text-surface-container-highest" stroke="currentColor" stroke-width="1" x1="100" x2="100" y1="100" y2="20"></line>
+<line class="text-surface-container-highest" stroke="currentColor" stroke-width="1" x1="100" x2="176" y1="100" y2="55"></line>
+<line class="text-surface-container-highest" stroke="currentColor" stroke-width="1" x1="100" x2="147" y1="100" y2="145"></line>
+<line class="text-surface-container-highest" stroke="currentColor" stroke-width="1" x1="100" x2="53" y1="100" y2="145"></line>
+<line class="text-surface-container-highest" stroke="currentColor" stroke-width="1" x1="100" x2="24" y1="100" y2="55"></line>
+<!-- Labels -->
+<text class="fill-current text-on-surface-variant text-[8px] font-mono" text-anchor="middle" x="100" y="14">1. THREAT DET</text>
+<text class="fill-current text-on-surface-variant text-[8px] font-mono" text-anchor="start" x="180" y="55">2. IFF</text>
+<text class="fill-current text-on-surface-variant text-[8px] font-mono" text-anchor="start" x="150" y="158">3. KINETIC</text>
+<text class="fill-current text-on-surface-variant text-[8px] font-mono" text-anchor="end" x="50" y="158">4. RF/EW</text>
+<text class="fill-current text-on-surface-variant text-[8px] font-mono" text-anchor="end" x="18" y="55">5. STRESS</text>
+<!-- Flight-A Polygon (Green) -->
+<polygon class="text-primary-container" fill="none" points="100,24 169,59 143,141 63,135 32,59" stroke="currentColor" stroke-width="2"></polygon>
+<!-- Flight-C Polygon (Cyan) -->
+<polygon class="text-secondary-container" fill="none" points="100,27 165,61 137,136 55,143 36,62" stroke="currentColor" stroke-dasharray="3,2" stroke-width="1.5"></polygon>
+<!-- Flight-B Polygon (Amber/Crimson) -->
+<polygon class="text-error" fill="none" points="100,30 149,71 140,138 60,137 45,67" stroke="currentColor" stroke-width="1.5"></polygon>
+</svg>
+</div>
+<!-- Delta Highlights Box -->
+<div class="mt-space-sm space-y-space-xs font-label-sm text-label-sm">
+<div class="flex items-center justify-between p-space-xs bg-surface-container-lowest">
+<span class="text-on-surface-variant">MAX POLAR GAP</span>
+<span class="text-error font-bold font-mono">Pillar 2 (IFF): -27%</span>
+</div>
+<div class="flex items-center justify-between p-space-xs bg-surface-container-lowest">
+<span class="text-on-surface-variant">PEAK SYNERGY</span>
+<span class="text-primary-container font-mono">Kinetic + EW Interlock</span>
+</div>
+<div class="flex items-center justify-between p-space-xs bg-surface-container-lowest">
+<span class="text-on-surface-variant">RECOMMENDED TACTIC</span>
+<span class="text-secondary-container font-mono">A-Lead / C-Support</span>
+</div>
+</div>
+</div>
+<div class="mt-space-sm p-space-xs bg-surface-container-highest text-center">
+<span class="font-label-sm text-label-sm text-on-surface uppercase tracking-wider">STANAG 4586 PROFILE CONFIRMED</span>
+</div>
+</div>
+</section>
+<!-- DETAILED BENCHMARK SCENARIO BREAKDOWN TABLE -->
+<section class="px-space-md pb-space-md">
+<div class="bg-surface-container-low p-space-md shadow-md">
+<div class="flex items-center justify-between pb-space-xs bg-surface-container-lowest -mx-space-md -mt-space-md p-space-sm px-space-md">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-secondary-container text-[18px]">table_rows</span>
+<span class="font-label-md text-label-md text-primary uppercase font-bold">Op-Viper Strike: High-Density Swarm Simulation Benchmark Table</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">EXERCISE ID: SIM-EX-2025-051</span>
+</div>
+<!-- Table Container -->
+<div class="overflow-x-auto mt-space-sm">
+<table class="w-full text-left font-label-sm text-label-sm">
+<thead class="bg-surface-container-highest text-on-surface uppercase font-mono">
+<tr>
+<th class="p-space-sm">Phase // Metric Scenario</th>
+<th class="p-space-sm">Flight-A (Phantoms)</th>
+<th class="p-space-sm">Flight-B (Talons)</th>
+<th class="p-space-sm">Flight-C (Reapers)</th>
+<th class="p-space-sm">Squadron Benchmark</th>
+<th class="p-space-sm">Vulnerability Assessment</th>
+</tr>
+</thead>
+<tbody class="divide-y-0">
+<!-- Row 1 -->
+<tr class="bg-surface-container-lowest hover:bg-surface-container transition-colors">
+<td class="p-space-sm">
+<div class="flex flex-col">
+<span class="font-bold text-on-surface">PH-01: Multi-Directional Ingress</span>
+<span class="text-on-surface-variant font-mono">48 Mach 0.8 Low-RCS Drones</span>
+</div>
+</td>
+<td class="p-space-sm font-mono text-primary-container font-bold">
+                100% Intercept (48/48)<br/><span class="text-on-surface-variant font-normal">T-Lock: 1.4s</span>
+</td>
+<td class="p-space-sm font-mono text-on-surface">
+                87.5% Intercept (42/48)<br/><span class="text-on-surface-variant font-normal">T-Lock: 2.6s</span>
+</td>
+<td class="p-space-sm font-mono text-secondary-container">
+                93.8% Intercept (45/48)<br/><span class="text-on-surface-variant font-normal">T-Lock: 1.9s</span>
+</td>
+<td class="p-space-sm font-mono text-on-surface-variant">
+                &gt;85.0% Intercept
+              </td>
+<td class="p-space-sm">
+<span class="px-space-xs py-0.5 bg-surface-container-high text-primary-container font-bold uppercase">NOMINAL // SECURE</span>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="bg-surface-container hover:bg-surface-container-high transition-colors">
+<td class="p-space-sm">
+<div class="flex flex-col">
+<span class="font-bold text-on-surface">PH-02: Mode-4 Spoofing / Decoys</span>
+<span class="text-on-surface-variant font-mono">16 Ghost Chirps + 12 Phantoms</span>
+</div>
+</td>
+<td class="p-space-sm font-mono text-on-surface">
+                92.8% Correct Lock<br/><span class="text-on-surface-variant font-normal">0 Friendly Fire</span>
+</td>
+<td class="p-space-sm font-mono text-error font-bold">
+                60.7% Correct Lock<br/><span class="text-error font-normal animate-pulse">2 Fratricide Hits Sim</span>
+</td>
+<td class="p-space-sm font-mono text-secondary-container">
+                96.4% Correct Lock<br/><span class="text-on-surface-variant font-normal">Triangulated Strobe</span>
+</td>
+<td class="p-space-sm font-mono text-on-surface-variant">
+                &gt;90.0% Correct Lock
+              </td>
+<td class="p-space-sm">
+<span class="px-space-xs py-0.5 bg-error-container text-on-error-container font-bold uppercase">CRITICAL DEFICIT (FLT-B)</span>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="bg-surface-container-lowest hover:bg-surface-container transition-colors">
+<td class="p-space-sm">
+<div class="flex flex-col">
+<span class="font-bold text-on-surface">PH-03: Kinetic Swarm Intercept Salvo</span>
+<span class="text-on-surface-variant font-mono">Simultaneous 64-Target CIWS</span>
+</div>
+</td>
+<td class="p-space-sm font-mono text-primary-container font-bold">
+                96.8% Neutralization<br/><span class="text-on-surface-variant font-normal">Expenditure: 1.2 salvo</span>
+</td>
+<td class="p-space-sm font-mono text-on-surface">
+                82.8% Neutralization<br/><span class="text-on-surface-variant font-normal">Expenditure: 1.8 salvo</span>
+</td>
+<td class="p-space-sm font-mono text-secondary-container">
+                78.1% Neutralization<br/><span class="text-on-surface-variant font-normal">Expenditure: 1.4 salvo</span>
+</td>
+<td class="p-space-sm font-mono text-on-surface-variant">
+                &gt;80.0% Neutralization
+              </td>
+<td class="p-space-sm">
+<span class="px-space-xs py-0.5 bg-surface-container-high text-primary font-bold uppercase">SATISFACTORY (FLT-A PEAK)</span>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="bg-surface-container hover:bg-surface-container-high transition-colors">
+<td class="p-space-sm">
+<div class="flex flex-col">
+<span class="font-bold text-on-surface">PH-04: High-Power EW Strobe &amp; Jamming</span>
+<span class="text-on-surface-variant font-mono">10kW Broadband RF Barrage</span>
+</div>
+</td>
+<td class="p-space-sm font-mono text-on-surface">
+                Recovery: 6.8s<br/><span class="text-on-surface-variant font-normal">Telemetry: Degraded</span>
+</td>
+<td class="p-space-sm font-mono text-tertiary-fixed-dim">
+                Recovery: 9.4s<br/><span class="text-on-surface-variant font-normal">Comms Link Loss 12s</span>
+</td>
+<td class="p-space-sm font-mono text-secondary-container font-bold">
+                Recovery: 1.2s<br/><span class="text-secondary font-normal">Active Null Beamforming</span>
+</td>
+<td class="p-space-sm font-mono text-on-surface-variant">
+                Recovery &lt;5.0s
+              </td>
+<td class="p-space-sm">
+<span class="px-space-xs py-0.5 bg-surface-container-high text-secondary-container font-bold uppercase">FLT-C EXCEEDS STANAG</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<!-- SQUADRON RESOURCE ALLOCATION & ACTION DIRECTIVES -->
+<section class="px-space-md pb-space-lg">
+<div class="bg-surface-container-low p-space-md shadow-md">
+<div class="flex items-center justify-between pb-space-xs bg-surface-container-lowest -mx-space-md -mt-space-md p-space-sm px-space-md">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary-container text-[18px]">verified_user</span>
+<span class="font-label-md text-label-md text-primary uppercase font-bold">Squadron Directives &amp; Pilot Cross-Deployment Recommendations</span>
+</div>
+<span class="px-space-xs py-0.5 bg-primary-container text-on-primary font-label-sm text-label-sm font-bold uppercase">
+          AUTHORIZATION READY
+        </span>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-space-md mt-space-md">
+<!-- Directive 01 -->
+<div class="bg-surface-container-lowest p-space-sm flex flex-col justify-between">
+<div class="flex flex-col">
+<div class="flex items-center justify-between mb-space-xs">
+<span class="font-label-sm text-label-sm text-secondary-container font-bold uppercase font-mono">DIRECTIVE 01 // CROSS-ATTACH</span>
+<span class="w-2 h-2 bg-secondary-container"></span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface">
+              Cross-attach <strong class="text-secondary font-mono">WO1 Tarasov</strong> (Flight-C EW Lead) to Flight-B during exercise <strong class="text-primary font-mono">SIM-EX-2025-052</strong>. Primary objective: conduct intensive Mode-4 Anti-Spoof remediation to eliminate recurring IFF decoy lock-on deficits.
+            </p>
+</div>
+<div class="mt-space-sm pt-space-xs bg-surface-container-highest flex justify-between items-center px-space-xs">
+<span class="font-label-sm text-label-sm text-on-surface-variant font-mono">TARGET: +25% IFF ACCURACY</span>
+<span class="font-label-sm text-label-sm text-secondary-container font-bold">PRIORITY: HIGH</span>
+</div>
+</div>
+<!-- Directive 02 -->
+<div class="bg-surface-container-lowest p-space-sm flex flex-col justify-between">
+<div class="flex flex-col">
+<div class="flex items-center justify-between mb-space-xs">
+<span class="font-label-sm text-label-sm text-primary-container font-bold uppercase font-mono">DIRECTIVE 02 // TIER-1 CLEARANCE</span>
+<span class="w-2 h-2 bg-primary-container"></span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface">
+<strong class="text-primary-container font-mono">Flight-A ("Phantoms")</strong> cleared for Tier-1 Unrestricted Kinetic Swarm deployments across all coastal theater sectors. Flight-A's 93.4% readiness satisfies NATO STANAG 4586 Level-4 full-spectrum autonomy directives.
+            </p>
+</div>
+<div class="mt-space-sm pt-space-xs bg-surface-container-highest flex justify-between items-center px-space-xs">
+<span class="font-label-sm text-label-sm text-on-surface-variant font-mono">STATUS: UNRESTRICTED</span>
+<span class="font-label-sm text-label-sm text-primary-container font-bold">CERTIFIED</span>
+</div>
+</div>
+<!-- Directive 03 -->
+<div class="bg-surface-container-lowest p-space-sm flex flex-col justify-between">
+<div class="flex flex-col">
+<div class="flex items-center justify-between mb-space-xs">
+<span class="font-label-sm text-label-sm text-error font-bold uppercase font-mono">DIRECTIVE 03 // LOCKOUT RESTRICTION</span>
+<span class="w-2 h-2 bg-error"></span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface">
+<strong class="text-error font-mono">Flight-B ("Talons")</strong> locked from Solo Sector Defense missions until the 4 provisional pilots complete required radar-track anti-deception recertification runs under supervision of Squadron Evaluator.
+            </p>
+</div>
+<div class="mt-space-sm pt-space-xs bg-surface-container-highest flex justify-between items-center px-space-xs">
+<span class="font-label-sm text-label-sm text-error font-mono">ACTION: PROVISIONAL HOLD</span>
+<span class="font-label-sm text-label-sm text-error font-bold">MANDATORY</span>
+</div>
+</div>
+</div>
+<!-- Final Operational Action CTAs -->
+<div class="mt-space-md pt-space-sm bg-surface-container-lowest -mx-space-md -mb-space-md p-space-sm px-space-md flex flex-col sm:flex-row items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-sm text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px] text-primary-container">info</span>
+<span>COMMANDER SIGN-OFF: MAJ. VANCE [TAC-01] • EXERCISE EVAL ID: #849-AEGIS</span>
+</div>
+<div class="flex items-center gap-space-xs w-full sm:w-auto">
+<button class="flex-1 sm:flex-none px-space-md py-1.5 bg-surface-container-high hover:bg-surface-bright text-on-surface font-label-sm text-label-sm font-bold uppercase transition-colors" type="button">
+            Print NATO STANAG Report
+          </button>
+<button class="flex-1 sm:flex-none px-space-md py-1.5 bg-surface-container-high hover:bg-surface-bright text-secondary-container font-label-sm text-label-sm font-bold uppercase transition-colors" type="button">
+            Schedule Multi-Flight Sim
+          </button>
+<button class="flex-1 sm:flex-none px-space-md py-1.5 bg-primary-container text-on-primary font-label-sm text-label-sm font-bold uppercase transition-colors shadow-sm" type="button">
+            Apply Re-Allocation
+          </button>
+</div>
+</div>
+</div>
+</section>
+</div></main></div>
+<!-- Interactive Roster Logic Script -->
+<script>
+  let activeFlight = 'all';
+  let activeStatus = 'all';
+
+  const telemetryData = {
+    'all': {
+      name: "ALL SQUADRON (104th)",
+      echelon: "STANAG Profile: Joint Ops",
+      latency: "2.08s",
+      latencyDelta: "Within 2.50s standard",
+      iffRate: "81.4%",
+      iffStatus: "22/28 CERT",
+      iffBenchmark: "Benchmark >80%",
+      deficits: "2 CR-3 / 6 CR-2",
+      recertBadge: "WATCH REQ",
+      deficitDesc: "IFF Spoof Remediation Track"
+    },
+    'flight-a': {
+      name: "FLIGHT-A ('PHANTOMS')",
+      echelon: "Tier-1 Autonomous Air Superiority",
+      latency: "1.82s",
+      latencyDelta: "-0.68s under threshold",
+      iffRate: "91.2%",
+      iffStatus: "8/9 CERT",
+      iffBenchmark: "Exceeds NATO Spec",
+      deficits: "0 CR-3 / 1 CR-2",
+      recertBadge: "NOMINAL",
+      deficitDesc: "1 Provisional Junior Wingman"
+    },
+    'flight-b': {
+      name: "FLIGHT-B ('TALONS')",
+      echelon: "Swarm & Low-Alt Escort Unit",
+      latency: "2.34s",
+      latencyDelta: "+0.52s degradation",
+      iffRate: "64.0%",
+      iffStatus: "5/10 CERT",
+      iffBenchmark: "Deficit Gap vs A: -27%",
+      deficits: "2 CR-3 / 3 CR-2",
+      recertBadge: "CRITICAL REQ",
+      deficitDesc: "IFF Spoof Lockout Enforced"
+    },
+    'flight-c': {
+      name: "FLIGHT-C ('REAPERS')",
+      echelon: "Electronic Attack & RF Ingress",
+      latency: "2.10s",
+      latencyDelta: "Optimal EW profile",
+      iffRate: "88.0%",
+      iffStatus: "7/9 CERT",
+      iffBenchmark: "Direct RF Countermeasure Qual",
+      deficits: "0 CR-3 / 2 CR-2",
+      recertBadge: "EW VALID",
+      deficitDesc: "Ready for Cross-Deployment"
+    }
+  };
+
+  function updateRosterView() {
+    const cards = document.querySelectorAll('.pilot-card');
+    let visibleCount = 0;
+
+    cards.forEach(card => {
+      const cardFlight = card.getAttribute('data-flight');
+      const cardStatus = card.getAttribute('data-status');
+
+      const matchesFlight = (activeFlight === 'all' || cardFlight === activeFlight);
+      const matchesStatus = (activeStatus === 'all' || cardStatus === activeStatus);
+
+      if (matchesFlight && matchesStatus) {
+        card.style.display = 'flex';
+        visibleCount++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    // Update Showing count label
+    const countLabel = document.getElementById('roster-showing-count');
+    if (countLabel) {
+      countLabel.textContent = `SHOWING ${visibleCount} / 28 PILOTS`;
+    }
+
+    // Toggle Empty State
+    const emptyState = document.getElementById('roster-empty-state');
+    if (emptyState) {
+      if (visibleCount === 0) {
+        emptyState.classList.remove('hidden');
+      } else {
+        emptyState.classList.add('hidden');
+      }
+    }
+
+    // Update Telemetry Box
+    const telem = telemetryData[activeFlight] || telemetryData['all'];
+    const elName = document.getElementById('telem-flight-name');
+    const elEchelon = document.getElementById('telem-flight-echelon');
+    const elLatency = document.getElementById('telem-avg-latency');
+    const elLatencyDelta = document.getElementById('telem-latency-delta');
+    const elIff = document.getElementById('telem-iff-rate');
+    const elIffStatus = document.getElementById('telem-iff-status');
+    const elIffBench = document.getElementById('telem-iff-benchmark');
+    const elDeficit = document.getElementById('telem-deficit-count');
+    const elRecert = document.getElementById('telem-recert-badge');
+    const elDeficitDesc = document.getElementById('telem-deficit-desc');
+
+    if (elName) elName.textContent = telem.name;
+    if (elEchelon) elEchelon.textContent = telem.echelon;
+    if (elLatency) elLatency.textContent = telem.latency;
+    if (elLatencyDelta) elLatencyDelta.textContent = telem.latencyDelta;
+    if (elIff) elIff.textContent = telem.iffRate;
+    if (elIffStatus) elIffStatus.textContent = telem.iffStatus;
+    if (elIffBench) elIffBenchmark.textContent = telem.iffBenchmark;
+    if (elDeficit) elDeficit.textContent = telem.deficits;
+    if (elRecert) {
+      elRecert.textContent = telem.recertBadge;
+      if (telem.recertBadge.includes('CRITICAL')) {
+        elRecert.className = 'font-label-sm text-label-sm text-error font-bold animate-pulse';
+      } else if (telem.recertBadge.includes('NOMINAL')) {
+        elRecert.className = 'font-label-sm text-label-sm text-primary-container font-bold';
+      } else {
+        elRecert.className = 'font-label-sm text-label-sm text-secondary-container font-bold';
+      }
+    }
+    if (elDeficitDesc) elDeficitDesc.textContent = telem.deficitDesc;
+  }
+
+  function selectFlightFilter(flightKey) {
+    activeFlight = flightKey;
+
+    // Update flight buttons
+    const pills = document.querySelectorAll('.flight-pill');
+    pills.forEach(pill => {
+      const pFlight = pill.getAttribute('data-flight');
+      if (pFlight === flightKey) {
+        pill.className = 'flight-pill px-space-sm py-1 font-label-sm text-label-sm border border-primary-container bg-primary-container text-on-primary font-bold transition-all';
+      } else {
+        pill.className = 'flight-pill px-space-sm py-1 font-label-sm text-label-sm border border-outline-variant bg-surface-container text-on-surface hover:border-primary-container transition-all';
+      }
+    });
+
+    updateRosterView();
+
+    // Smooth scroll to roster view if triggered from higher cards
+    const rosterSection = document.getElementById('roster-section');
+    if (rosterSection && window.scrollY > 300) {
+      rosterSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  function selectStatusFilter(statusKey) {
+    activeStatus = statusKey;
+
+    const pills = document.querySelectorAll('.status-pill');
+    pills.forEach(pill => {
+      const pStatus = pill.getAttribute('data-status');
+      if (pStatus === statusKey) {
+        pill.className = 'status-pill px-space-sm py-1 font-label-sm text-label-sm border border-primary-container bg-surface-container-high text-primary-container font-bold transition-all';
+      } else {
+        pill.className = 'status-pill px-space-sm py-1 font-label-sm text-label-sm border border-outline-variant bg-surface-container text-on-surface hover:border-primary-container transition-all';
+      }
+    });
+
+    updateRosterView();
+  }
+
+  function resetFilters() {
+    activeFlight = 'all';
+    activeStatus = 'all';
+
+    selectFlightFilter('all');
+    selectStatusFilter('all');
+  }
+
+  // Initialize view
+  document.addEventListener('DOMContentLoaded', () => {
+    updateRosterView();
+  });
+</script>
+</body></html>

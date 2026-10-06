@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+body {
+  background-color: #1E1E1E;
+  color: #00FF41;
+  font-family: 'Roboto Mono', monospace;
+}
