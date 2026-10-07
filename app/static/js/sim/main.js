@@ -11,6 +11,7 @@ import { esc, renderStages, renderPenalties, renderContacts, gradeBlock } from '
 
 const $ = (id) => document.getElementById(id);
 const TICK = 1 / 30;
+const UNSENT_KEY = 'dtt.unsent';
 const DRONES = new Set(['quadcopter', 'hexacopter', 'fixed_wing']);
 const MIN_SEPARATION_M = 22;
 const swarmGroups = new Map(); // reused every frame: group -> live member meshes
@@ -632,18 +633,32 @@ async function finish() {
   S.phase = 'submitting';
   S.sound.rotor(0, false);
   screen('<h2 id="screen-title" class="panel-title">Scoring on the server…</h2><p class="label">Raw events only are sent; the server rebuilds the scenario and scores them.</p>');
-  const body = { callsign: trainee.callsign, unit: trainee.unit, scenario_id: S.scenario.id,
+  S.clientId ??= `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const body = { client_id: S.clientId, callsign: trainee.callsign, unit: trainee.unit, scenario_id: S.scenario.id,
     params: S.scenario.params, events: S.events, ended_t: round3(Math.min(S.t, S.scenario.duration_s)) };
   try {
     const res = await fetch('/api/sessions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || res.statusText);
     S.phase = 'done';
+    try {
+      const saved = JSON.parse(localStorage.getItem(UNSENT_KEY) || '[]').filter((b) => b.client_id !== body.client_id);
+      localStorage.setItem(UNSENT_KEY, JSON.stringify(saved));
+    } catch { /* storage unavailable */ }
     showResults(data);
   } catch (err) {
     S.phase = 'confirm';
+    // Keep the raw events in this browser so the session is not lost; Mission select offers to resend it.
+    let kept = false;
+    try {
+      const saved = JSON.parse(localStorage.getItem(UNSENT_KEY) || '[]').filter((b) => b.client_id !== body.client_id);
+      saved.push(body);
+      localStorage.setItem(UNSENT_KEY, JSON.stringify(saved.slice(-10)));
+      kept = true;
+    } catch { /* storage unavailable */ }
     screen(`<h2 id="screen-title" class="panel-title">Could not save the session</h2>
       <div class="notice error">${esc(err.message)}</div>
+      <p>${kept ? 'The session is kept in this browser. Try again now, or resend it later from Mission select.' : 'Try again before leaving this page.'}</p>
       <div class="screen-actions"><button class="btn primary" id="retry">Try again</button></div>`, '#retry');
     $('retry').addEventListener('click', () => { S.phase = 'running'; finish(); });
   }

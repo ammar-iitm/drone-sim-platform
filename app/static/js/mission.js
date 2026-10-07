@@ -111,6 +111,37 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Enter' && !(e.target instanceof HTMLButtonElement)) { e.preventDefault(); launch(); }
 });
 
+// Sessions that could not be saved (server down mid-session) are kept in this browser until resent.
+function unsent() {
+  try { return JSON.parse(localStorage.getItem('dtt.unsent') || '[]'); } catch { return []; }
+}
+function showUnsent() {
+  const list = unsent();
+  $('unsent').hidden = !list.length;
+  $('unsent-text').textContent = `${list.length} session${list.length === 1 ? '' : 's'} not yet saved on the server`;
+}
+$('unsent-send').addEventListener('click', async () => {
+  const left = [], done = [];
+  for (const body of unsent()) {
+    try {
+      const res = await fetch('/api/sessions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      const data = await res.json();
+      if (res.ok) done.push(`<a href="/dashboard/session/${data.session_id}">session ${data.session_id}</a>`);
+      else if (res.status >= 500) left.push(body);
+      else done.push(`rejected: ${esc(data.error)}`);
+    } catch { left.push(body); }
+  }
+  try { localStorage.setItem('dtt.unsent', JSON.stringify(left)); } catch { /* ignore */ }
+  $('unsent-result').innerHTML = done.length ? `Saved: ${done.join(', ')}` : 'Server still unreachable';
+  showUnsent();
+  if (!left.length) {
+    $('unsent').hidden = false;
+    $('unsent-text').textContent = 'All saved sessions sent.';
+    $('unsent-send').hidden = true;
+  }
+});
+showUnsent();
+
 loadScripted();
 loadUnits();
 preview();

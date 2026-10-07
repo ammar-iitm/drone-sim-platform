@@ -204,3 +204,39 @@ def test_quality_levels_and_auto_step_down(page, server):
     page.wait_for_function("document.getElementById('quality').textContent.includes('LOW')")
 
     assert page.errors == []
+
+
+def test_help_page_shows_live_rubric(page, server):
+    page.goto(f"{server}/help")
+    page.wait_for_selector("#t-responses tbody tr")
+    text = page.inner_text("main").lower()
+    for phrase in ("quick start", "threat markers", "detected fast", "critical misclassification",
+                   "restraint", "grade a", "fixed wing", "intercept chance"):
+        assert phrase in text, phrase
+    assert page.locator("#t-responses tbody tr").count() == 6
+    rubric = page.evaluate("fetch('/api/rubric').then(r => r.json())")
+    assert f"× {rubric['weights']['engagement']}" in page.inner_text("#flow")
+    assert page.errors == [] and page.external == []
+
+
+def test_unsaved_session_is_kept_and_resent(page, server):
+    begin(page, server, "id=s1-dawn-recon&speed=16")
+    page.wait_for_function("window.__sim.t > 15")
+    # Simulate the server being unreachable for the save.
+    page.route("**/api/sessions", lambda r: r.abort() if r.request.method == "POST" else r.continue_())
+    page.keyboard.press("Escape")
+    page.keyboard.press("Enter")
+    page.wait_for_selector("#retry")
+    assert "kept in this browser" in page.inner_text("#screen-card")
+    assert len(page.evaluate("JSON.parse(localStorage.getItem('dtt.unsent'))")) == 1
+    before = len(page.evaluate("fetch('/api/sessions').then(r => r.json())"))
+    page.unroute("**/api/sessions")
+
+    page.goto(f"{server}/mission")
+    page.wait_for_selector("#unsent:not([hidden])")
+    assert "1 session not yet saved" in page.inner_text("#unsent-text")
+    page.click("#unsent-send")
+    page.wait_for_function("document.getElementById('unsent-text').textContent.includes('All saved sessions sent')")
+    assert "session" in page.inner_text("#unsent-result").lower()
+    assert len(page.evaluate("fetch('/api/sessions').then(r => r.json())")) == before + 1
+    assert page.evaluate("JSON.parse(localStorage.getItem('dtt.unsent'))") == []

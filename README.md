@@ -6,24 +6,44 @@ Planning documents: [docs/PRD.md](docs/PRD.md), [docs/AVD.md](docs/AVD.md), [doc
 
 ## Install and run
 
-You need Python 3.10 or newer and a current Chrome, Edge or Firefox.
+You need Python 3.10 or newer and a current Chrome, Edge or Firefox. The first start needs internet once to install Flask; after that everything runs offline. Three.js and Chart.js are bundled in `app/static/vendor/`, and the pages use system fonts.
+
+**One command** (creates `.venv` on the first run, then opens the browser at http://localhost:5050/mission):
+
+```bash
+./start.sh              # macOS or Linux
+./start.sh --demo       # also seed a demo cohort (6 trainees, 2 units, 30 scored sessions) if there is no database yet
+```
+
+```bat
+start.bat               :: Windows (double-click works too)
+start.bat --demo
+```
+
+**By hand:**
 
 ```bash
 python3 -m venv .venv
-.venv/bin/pip install -r requirements.txt
-.venv/bin/python run.py                 # http://localhost:5050/
+.venv/bin/pip install -r requirements.txt        # Windows: .venv\Scripts\pip install -r requirements.txt
+.venv/bin/python run.py                          # Windows: .venv\Scripts\python run.py
 ```
 
-Optional extras:
+Options:
 
 ```bash
-.venv/bin/python scripts/seed_demo.py --reset   # demo cohort: 6 trainees, 2 units, 30 scored sessions
-.venv/bin/python run.py --port 8000 --lan       # expose on the local network (no login; see AVD)
+.venv/bin/python scripts/seed_demo.py --reset    # reset the database to the demo cohort
+.venv/bin/python run.py --port 8000 --lan        # expose on the local network (no login; see AVD)
+NO_BROWSER=1 ./start.sh                          # start without opening a browser
+.venv/bin/python scripts/package.py              # build dist/drone-threat-trainer-<date>.zip for submission or another machine
 ```
 
-No internet is needed once the requirements are installed.
+**Graphics quality.** On a slow laptop, choose **Graphics quality** on Mission select:
+- **Auto** (the default) starts at High and steps down if the frame rate stays under 35 fps for 3 seconds.
+- **Low** renders at 0.75× resolution with no antialiasing and draws only the nearest 35% of scenery.
 
-On a slow laptop, choose **Graphics quality** on Mission select. **Auto** (the default) starts at High and steps down if the frame rate stays under 35 fps for 3 seconds. **Low** renders at 0.75× resolution with no antialiasing and draws only the nearest 35% of scenery. You can also add `&quality=low` to a simulator URL. Three.js and Chart.js are in `app/static/vendor/`, and the pages use system fonts.
+You can also add `&quality=low` to a simulator URL.
+
+**If a save fails.** If the server is unreachable when a session ends, the session is kept in the browser. Mission select then offers to send it once the server is back.
 
 ## Using it
 
@@ -47,7 +67,8 @@ On a slow laptop, choose **Graphics quality** on Mission select. **Auto** (the d
    | `P` / `Esc` | Pause / end the session |
 
 3. **Score screen**: shows the composite score, grade, stage bars and the decision-tree path with a reason for every contact. **Run same seed again** replays the identical scenario.
-4. **AAR dashboard** (`/dashboard`): shows the unit overview, trainee progress (with a table view), unit comparison, confusion matrix and session log. Each session links to the session review timeline.
+4. **Help and scoring** (`/help`): controls, threat markers, sensors and radar, and the full scoring tree drawn live from `rubric.json`.
+5. **AAR dashboard** (`/dashboard`): shows the unit overview, trainee progress (with a table view), unit comparison, confusion matrix and session log. Each session links to the session review timeline.
 
 ## Editing the rubric
 
@@ -74,7 +95,7 @@ The browser never sends a score. It sends raw events (`mark`, `classify`, `respo
 app/
   __init__.py        Flask app factory
   api.py             JSON API (scenarios, rubric, trainees, sessions, analytics)
-  views.py           Pages: /mission, /sim, /dashboard, /dashboard/session/<id>
+  views.py           Pages: /mission, /sim, /dashboard, /dashboard/session/<id>, /help
   scenario.py        Seeded generator: scripted + procedural scenarios, difficulty table
   scenarios/*.json   The six scripted scenarios (waypoints as bearing, range, altitude)
   scoring.py         Decision-tree scoring: a pure function of scenario, events and rubric
@@ -85,11 +106,12 @@ app/
   templates/         Pages in the AEGIS (Stitch) style
   static/css/        aegis.css (design system), sim.css (HUD)
   static/js/sim/     Simulator: world.js (Three.js scene), radar.js, main.js (loop, input, HUD)
-  static/js/         mission.js, dashboard.js, session.js, results.js
+  static/js/         mission.js, dashboard.js, session.js, help.js, results.js
   static/vendor/     Three.js 0.186.1, Chart.js 4.5.1 (with licences)
 rubric.json          Editable scoring rubric
-run.py               Start the app
+run.py               Start the app (start.sh / start.bat wrap it with first-run setup)
 scripts/seed_demo.py Seed a demo cohort through the real API
+scripts/package.py   Build a clean zip for submission or another machine
 tests/               pytest: generator, scoring tree, API, offline check, JS/Python roll parity
 tests/e2e/           Browser smoke test (Playwright with the installed Chrome)
 archive/             Earlier Antigravity prototype (Node/React/Unity) and the original Stitch screens

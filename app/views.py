@@ -25,6 +25,11 @@ def dashboard():
     return render_template("dashboard.html", active="dashboard")
 
 
+@bp.get("/help")
+def help_page():
+    return render_template("help.html", active="help")
+
+
 @bp.get("/dashboard/session/<int:session_id>")
 def session_review(session_id):
     return render_template("session.html", active="dashboard", session_id=session_id)

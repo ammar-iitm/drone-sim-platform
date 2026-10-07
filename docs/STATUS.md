@@ -9,7 +9,7 @@
 
 Of the 21 requirements: **19 Verified, 2 Partial, 0 Present but unverified, 0 Missing, 0 Broken.**
 - **Partial:** F8 (every audio cue, the distance-based hum and mute are verified by test, but nobody has listened yet) and F9 (the VR seam is an isolated renderer module, not a WebXR mode).
-- **Tests:** 144 automated tests pass. They cover the generator, every scoring branch, the API, the offline rule, JS/Python roll parity, and 30 browser tests that include all six scenarios played end to end.
+- **Tests:** 146 automated tests pass. They cover the generator, every scoring branch, the API, the offline rule, JS/Python roll parity, and 32 browser tests that include all six scenarios played end to end.
 - **Checklist:** 66 of 81 items are ticked.
 - **What remains:** checks only a person can do on the demo laptop (Wi-Fi off, frame rate, hearing the audio, colour-blind review), five open decisions, and demo rehearsal.
 
@@ -61,6 +61,16 @@ Of the 21 requirements: **19 Verified, 2 Partial, 0 Present but unverified, 0 Mi
 | Deterministic | Met | Generator tests; seed-reuse browser test |
 | Server-owned scoring | Met | `api.submit_session` rebuilds the scenario and ignores any client score (`test_submit_score_store_and_read_back` sends `total: 100`) |
 | No real weapon modelling | Met | Abstract responses with configurable effectiveness only |
+
+## Hand-over readiness (2026-10-07)
+
+| Item | Evidence |
+| --- | --- |
+| One-command start | `start.sh` (macOS/Linux): from an unzipped package with no `.venv`, `./start.sh --demo` created the environment, installed, seeded and served `/mission` in **8.4 s** on the dev Mac (pip cache warm). `start.bat` for Windows is written but **not yet run on Windows** (track A, issue #10) |
+| Launch to first scenario | Warm `./start.sh` to a running scenario took **2.3 s** with scripted clicks on the dev Mac. Still to be timed by hand on the demo laptop (issue #9) |
+| Self-contained package | `scripts/package.py` builds a 0.6 MB zip (71 files, vendored libraries included). The 114 non-browser tests pass inside the unzipped package |
+| No lost sessions | If saving fails, the session is kept in the browser and Mission select offers to resend it (`test_finish::test_unsaved_session_is_kept_and_resent`) |
+| In-app help | `/help` explains controls, markers, sensors and radar, and draws the scoring tree from the live rubric (`test_finish::test_help_page_shows_live_rubric`) |
 
 ## Decisions
 

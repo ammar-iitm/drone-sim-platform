@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Help and scoring{% endblock %}
+{% block head %}
+<style>
+  .help { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--s3); margin-top: var(--s3); align-items: start; }
+  .help .wide { grid-column: 1 / -1; }
+  .help p, .help li { margin: 0 0 var(--s2); max-width: 80ch; }
+  .help ol, .help ul { margin: 0; padding-left: 20px; }
+  .legend { display: grid; grid-template-columns: auto 1fr; gap: var(--s2) var(--s3); align-items: center; }
+  .flow { display: flex; flex-wrap: wrap; gap: var(--s2); align-items: center; }
+  .flow .arrow { color: var(--on-surface-variant); }
+  @media (max-width: 1100px) { .help { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}
+{% block cmdbar %}<span class="chip cyan">Rubric <strong id="rubric-v">--</strong></span>{% endblock %}
+{% block content %}
+<main class="page">
+  <div class="opbar">
+    <div class="group"><div class="kv"><span class="label">Reference</span><span class="value-lg">HELP AND SCORING</span></div></div>
+    <div class="group"><a class="btn primary" href="/mission">Start a scenario</a></div>
+  </div>
+
+  <div class="help">
+    <section class="panel">
+      <div class="panel-head"><h2 class="panel-title"><span class="tag">01</span>Quick start</h2></div>
+      <div class="panel-body">
+        <ol>
+          <li><strong>Mission select:</strong> enter a callsign and unit, pick a scripted scenario or generate one from a seed, and press <span class="key">Enter</span>.</li>
+          <li><strong>Scan</strong> the view and the radar. When you spot a contact, <strong>mark</strong> it by clicking it, or click its radar track.</li>
+          <li><strong>Classify</strong> it with <span class="key">1</span> to <span class="key">5</span>, then <strong>respond</strong> with <span class="key">T</span> <span class="key">R</span> <span class="key">J</span> <span class="key">I</span> <span class="key">C</span>.</li>
+          <li>The session ends when every hostile is resolved or time runs out, or press <span class="key">Esc</span>. The server scores it and shows the reason for every point.</li>
+          <li>Review progress on the <a href="/dashboard">AAR dashboard</a>.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><h2 class="panel-title"><span class="tag">02</span>Threat markers</h2></div>
+      <div class="panel-body">
+        <p>Every state is shown by shape and text as well as colour.</p>
+        <div class="legend">
+          <span class="badge hostile"><svg aria-hidden="true"><use href="#s-hostile"/></svg>HOSTILE</span><span>Classified as a recon or armed drone</span>
+          <span class="badge unknown"><svg aria-hidden="true"><use href="#s-unknown"/></svg>UNKNOWN</span><span>Marked, not yet classified</span>
+          <span class="badge friendly"><svg aria-hidden="true"><use href="#s-friendly"/></svg>FRIENDLY</span><span>Classified as a friendly aircraft</span>
+          <span class="badge benign"><svg aria-hidden="true"><use href="#s-benign"/></svg>BENIGN</span><span>Classified as a bird, decoy or balloon</span>
+        </div>
+        <p style="margin-top:12px">On the radar, an unmarked track is a cyan square with its track ID and size cue (S, M or L). The radar never shows what a contact is.</p>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><h2 class="panel-title"><span class="tag">03</span>Controls</h2></div>
+      <div class="panel-body">
+        <table class="data" id="controls"><tbody></tbody></table>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><h2 class="panel-title"><span class="tag">04</span>Sensors and radar</h2></div>
+      <div class="panel-body">
+        <ul>
+          <li><strong>Day EO:</strong> natural colour. Contacts are dark against the sky.</li>
+          <li><strong>Night vision:</strong> green phosphor with grain. Faint contacts become visible at night.</li>
+          <li><strong>Thermal:</strong> white-hot. Drones, birds and aircraft glow against a cold sky, and it sees further through haze.</li>
+          <li><strong>Degradation</strong> (levels 0 to 3) adds noise and fog and cuts visible range from 3000 m down to 900 m. Lean on the radar.</li>
+          <li><strong>Radar:</strong> a 30 rpm sweep, so tracks update every 2 seconds. Small drones and birds are only picked up within about 1.3 km. Low flyers hide in ground clutter, especially among buildings. A track forms after 2 hits in 3 sweeps and drops after 3 misses. Clicking a lone return with no target behind it is a false alarm.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel wide">
+      <div class="panel-head"><h2 class="panel-title"><span class="tag">05</span>How a session is scored</h2>
+        <span class="label">Live from rubric.json · edit the file to change the next session</span></div>
+      <div class="panel-body">
+        <p>Every contact goes down the same three stages. Each stage records the branch it reached and the reason. Only hostile contacts must be detected; others are scored only if you mark them.</p>
+        <div class="flow" id="flow"></div>
+        <div class="help" style="margin-top:0">
+          <div><h3 class="panel-title" style="margin:12px 0 6px">Detection (time to mark versus par)</h3><table class="data" id="t-detection"></table></div>
+          <div><h3 class="panel-title" style="margin:12px 0 6px">Classification</h3><table class="data" id="t-classification"></table></div>
+          <div><h3 class="panel-title" style="margin:12px 0 6px">Engagement</h3><table class="data" id="t-engagement"></table></div>
+          <div><h3 class="panel-title" style="margin:12px 0 6px">Penalties and grades</h3><table class="data" id="t-penalties"></table></div>
+          <div class="wide"><h3 class="panel-title" style="margin:12px 0 6px">Responses: suitable choices and chance of success by drone type</h3>
+            <div style="overflow-x:auto"><table class="data" id="t-responses"></table></div></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+{% endblock %}
+{% block scripts %}
+<script type="module" src="{{ url_for('static', filename='js/help.js') }}"></script>
+{% endblock %}
