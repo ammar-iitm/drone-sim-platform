@@ -11,7 +11,7 @@ Of the 21 requirements: **19 Verified, 2 Partial, 0 Present but unverified, 0 Mi
 - **Partial:** F8 (every audio cue, the distance-based hum and mute are verified by test, but nobody has listened yet) and F9 (the VR seam is an isolated renderer module, not a WebXR mode).
 - **Tests:** 146 automated tests pass. They cover the generator, every scoring branch, the API, the offline rule, JS/Python roll parity, and 32 browser tests that include all six scenarios played end to end.
 - **Checklist:** 66 of 81 items are ticked.
-- **What remains:** checks only a person can do on the demo laptop (Wi-Fi off, frame rate, hearing the audio, colour-blind review), five open decisions, and demo rehearsal.
+- **What remains:** checks only a person can do on the target laptop (frame rate with 12 drones, hearing the audio, colour-blind review, a second machine) and the open rubric interpretations. No demo is scheduled.
 
 ## Requirement map
 
@@ -57,7 +57,7 @@ Of the 21 requirements: **19 Verified, 2 Partial, 0 Present but unverified, 0 Mi
 
 | Constraint | Status | Evidence |
 | --- | --- | --- |
-| Offline | Met | Every browser test blocks non-local requests: zero attempts recorded. `test_offline_and_parity::test_no_external_urls_in_pages_scripts_or_styles`. Human check 2026-10-06: fresh clone, install, seed and full run on the demo laptop with Wi-Fi off |
+| Offline | Met | Every browser test blocks non-local requests: zero attempts recorded. `test_offline_and_parity::test_no_external_urls_in_pages_scripts_or_styles`. Human check 2026-10-06: fresh clone, install, seed and full run on the target laptop with Wi-Fi off |
 | Deterministic | Met | Generator tests; seed-reuse browser test |
 | Server-owned scoring | Met | `api.submit_session` rebuilds the scenario and ignores any client score (`test_submit_score_store_and_read_back` sends `total: 100`) |
 | No real weapon modelling | Met | Abstract responses with configurable effectiveness only |
@@ -67,7 +67,7 @@ Of the 21 requirements: **19 Verified, 2 Partial, 0 Present but unverified, 0 Mi
 | Item | Evidence |
 | --- | --- |
 | One-command start | `start.sh` (macOS/Linux): from an unzipped package with no `.venv`, `./start.sh --demo` created the environment, installed, seeded and served `/mission` in **8.4 s** on the dev Mac (pip cache warm). `start.bat` for Windows is written but **not yet run on Windows** (track A, issue #10) |
-| Launch to first scenario | Warm `./start.sh` to a running scenario took **2.3 s** with scripted clicks on the dev Mac. Still to be timed by hand on the demo laptop (issue #9) |
+| Launch to first scenario | Warm `./start.sh` to a running scenario took **2.3 s** with scripted clicks on the dev Mac. Still to be timed by hand on the target laptop (issue #9) |
 | Self-contained package | `scripts/package.py` builds a 0.6 MB zip (71 files, vendored libraries included). The 114 non-browser tests pass inside the unzipped package |
 | No lost sessions | If saving fails, the session is kept in the browser and Mission select offers to resend it (`test_finish::test_unsaved_session_is_kept_and_resent`) |
 | In-app help | `/help` explains controls, markers, sensors and radar, and draws the scoring tree from the live rubric (`test_finish::test_help_page_shows_live_rubric`) |
@@ -76,6 +76,7 @@ Of the 21 requirements: **19 Verified, 2 Partial, 0 Present but unverified, 0 Mi
 
 Decided by the lead on 2026-10-07:
 
+- **No demo is scheduled.** The demo-only tasks (date and format, presenter roles, rehearsals, fallback video) are closed as not planned; `DEMO.md` is kept as a ready walkthrough in case one is arranged. Machine checks continue on a "target laptop" instead of a demo laptop.
 - **Grade bands:** A ≥ 90, B ≥ 80, C ≥ 70, D ≥ 60, otherwise F (as in `rubric.json`).
 - **VR:** desktop only for this release, as in the PRD. Rendering stays isolated in `world.js` so VR can be added later.
 - **Theme:** keep the Stitch dark look only. This is a deliberate deviation from the Visual Design doc's light dashboard theme.
@@ -88,7 +89,7 @@ Still open (track B, issue #15):
 
 ## Needs a human check
 
-1. ~~**On the demo laptop:** Wi-Fi-off run~~ done 2026-10-06. Saturation Swarm (8 drones) measured **30 fps**: passes, but with no headroom. Since then, quality levels have been added (Auto/High/Medium/Low; Auto steps down after 3 s under 35 fps). Re-measure there with a 12-drone swarm: `/sim?callsign=test&unit=test&seed=7&difficulty=5&swarm=12&degradation=0`, first on Auto, then on Low.
+1. ~~**On the target laptop:** Wi-Fi-off run~~ done 2026-10-06. Saturation Swarm (8 drones) measured **30 fps**: passes, but with no headroom. Since then, quality levels have been added (Auto/High/Medium/Low; Auto steps down after 3 s under 35 fps). Re-measure on the target laptop with a 12-drone swarm: `/sim?callsign=test&unit=test&seed=7&difficulty=5&swarm=12&degradation=0`, first on Auto, then on Low.
 2. **Audio:** play any scenario with sound on. The rotor hum should rise as a drone closes in, and the chime, buzz and breach alarm should play on their events. Check that **M** mutes.
 3. **Colour-blind review** (my review of the greyscale render `13-greyscale-markers.png` passed: all four states are distinct by shape and text; please confirm by eye): set macOS Display → Colour filters → Greyscale, then check that threat markers (triangle, diamond, circle, square, all with text labels) and the dashboard still read correctly.
 4. **Urban Canyon feel:** the drone should be visible for about 4 s around T+37 s and again on final approach.

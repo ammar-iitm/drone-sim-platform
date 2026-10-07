@@ -6,12 +6,12 @@ Oct 6, 2026 · Ammar Hashmi
 
 Settle these first, because each one changes what gets built. The first four match the open questions in the PRD.
 
-- [ ] Confirm the date and format of the final demo: own laptop or projector, internet available or not
+- [ ] ~~Confirm the date and format of the final demo: own laptop or projector, internet available or not~~ (not applicable: no demo scheduled, 2026-10-07)
 - [x] Confirm whether a VR demonstration is expected, or desktop is enough (desktop only, decided 2026-10-07)
 - [ ] Find any official reference for threat classes and rules of engagement to align the rubric with
-- [ ] Decide who plays the instructor during the demo
+- [ ] ~~Decide who plays the instructor during the demo~~ (not applicable: no demo scheduled, 2026-10-07)
 - [ ] Confirm the team and who owns the simulator, backend and dashboard
-- [ ] Pick the demo laptop and note its GPU and browser
+- [ ] Pick the target laptop and note its GPU and browser
 - [x] Create the project folder and a Git repository with a first commit
 - [x] Install Python 3.10 or newer, Flask and pytest
 - [x] Copy Three.js and Chart.js into the static folder so nothing loads from the internet
@@ -88,14 +88,14 @@ These cover requirements F17 to F21 and the layout in the Visual Design doc.
 
 ## Quality gates
 
-Nothing should be called done until these pass on the demo laptop.
+Nothing should be called done until these pass on the target laptop.
 
 - [x] Generator tests pass: same seed identical, different seeds differ, every difficulty respects its table
 - [x] Scoring tests pass for every branch: missed, slow, fast, wrong family, friendly engaged, restraint, breach, false alarms
 - [x] API tests pass: submit, read back, analytics shapes, bad input rejected
 - [x] Browser smoke test loads the simulator with no console errors and saves a session
 - [x] The whole system works with Wi-Fi switched off
-- [ ] The simulator holds 30 fps or better with a 12-drone swarm on the demo laptop
+- [ ] The simulator holds 30 fps or better with a 12-drone swarm on the target laptop
 - [ ] Launch to first scenario takes under 60 seconds from a clean start
 - [x] Every score change shows a decision-tree reason
 - [x] Keyboard-only run through a full scenario works
@@ -107,8 +107,8 @@ Nothing should be called done until these pass on the demo laptop.
 
 - [x] Seed a demo cohort of trainees with several sessions each so the dashboard shows real trends
 - [x] Write a three to five minute walkthrough script: scenario, decision, score, dashboard
-- [ ] Rehearse the demo twice from a clean start, including one deliberate mistake to show the tree reason
-- [ ] Prepare a fallback: a recorded screen capture in case the live demo fails
+- [ ] ~~Rehearse the demo twice from a clean start, including one deliberate mistake to show the tree reason~~ (not applicable: no demo scheduled, 2026-10-07)
+- [ ] ~~Prepare a fallback: a recorded screen capture in case the live demo fails~~ (not applicable: no demo scheduled, 2026-10-07)
 - [x] Write the README with install and run steps, folder layout and how to edit the rubric
 - [x] State assumptions and limits plainly: public-source rubric, abstract responses, no real weapon modelling
 - [x] Map each of the three required outcomes in the problem statement to where it appears in the demo

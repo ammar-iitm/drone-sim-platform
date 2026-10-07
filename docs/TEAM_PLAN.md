@@ -2,6 +2,8 @@
 
 Oct 6, 2026 · Status at commit `92d8893`: 19 of 21 requirements verified, 144 tests passing, checklist 63 of 81. See [STATUS.md](STATUS.md) for evidence, [DEMO.md](DEMO.md) for the judging script and [CHECKLIST.md](CHECKLIST.md) for the full list.
 
+**Update 2026-10-07: no demo is scheduled.** L1, L3, B4 and B5 are closed as not planned (issues #1, #3, #17, #18) and can be reopened if a demo is arranged. "Demo laptop" below now means the target laptop the trainer will run on.
+
 The 18 open checklist items split into two tracks that touch different files, so both can run at the same time without merge conflicts. A handful of decisions belong to the team lead and unblock parts of both tracks.
 
 ## Lead (Ammar): decisions, first
@@ -10,12 +12,12 @@ These block work below. Decide them and note the answers in `STATUS.md` under "O
 
 | # | Decision | Blocks |
 | --- | --- | --- |
-| L1 | Demo date and format: own laptop or projector, internet or not | A1, B4 |
+| ~~L1~~ | ~~Demo date and format~~ (no demo): own laptop or projector, internet or not | A1, B4 |
 | L2 | VR demo expected, or desktop only? (The PRD says desktop; VR is a Could) | Nothing if desktop |
-| L3 | Who plays the instructor in the demo, and who drives the laptop | B4 |
+| ~~L3~~ | ~~Who plays the instructor in the demo, and who drives the laptop~~ (no demo) | B4 |
 | L4 | Light theme for the dashboard: needed, or keep the Stitch dark look? | A5 |
 | L5 | Text size: keep 12 px captions, or move all data text to 14 px? | A5 |
-| L6 | Pick the demo laptop; record its GPU and browser in `STATUS.md` | A1 to A4 |
+| L6 | Pick the target laptop; record its GPU and browser in `STATUS.md` | A1 to A4 |
 | L7 | Team owners: confirm A and B below, and who reviews merges | Everyone |
 
 Checklist items covered: "Confirm the date and format…", "Confirm whether a VR demonstration…", "Decide who plays the instructor…", "Confirm the team…", "Pick the demo laptop…".
@@ -44,8 +46,8 @@ Checklist items covered: "Audio cues and a mute button", "Light and dark themes 
 | B1 | Align the rubric with an official or public reference | Look for public counter-UAS doctrine or SIH guidance on threat classes and rules of engagement. Compare with `rubric.json`: classes and families, expected responses per drone model, penalties and grade bands. List the differences, then edit `rubric.json`. No code change is needed. | Each change is cited in a short "Rubric sources" section in `STATUS.md`, and `.venv/bin/python -m pytest tests/test_scoring.py` still passes. If a test fails because a rule changed on purpose, update the test with a comment explaining why. | M |
 | B2 | Confirm the scoring interpretations | Review the five "Open decisions" items in `STATUS.md` that are about scoring (grade bands, failed-roll-then-breach, decoys as non-threats, the 300 m "late" range, swarm counting) and agree them with the lead. | Each is marked "Agreed" or changed in `rubric.json`. | S |
 | B3 | Read the plan docs and record disagreements | Read the PRD, AVD and Visual Design docs against the running app. | Disagreements are listed in `STATUS.md`; anything that needs code becomes an issue for A. | S |
-| B4 | Rehearse twice, after L1 and L3 | Follow `docs/DEMO.md` from a clean start (`scripts/seed_demo.py --reset`), including the deliberate mistake (jamming the friendly aircraft). Time it, and tighten the script where it runs long. | Two full runs under 5 minutes; edits made to `DEMO.md`. | M |
-| B5 | Fallback recording | QuickTime → New Screen Recording of one clean run of the script, with narration. Keep it on the demo laptop and a USB stick. | A video under 5 minutes, played back once to confirm it works. | S |
+| ~~B4~~ | ~~Rehearse twice~~ (no demo), after L1 and L3 | Follow `docs/DEMO.md` from a clean start (`scripts/seed_demo.py --reset`), including the deliberate mistake (jamming the friendly aircraft). Time it, and tighten the script where it runs long. | Two full runs under 5 minutes; edits made to `DEMO.md`. | M |
+| ~~B5~~ | ~~Fallback recording~~ (no demo) | QuickTime → New Screen Recording of one clean run of the script, with narration. Keep it on the demo laptop and a USB stick. | A video under 5 minutes, played back once to confirm it works. | S |
 | B6 | Problem-statement check | Re-read SIH PS 26247 and tick each required outcome against the table at the top of `DEMO.md`. | Every outcome maps to a moment in the demo. | S |
 | B7 | Submit | Submit on the SIH portal, following its format, with the repo link if requested. The repo is private, so add judges or export a zip if the portal needs access. | Confirmation saved (screenshot or PDF) in the team drive. | S |
 

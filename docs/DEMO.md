@@ -1,6 +1,6 @@
 # Demo walkthrough: AEGIS // Drone Threat Trainer
 
-Oct 6, 2026 · For the SIH 26247 judging slot. Target length: 4 to 5 minutes.
+Oct 6, 2026 · **No demo is scheduled (lead decision, 2026-10-07).** This script is kept ready in case a judging slot or review is arranged; it also works as a guided tour of the app. Target length: 4 to 5 minutes.
 
 ## The three outcomes and where they appear
 
@@ -71,4 +71,4 @@ If anything fails live, play the screen recording.
 | Where does the rubric come from? | Public counter-drone principles. Every weight, threshold and penalty is in `rubric.json`, editable by the instructor without code. |
 | Can it run in VR? | Not in this release (a PRD non-goal). Rendering is isolated in `world.js`, so a WebXR renderer can replace it. |
 | Can scores be faked from the browser? | No. The server rebuilds the scenario from its id or seed and scores raw events, including re-running the response rolls. |
-| What hardware does it need? | A browser with WebGL and Python. It holds 60 fps with 12 drones on a laptop GPU in testing. |
+| What hardware does it need? | A browser with WebGL and Python 3.10+. Measured 30 fps with an 8-drone swarm on the team laptop; a Graphics quality setting (Auto/High/Medium/Low) trades detail for frame rate. |
