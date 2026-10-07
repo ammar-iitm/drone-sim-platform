@@ -68,7 +68,10 @@ TEXT_AUDIT = """() => {
     if (cs.display === 'none' || cs.visibility === 'hidden' || el.closest('[hidden]')) continue;
     if (![...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim())) continue;
     if (el.closest('.sr-only')) continue;
-    out.push({ size: parseFloat(cs.fontSize), text: el.textContent.trim().slice(0, 40) });
+    // Captions may be 12 px: section labels, column headers, hot-key hints, chip names, tags.
+    const caption = !!(el.closest('th, kbd, .key, .tag, .rail-foot, .rail-head') ||
+      (el.closest('.label') && !el.closest('.label.data')) || (el.closest('.chip') && el.tagName !== 'STRONG'));
+    out.push({ size: parseFloat(cs.fontSize), caption, text: el.textContent.trim().slice(0, 40) });
   }
   return out;
 }"""
@@ -95,6 +98,9 @@ def test_text_sizes(page, server):
         assert items, name
         smallest = min(i["size"] for i in items)
         assert smallest >= 12, (name, [i for i in items if i["size"] < 12][:5])
+        # Lead decision 2026-10-07: everything that is not a caption is at least 14 px.
+        small_data = [i for i in items if i["size"] < 14 and not i["caption"]]
+        assert small_data == [], (name, small_data[:8])
 
 
 def test_swarm_of_twelve_frame_rate(page, server):

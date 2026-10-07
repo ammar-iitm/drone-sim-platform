@@ -304,6 +304,7 @@ function markNearestTrack() {
 function toggleConsole(on = !S.radarMode) {
   S.radarMode = on;
   $('view').classList.toggle('radar-mode', on);
+  $('sim').classList.toggle('console', on);
   $('radar-big').hidden = !on;
   $('radar-wrap').hidden = on;
   $('track-table').hidden = !on;
@@ -506,7 +507,7 @@ function drawFrame() {
   // Marker overlay (not affected by the sensor filter).
   const ctx = sizeCanvas($('overlay'), vw, vh);
   ctx.clearRect(0, 0, vw, vh);
-  ctx.font = '700 13px ui-monospace, Menlo, monospace';
+  ctx.font = '700 14px ui-monospace, Menlo, monospace';
   ctx.textBaseline = 'middle';
   const p = { x: 0, y: 0 };
   for (const [id, m] of S.marked) {

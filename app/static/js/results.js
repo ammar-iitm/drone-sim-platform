@@ -42,7 +42,7 @@ export function renderContacts(result, rubric) {
   const label = (cls) => (rubric?.classes?.[cls]?.label) || cls;
   return result.contacts.map((c) => {
     if (!c.scored) {
-      return `<article class="ccard"><div class="label">${esc(c.id)} · ${esc(c.model.replace('_', ' '))}</div>
+      return `<article class="ccard"><div class="label data">${esc(c.id)} · ${esc(c.model.replace('_', ' '))}</div>
         ${badge(trueState(c))}<p class="muted">Not scored: a non-hostile contact that was never marked.</p></article>`;
     }
     const stages = ['detection', 'classification', 'engagement'].map((s) => `
@@ -52,7 +52,7 @@ export function renderContacts(result, rubric) {
       ...c.critical.map(() => '<span class="badge bad">Critical −25</span>'),
       c.neutralised_t != null ? `<span class="badge good">Neutralised T+${c.neutralised_t.toFixed(1)} s</span>` : ''].join('');
     return `<article class="ccard">
-      <div class="label">${esc(c.id)} · ${esc(c.model.replace('_', ' '))} · truth: ${esc(label(c.true_class))}</div>
+      <div class="label data">${esc(c.id)} · ${esc(c.model.replace('_', ' '))} · truth: ${esc(label(c.true_class))}</div>
       <div class="path">${badge(trueState(c))}${flags}</div>
       <div class="path" aria-label="Decision tree path">${c.path.map((p) => `<span class="chip">${esc(p)}</span>`).join('')}</div>
       ${stages}

@@ -7,7 +7,7 @@ Oct 6, 2026 · Ammar Hashmi
 Settle these first, because each one changes what gets built. The first four match the open questions in the PRD.
 
 - [ ] Confirm the date and format of the final demo: own laptop or projector, internet available or not
-- [ ] Confirm whether a VR demonstration is expected, or desktop is enough
+- [x] Confirm whether a VR demonstration is expected, or desktop is enough (desktop only, decided 2026-10-07)
 - [ ] Find any official reference for threat classes and rules of engagement to align the rubric with
 - [ ] Decide who plays the instructor during the demo
 - [ ] Confirm the team and who owns the simulator, backend and dashboard
@@ -83,7 +83,7 @@ These cover requirements F17 to F21 and the layout in the Visual Design doc.
 - [x] Sortable session table with a link to each session review
 - [x] Session review shows the event timeline with decision paths, reasons and points
 - [x] Every chart has hover details and a table view
-- [ ] Light and dark themes both read correctly
+- [x] Light and dark themes both read correctly (scope changed: dark only by lead decision 2026-10-07; dark verified in screenshots)
 - [x] CSV export of a session or unit report (could have)
 
 ## Quality gates
@@ -99,7 +99,7 @@ Nothing should be called done until these pass on the demo laptop.
 - [ ] Launch to first scenario takes under 60 seconds from a clean start
 - [x] Every score change shows a decision-tree reason
 - [x] Keyboard-only run through a full scenario works
-- [ ] Text is at least 14 px and focus rings are visible
+- [x] Text is at least 14 px and focus rings are visible (captions 12 px as allowed; `test_access::test_text_sizes`, `test_finish::test_comparison_chart_and_focus_rings`)
 - [ ] Threat state never relies on colour alone
 - [x] Reduced-motion setting is respected
 

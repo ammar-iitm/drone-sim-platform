@@ -6,7 +6,7 @@
   .dash .wide { grid-column: 1 / -1; }
   .chart-box { position: relative; height: 300px; }
   .toggle { display: flex; gap: var(--s1); }
-  .toggle .btn { min-height: 30px; font-size: 12px; }
+  .toggle .btn { min-height: 32px; font-size: 14px; }
   .toggle .btn[aria-pressed="true"] { border-color: var(--cyan); color: var(--cyan); }
   .confusion td.cell { text-align: center; font-weight: 700; min-width: 64px; }
   .weak { display: flex; flex-direction: column; gap: var(--s2); }
@@ -38,7 +38,7 @@
     <section class="stat-tiles" aria-label="Unit summary">
       <div class="tile"><div class="label">Sessions</div><div class="value-xl" id="t-sessions">--</div></div>
       <div class="tile"><div class="label">Unit average score</div><div class="value-xl green" id="t-avg">--</div></div>
-      <div class="tile"><div class="label">Weakest skill</div><div class="value-xl amber" id="t-weak">--</div><div class="label" id="t-weak-v"></div></div>
+      <div class="tile"><div class="label">Weakest skill</div><div class="value-xl amber" id="t-weak">--</div><div class="label data" id="t-weak-v"></div></div>
       <div class="tile"><div class="label">Breaches</div><div class="value-xl red" id="t-breaches">--</div></div>
     </section>
 
@@ -51,7 +51,7 @@
         <div class="panel-body">
           <div class="chart-box" data-pane="chart"><canvas id="progress" role="img" aria-label="Scores by session for detection, classification and engagement"></canvas></div>
           <div data-pane="table" hidden><table class="data" id="progress-table"></table></div>
-          <p class="label" id="progress-notes"></p>
+          <p class="label data" id="progress-notes"></p>
         </div>
       </section>
 

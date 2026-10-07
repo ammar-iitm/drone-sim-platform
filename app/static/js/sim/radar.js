@@ -196,7 +196,7 @@ export class Radar {
     const R = Math.min(w, h) / 2 - (big ? 34 : 16);
     const k = R / this.scale;
     const toScreen = (x, z) => [cx + x * k, cy + z * k];
-    const fontPx = big ? 14 : 12;
+    const fontPx = big ? 15 : 13;
     ctx.font = `${fontPx}px ui-monospace, Menlo, monospace`;
 
     // Optical field of view.

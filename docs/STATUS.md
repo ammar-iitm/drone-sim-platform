@@ -10,7 +10,7 @@
 Of the 21 requirements: **19 Verified, 2 Partial, 0 Present but unverified, 0 Missing, 0 Broken.**
 - **Partial:** F8 (every audio cue, the distance-based hum and mute are verified by test, but nobody has listened yet) and F9 (the VR seam is an isolated renderer module, not a WebXR mode).
 - **Tests:** 144 automated tests pass. They cover the generator, every scoring branch, the API, the offline rule, JS/Python roll parity, and 30 browser tests that include all six scenarios played end to end.
-- **Checklist:** 63 of 81 items are ticked.
+- **Checklist:** 66 of 81 items are ticked.
 - **What remains:** checks only a person can do on the demo laptop (Wi-Fi off, frame rate, hearing the audio, colour-blind review), five open decisions, and demo rehearsal.
 
 ## Requirement map
@@ -50,7 +50,7 @@ Of the 21 requirements: **19 Verified, 2 Partial, 0 Present but unverified, 0 Mi
 | Only hostiles must be detected; others scored only if marked | As written |
 | Penalties: false alarm 2 (cap 10), breach 10, critical 25 | As written |
 | Weights 30/30/40 from `rubric.json`; clamp 0–100 | As written |
-| Grade bands | AVD gives none; placeholder A ≥ 90, B ≥ 80, C ≥ 70, D ≥ 60, F (decision pending) |
+| Grade bands | AVD gives none; lead decided A ≥ 90, B ≥ 80, C ≥ 70, D ≥ 60, F (2026-10-07) |
 | Server owns the score; rolls from the scenario seed | Implemented; browser and server rolls are bit-identical (`test_offline_and_parity::test_js_and_python_rolls_match`) |
 
 ## Hard constraints
@@ -62,13 +62,19 @@ Of the 21 requirements: **19 Verified, 2 Partial, 0 Present but unverified, 0 Mi
 | Server-owned scoring | Met | `api.submit_session` rebuilds the scenario and ignores any client score (`test_submit_score_store_and_read_back` sends `total: 100`) |
 | No real weapon modelling | Met | Abstract responses with configurable effectiveness only |
 
-## Open decisions
+## Decisions
 
-1. **Grade bands:** confirm A ≥ 90, B ≥ 80, C ≥ 70, D ≥ 60, or supply official bands.
-2. **Rubric interpretations:** failed-roll-then-breach scores 60%; decoys are non-threats; "late" means within 300 m; suitable responses per model (jam or intercept for quadcopters and hexacopters, intercept only for fixed-wing).
-3. **Theme:** the Visual Design doc asks for a light dashboard theme; the Stitch design is dark only. Currently dark only.
-4. **Text size:** 12 px monospace captions are used for labels, table headers and readouts (allowed as captions by the Visual Design doc), and body text is 14 px. Confirm this, or move all data text to 14 px.
-5. **Swarm counting:** swarm members are counted on top of the difficulty table's hostile count.
+Decided by the lead on 2026-10-07:
+
+- **Grade bands:** A ≥ 90, B ≥ 80, C ≥ 70, D ≥ 60, otherwise F (as in `rubric.json`).
+- **VR:** desktop only for this release, as in the PRD. Rendering stays isolated in `world.js` so VR can be added later.
+- **Theme:** keep the Stitch dark look only. This is a deliberate deviation from the Visual Design doc's light dashboard theme.
+- **Text size:** all data text is at least 14 px. Only captions (section labels, column headers, hot-key hints, chip names) are 12 px, which matches the Visual Design rule. Enforced by `test_access::test_text_sizes`.
+
+Still open (track B, issue #15):
+
+1. **Rubric interpretations:** failed-roll-then-breach scores 60%; decoys are non-threats; "late" means within 300 m; suitable responses per model (jam or intercept for quadcopters and hexacopters, intercept only for fixed-wing).
+2. **Swarm counting:** swarm members are counted on top of the difficulty table's hostile count.
 
 ## Needs a human check
 

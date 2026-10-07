@@ -60,6 +60,10 @@ a { color: var(--cyan); }
   letter-spacing: 0.06em;
   color: var(--on-surface-variant);
 }
+/* Captions (section labels, column headers, hot-key hints) may be 12 px; anything a trainee or
+   instructor reads as data is at least 14 px. Use .label.data for data shown in label style. */
+.label.data { font-size: 14px; }
+.ccard .path .chip, .card .tags .chip, #difficulty-out { font-size: 14px; }
 .value { font: 700 14px/1.3 var(--font-mono); font-variant-numeric: tabular-nums; }
 .value-lg { font: 700 22px/1.2 var(--font-mono); font-variant-numeric: tabular-nums; }
 .value-xl { font: 700 34px/1.1 var(--font-mono); font-variant-numeric: tabular-nums; }
@@ -82,7 +86,7 @@ a { color: var(--cyan); }
   padding: 3px var(--s2); border: 1px solid var(--outline-variant); background: var(--surface-lowest);
   font: 400 12px/1.3 var(--font-mono); text-transform: uppercase; letter-spacing: 0.04em; color: var(--on-surface-variant);
 }
-.chip strong { color: var(--green); font-weight: 700; }
+.chip strong { color: var(--green); font-weight: 700; font-size: 14px; }
 .chip.cyan strong { color: var(--cyan); }
 .chip.amber strong { color: var(--amber); }
 .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); display: inline-block; }
@@ -101,7 +105,7 @@ a { color: var(--cyan); }
 .rail nav a {
   display: flex; align-items: center; gap: var(--s3); padding: var(--s3) var(--s3);
   color: var(--on-surface-variant); text-decoration: none; border-left: 2px solid transparent;
-  font: 400 13px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: 0.04em;
+  font: 400 14px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: 0.04em;
 }
 .rail nav a svg { width: 18px; height: 18px; flex: none; }
 .rail nav a:hover { background: var(--surface-container); color: var(--on-surface); }
@@ -125,7 +129,7 @@ body.compact .rail nav a { justify-content: center; padding: var(--s3) 0; }
   display: flex; align-items: center; justify-content: space-between; gap: var(--s2);
   padding: var(--s2) var(--s3); border-bottom: 1px solid var(--outline-variant); background: var(--surface-lowest);
 }
-.panel-title { font: 700 13px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: 0.06em; color: var(--primary); margin: 0; }
+.panel-title { font: 700 14px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: 0.06em; color: var(--primary); margin: 0; }
 .panel-title .tag { color: var(--cyan); font-weight: 400; margin-right: var(--s2); }
 .panel-body { padding: var(--s3); }
 .opbar {
@@ -139,7 +143,7 @@ body.compact .rail nav a { justify-content: center; padding: var(--s3) 0; }
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: var(--s2);
   min-height: 36px; padding: 0 var(--s3); cursor: pointer; text-decoration: none;
-  font: 700 13px/1 var(--font-mono); text-transform: uppercase; letter-spacing: 0.04em;
+  font: 700 14px/1 var(--font-mono); text-transform: uppercase; letter-spacing: 0.04em;
   background: transparent; color: var(--on-surface); border: 1px solid var(--outline-variant);
 }
 .btn:hover { background: var(--surface-container); }
@@ -173,9 +177,9 @@ table.data th button { all: unset; cursor: pointer; }
 table.data th button:focus-visible { outline: 2px solid var(--cyan); }
 .badge {
   display: inline-flex; align-items: center; gap: 6px; padding: 2px 6px; border: 1px solid currentColor;
-  font: 700 12px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap;
+  font: 700 14px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap;
 }
-.badge svg { width: 12px; height: 12px; }
+.badge svg { width: 13px; height: 13px; }
 .badge.hostile { color: var(--hostile); } .badge.unknown { color: var(--unknown); }
 .badge.friendly { color: var(--friendly); } .badge.benign { color: var(--benign); }
 .badge.good { color: var(--green); } .badge.warn { color: var(--amber); } .badge.bad { color: var(--red); }
@@ -186,7 +190,7 @@ table.data th button:focus-visible { outline: 2px solid var(--cyan); }
 .toast {
   position: fixed; left: 50%; bottom: var(--s5); transform: translateX(-50%); z-index: 90;
   background: var(--surface-high); border: 1px solid var(--outline-variant); padding: var(--s2) var(--s4);
-  font: 700 13px/1.3 var(--font-mono); text-transform: uppercase;
+  font: 700 14px/1.3 var(--font-mono); text-transform: uppercase;
 }
 .notice { padding: var(--s3); border: 1px solid var(--outline-variant); background: var(--surface-lowest); }
 .notice.error { border-color: var(--red); color: var(--red); }

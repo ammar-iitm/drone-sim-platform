@@ -31,7 +31,7 @@ async function loadScripted() {
   $('cards').innerHTML = list.map((s) => `
     <article class="card" role="listitem" data-id="${esc(s.id)}" aria-pressed="false">
       <button class="select" type="button" data-id="${esc(s.id)}" data-name="${esc(s.name)}">
-        <span class="label cyan">SCN-0${s.order} · ${esc(s.threat_summary)}</span>
+        <span class="label data cyan">SCN-0${s.order} · ${esc(s.threat_summary)}</span>
         <h3>${esc(s.name)}</h3>
         <p>${esc(s.objective)}</p>
         <span class="tags">
@@ -76,7 +76,7 @@ async function preview() {
   $('preview').className = 'notice preview';
   $('preview').innerHTML = `
     <div class="value cyan">${esc(data.name.toUpperCase())}</div>
-    <div class="label" style="margin-top:6px">${esc(data.id)} · ${Math.round(data.duration_s)} s ·
+    <div class="label data" style="margin-top:6px">${esc(data.id)} · ${Math.round(data.duration_s)} s ·
       ${counts.hostile || 0} hostile · ${counts.decoy || 0} decoy · ${counts.benign || 0} bird · ${counts.friendly || 0} friendly</div>`;
   return { params: data.params, name: data.name, id: data.id };
 }
