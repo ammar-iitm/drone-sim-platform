@@ -48,8 +48,8 @@ Checklist items covered: "Audio cues and a mute button", "Light and dark themes 
 | B3 | Read the plan docs and record disagreements | Read the PRD, AVD and Visual Design docs against the running app. | Disagreements are listed in `STATUS.md`; anything that needs code becomes an issue for A. | S |
 | ~~B4~~ | ~~Rehearse twice~~ (no demo), after L1 and L3 | Follow `docs/DEMO.md` from a clean start (`scripts/seed_demo.py --reset`), including the deliberate mistake (jamming the friendly aircraft). Time it, and tighten the script where it runs long. | Two full runs under 5 minutes; edits made to `DEMO.md`. | M |
 | ~~B5~~ | ~~Fallback recording~~ (no demo) | QuickTime → New Screen Recording of one clean run of the script, with narration. Keep it on the demo laptop and a USB stick. | A video under 5 minutes, played back once to confirm it works. | S |
-| B6 | Problem-statement check | Re-read SIH PS 26247 and tick each required outcome against the table at the top of `DEMO.md`. | Every outcome maps to a moment in the demo. | S |
-| B7 | Submit | Submit on the SIH portal, following its format, with the repo link if requested. The repo is private, so add judges or export a zip if the portal needs access. | Confirmation saved (screenshot or PDF) in the team drive. | S |
+| ~~B6~~ | ~~Problem-statement check~~ (done 2026-10-10, see `PS_MAPPING.md`) | Re-read SIH PS 26247 and tick each required outcome against the table at the top of `DEMO.md`. | Every outcome maps to a moment in the demo. | S |
+| ~~B7~~ | ~~Submit~~ (not needed: no zip submission, 2026-10-10) | Submit on the SIH portal, following its format, with the repo link if requested. The repo is private, so add judges or export a zip if the portal needs access. | Confirmation saved (screenshot or PDF) in the team drive. | S |
 
 Checklist items covered: "Find any official reference…", "Read the PRD, AVD and Visual Design docs…", "Rehearse the demo twice…", "Prepare a fallback…", "Re-read the problem statement…", "Submit through the SIH portal…".
 

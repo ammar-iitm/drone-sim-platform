@@ -10,7 +10,7 @@
 Of the 21 requirements: **19 Verified, 2 Partial, 0 Present but unverified, 0 Missing, 0 Broken.**
 - **Partial:** F8 (every audio cue, the distance-based hum and mute are verified by test, but nobody has listened yet) and F9 (the VR seam is an isolated renderer module, not a WebXR mode).
 - **Tests:** 186 automated tests pass. They cover the generator, every scoring branch, the API, the offline rule, JS/Python roll parity, and 39 browser tests that include all six scenarios played end to end, both standard and varied.
-- **Checklist:** 66 of 81 items are ticked.
+- **Checklist:** 67 of 81 items are ticked; 5 more are not applicable (no demo, no zip submission).
 - **What remains:** checks only a person can do on the target laptop (frame rate with 12 drones, hearing the audio, colour-blind review, a second machine) and the open rubric interpretations. No demo is scheduled.
 
 ## Requirement map

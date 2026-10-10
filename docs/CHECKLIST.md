@@ -112,6 +112,6 @@ Nothing should be called done until these pass on the target laptop.
 - [x] Write the README with install and run steps, folder layout and how to edit the rubric
 - [x] State assumptions and limits plainly: public-source rubric, abstract responses, no real weapon modelling
 - [x] Map each of the three required outcomes in the problem statement to where it appears in the demo
-- [ ] Package the project folder and test it on a second machine
-- [ ] Re-read the problem statement one last time and tick off each outcome
-- [ ] Submit through the SIH portal and keep a copy of the confirmation
+- [ ] Install and test on a second machine from the README (issue #10). ~~Package the project folder~~ (not needed: no zip submission, 2026-10-10)
+- [x] Re-read the problem statement one last time and tick off each outcome (official text checked in `docs/PS_MAPPING.md`: all 24 elements met, 2026-10-10)
+- [ ] ~~Submit through the SIH portal and keep a copy of the confirmation~~ (not applicable: no zip submission, 2026-10-10)

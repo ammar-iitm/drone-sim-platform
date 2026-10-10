@@ -11,8 +11,10 @@ This is the starting page for anyone picking up the project. The detail lives in
   - **F8 audio:** tested in code, but nobody has listened yet.
   - **F9 VR:** not built; desktop only by lead decision.
 - **Tests:** 186 pass in total, 147 Python and 39 browser (Playwright).
-- **Checklist:** 66 of 81 items ticked. Of the 15 left, 4 are not applicable because there is no demo, and 11 are open (see "What is left").
+- **Checklist:** 67 of 81 items ticked. Of the 14 left, 5 are not applicable (no demo, no zip submission) and 9 are open (see "What is left").
 - **No demo is scheduled** (lead decision, 2026-10-07). [docs/DEMO.md](docs/DEMO.md) is kept as a ready walkthrough in case one is arranged.
+- **No zip submission** (lead decision, 2026-10-10). `scripts/package.py` still builds a zip if one is ever needed.
+- **Problem statement:** the official PS 26247 text is in [docs/PS_MAPPING.md](docs/PS_MAPPING.md); all 24 elements are met, including randomization against rote learning.
 
 ## Get going in 5 minutes
 
@@ -48,7 +50,7 @@ To run the tests:
 | `app/templates/`, `app/static/css/` | Pages and the Stitch "AEGIS" dark look |
 | `rubric.json` | Every scoring number. Edits apply to the next session with no restart |
 | `tests/` | Python tests; `tests/e2e/` holds the Playwright tests, which block every non-local request |
-| `scripts/seed_demo.py`, `scripts/package.py` | Demo data (`--reset`), and the submission zip in `dist/` |
+| `scripts/seed_demo.py`, `scripts/package.py` | Demo data (`--reset`), and an optional zip in `dist/` (no zip submission needed) |
 | `archive/` | The original Antigravity prototype (Node/React/Unity). Kept for reference, not used |
 | `frontend/` | An empty leftover Vite cache. Not tracked by git; safe to ignore |
 
@@ -58,9 +60,9 @@ To run the tests:
 | --- | --- |
 | [docs/STATUS.md](docs/STATUS.md) | The evidence: the requirement map F1 to F21, scoring rules, decisions, human checks |
 | [docs/CHECKLIST.md](docs/CHECKLIST.md) | The full task list. Tick only what you actually ran and saw work |
-| [docs/TEAM_PLAN.md](docs/TEAM_PLAN.md) | Who does what: Lead, Track A (test and polish), Track B (rubric and submission) |
+| [docs/TEAM_PLAN.md](docs/TEAM_PLAN.md) | Who does what: Lead, Track A (test and polish), Track B (rubric) |
 | [docs/RUBRIC_SOURCES.md](docs/RUBRIC_SOURCES.md) | **Draft.** Rubric compared with public counter-UAS sources (#14) |
-| [docs/PS_MAPPING.md](docs/PS_MAPPING.md) | **Draft.** Each problem-statement element mapped to features and evidence (#19) |
+| [docs/PS_MAPPING.md](docs/PS_MAPPING.md) | The official problem statement, with each element mapped to features and evidence (#19, done) |
 | [docs/PRD.md](docs/PRD.md), [docs/AVD.md](docs/AVD.md), [docs/VISUAL_DESIGN.md](docs/VISUAL_DESIGN.md) | The original plan |
 | [docs/DEMO.md](docs/DEMO.md) | Walkthrough script (no demo scheduled) |
 
@@ -72,6 +74,7 @@ To run the tests:
 - **Desktop only.** No VR in this release.
 - **Grade bands:** A ≥ 90, B ≥ 80, C ≥ 70, D ≥ 60, otherwise F.
 - **No demo** for now. Issues #1, #3, #17 and #18 are closed as not planned; reopen them if a demo comes back.
+- **No zip submission** (2026-10-10). Issue #20 is closed as not planned.
 
 ## What is left
 
@@ -89,8 +92,6 @@ Tracked as GitHub issues with labels `lead`, `track-a` and `track-b`.
 | Track B | #14 | Review `RUBRIC_SOURCES.md`; read ATP 3-01.81 directly; mark rows Agreed, Changed or Rejected | — |
 | Track B | #15 | Agree the scoring interpretations with the lead, including whether Take cover or Report should earn credit against a hostile | Lead |
 | Track B | #16 | Read the plan docs against the running app and list disagreements | — |
-| Track B | #19 | Paste the official PS 26247 text into `PS_MAPPING.md` and check every row | — |
-| Track B | #20 | Build the zip (`scripts/package.py`), submit on the SIH portal, keep the confirmation | #19 |
 
 ## Known limits and risks
 
