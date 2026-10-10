@@ -2,6 +2,8 @@
 
 import json
 
+from .db import avg1
+
 METRICS = ("detection", "classification", "engagement")
 TARGET = 80
 
@@ -57,18 +59,16 @@ def trainee(db, trainee_id, rubric):
 
 
 def unit(db, unit_name):
+    stage_avgs = ", ".join(f"{avg1('s.' + m)} AS {m}" for m in ("total",) + METRICS)
     trainees = [dict(r) for r in db.execute(
-        "SELECT t.id, t.callsign, COUNT(s.id) AS sessions, ROUND(AVG(s.total), 1) AS total, "
-        "ROUND(AVG(s.detection), 1) AS detection, ROUND(AVG(s.classification), 1) AS classification, "
-        "ROUND(AVG(s.engagement), 1) AS engagement, SUM(s.breaches) AS breaches "
+        f"SELECT t.id, t.callsign, COUNT(s.id) AS sessions, {stage_avgs}, SUM(s.breaches) AS breaches "
         "FROM trainees t LEFT JOIN sessions s ON s.trainee_id = t.id WHERE t.unit = ? "
         "GROUP BY t.id ORDER BY t.callsign", (unit_name,))]
     if not trainees:
         return None
     agg = db.execute(
-        "SELECT COUNT(*) AS sessions, ROUND(AVG(total), 1) AS total, ROUND(AVG(detection), 1) AS detection, "
-        "ROUND(AVG(classification), 1) AS classification, ROUND(AVG(engagement), 1) AS engagement, "
-        "COALESCE(SUM(breaches), 0) AS breaches FROM sessions s JOIN trainees t ON t.id = s.trainee_id "
+        f"SELECT COUNT(*) AS sessions, {stage_avgs}, "
+        "COALESCE(SUM(s.breaches), 0) AS breaches FROM sessions s JOIN trainees t ON t.id = s.trainee_id "
         "WHERE t.unit = ?", (unit_name,)).fetchone()
     averages = {m: agg[m] for m in METRICS + ("total",)}
 

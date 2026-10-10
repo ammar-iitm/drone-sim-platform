@@ -1,0 +1,16 @@
+.venv
+archive
+data
+dist
+docs
+test-results
+tests
+scripts
+frontend
+*.md
+!README.md
+.env*
+.vercel
+.agents
+.claude
+skills-lock.json

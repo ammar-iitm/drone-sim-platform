@@ -94,8 +94,9 @@ def test_bad_input_rejected_and_database_untouched(client, app):
         assert "error" in r.get_json()
     assert client.post("/api/sessions", data="not json", content_type="application/json").status_code == 400
     assert client.get("/api/sessions").get_json() == before
-    conn = sqlite3.connect(app.config["DATABASE"])
-    assert conn.execute("PRAGMA integrity_check").fetchone()[0] == "ok"
+    if not app.config.get("DATABASE_URL"):
+        conn = sqlite3.connect(app.config["DATABASE"])
+        assert conn.execute("PRAGMA integrity_check").fetchone()[0] == "ok"
 
 
 def test_analytics_shapes(client):

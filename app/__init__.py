@@ -18,10 +18,11 @@ def create_app(test_config=None):
     if test_config:
         app.config.update(test_config)
     app.json.sort_keys = False
-    Path(app.config["DATABASE"]).parent.mkdir(parents=True, exist_ok=True)
 
     from . import api, db, views
     db.init_app(app)
+    hosted = bool(db.database_url(app))
+    app.context_processor(lambda: {"hosted": hosted})
     app.register_blueprint(api.bp)
     app.register_blueprint(views.bp)
     return app

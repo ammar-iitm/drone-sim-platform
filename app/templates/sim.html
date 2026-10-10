@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/sim.css') }}">
 {% endblock %}
 {% block cmdbar %}
-<span class="chip"><span class="dot" id="link-dot"></span>Link <strong id="link">Local</strong></span>
+<span class="chip"><span class="dot" id="link-dot"></span>Link <strong id="link">{{ "Hosted" if hosted else "Local" }}</strong></span>
 <span class="chip cyan">T+ <strong id="clock">00:00</strong></span>
 <span class="chip amber" id="speed-chip" hidden>Fast-forward <strong id="speed"></strong></span>
 <span class="chip">Quality <strong id="quality">--</strong></span>

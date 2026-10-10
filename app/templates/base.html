@@ -34,7 +34,7 @@
 
   <aside class="rail" aria-label="Main navigation">
     <div>
-      <div class="rail-head"><span class="label">Operations rail</span><span class="label green">Offline</span></div>
+      <div class="rail-head"><span class="label">Operations rail</span><span class="label green">{{ "Hosted" if hosted else "Offline" }}</span></div>
       <nav>
         <a href="{{ url_for('views.mission') }}" {% if active == 'mission' %}aria-current="page"{% endif %} title="Mission select">
           <svg aria-hidden="true"><use href="#i-mission"/></svg><span>Mission select</span></a>
@@ -47,7 +47,7 @@
       </nav>
     </div>
     <div class="rail-foot">
-      <div class="row label"><span>Store</span><span class="green">SQLite local</span></div>
+      <div class="row label"><span>Store</span><span class="green">{{ "Postgres hosted" if hosted else "SQLite local" }}</span></div>
       <div class="meter"><span style="width:100%"></span></div>
       <div class="row label"><span>Scoring</span><span>Server</span></div>
     </div>

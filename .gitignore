@@ -9,3 +9,7 @@ data/*.db-journal
 .DS_Store
 dist/
 .vite/
+
+# Vercel
+.vercel
+.env*

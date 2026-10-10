@@ -75,6 +75,16 @@ You can also add `&quality=low` to a simulator URL.
 
 **If a save fails.** If the server is unreachable when a session ends, the session is kept in the browser. Mission select then offers to send it once the server is back.
 
+## Hosted version (Vercel)
+
+Live at **https://drone-sim-platform.vercel.app**. It's public, with no login.
+
+- **Hosting:** the Vercel project `drone-sim-platform` on team `the-layers`, running as one Flask function in `iad1` (US East). `index.py` is the entrypoint.
+- **Database:** Neon Postgres from the Vercel Marketplace (`drone-trainer-db`). Neon sets `DATABASE_URL` on the project. When `DATABASE_URL` is set the app uses Postgres (`app/schema_pg.sql`); otherwise it uses the local SQLite file, so the laptop version stays fully offline. Queries are written once; `app/db.py` translates them for Postgres.
+- **Deploying:** run `npx vercel deploy --prod` from the repo root. The project is **not** connected to GitHub, so pushing doesn't deploy. `.vercelignore` keeps tests, archive, screenshots and local data out of the upload.
+- **Testing on Postgres:** `TEST_DATABASE_URL=<url> .venv/bin/python -m pytest tests --ignore=tests/e2e` runs the Python tests on Postgres. The test tables are dropped before every test, so point it at the separate `trainer_test` database in the same Neon project, **never** the live `neondb`.
+- **Sidebar labels:** the sidebar and simulator show **Hosted / Postgres hosted** instead of **Offline / SQLite local**.
+
 ## Using it
 
 1. **Mission select** (`/mission`): enter a callsign and unit. Pick one of the six scripted scenarios, or set seed, difficulty, time of day, terrain, degradation, swarm size and threat mix for a procedural one. Then press **Launch**.
@@ -134,7 +144,7 @@ app/
   geometry.py        Contact paths (shared maths with static/js/sim/path.js)
   rng.py             Seeded rolls (bit-identical with static/js/sim/rng.js)
   analytics.py       Trends, confusion matrix, unit rollup
-  db.py, schema.sql  SQLite storage (data/trainer.db)
+  db.py, schema.sql  Storage: SQLite (data/trainer.db) by default; Postgres (schema_pg.sql) when DATABASE_URL is set
   templates/         Pages in the AEGIS (Stitch) style
   static/css/        aegis.css (design system), sim.css (HUD)
   static/js/sim/     Simulator: world.js (Three.js scene), radar.js, main.js (loop, input, HUD)
@@ -142,6 +152,7 @@ app/
   static/vendor/     Three.js 0.186.1, Chart.js 4.5.1 (with licences)
 rubric.json          Editable scoring rubric
 run.py               Start the app (start.sh / start.bat wrap it with first-run setup)
+index.py             Vercel entrypoint (hosted version)
 scripts/seed_demo.py Seed a demo cohort through the real API
 scripts/package.py   Build a clean zip to copy to another machine
 tests/               pytest: generator, scenario variants, scoring tree, API, offline check, JS/Python roll parity
@@ -157,6 +168,7 @@ data/                SQLite database (created on first run; delete to reset)
 .venv/bin/python -m pytest tests --ignore=tests/e2e    # 147 Python tests, under a second
 .venv/bin/pip install playwright                        # once: the browser tests drive the installed Chrome
 .venv/bin/python -m pytest                              # all 186, about 5 minutes
+TEST_DATABASE_URL=<postgres url> .venv/bin/python -m pytest tests --ignore=tests/e2e   # same tests on Postgres
 ```
 
 The browser tests block every non-local request, so they also check that nothing is fetched from the internet.
@@ -174,6 +186,7 @@ The browser tests block every non-local request, so they also check that nothing
 | 2026-10-10 | **No zip submission.** `scripts/package.py` still builds one if it is ever needed |
 | 2026-10-10 | **Target laptop:** the MacBook Pro listed under Status |
 | 2026-10-10 | **Team:** Ammar owns every track and reviews merges |
+| 2026-10-10 | **Hosted on Vercel** with Neon Postgres, public link, no login. Local and offline use stays on SQLite |
 
 ## Open scoring questions (issue #15)
 
@@ -208,7 +221,9 @@ Tracked as GitHub issues, all assigned to Ammar:
 - **The cold-start times had pip's download cache warm.** A truly fresh machine will be slower on the first install. `start.sh` needs Python 3.10 or newer and refuses macOS's built-in 3.9 with a clear message.
 - **Scoring needs the server.** If the server is down when a session ends, the session is kept in the browser and offered for resending on Mission select.
 - **Identity:** trainees are identified by callsign and unit only.
-- **`--lan` mode has no login.** Use it only on a trusted network, and add instructor login before any shared deployment.
+- **`--lan` mode has no login.** Use it only on a trusted network.
+- **The hosted version is public with no login.** Anyone with the link can create trainees and sessions, and read the dashboard and CSV exports. Keep real personnel data off it. Before wider use, add instructor login or turn on Vercel Deployment Protection.
+- **Hosted latency:** every request opens a new database connection to Neon, and Neon's free tier sleeps when idle. The first request after a quiet spell takes a second or two longer.
 - **Visual effects are not scored.** Swarm separation and wobble are drawn on top of each drone's path; the server always scores the clean path.
 
 ## Working rules

@@ -10,7 +10,7 @@ from flask import Blueprint, Response, current_app, jsonify, request
 from werkzeug.exceptions import HTTPException
 
 from . import analytics, scenario as scen, scoring
-from .db import get_db
+from .db import avg1, get_db
 
 bp = Blueprint("api", __name__, url_prefix="/api")
 
@@ -84,7 +84,7 @@ def get_rubric():
 def list_trainees():
     unit = request.args.get("unit")
     sql = ("SELECT t.id, t.callsign, t.unit, t.created_at, COUNT(s.id) AS sessions, "
-           "ROUND(AVG(s.total), 1) AS average FROM trainees t LEFT JOIN sessions s ON s.trainee_id = t.id ")
+           f"{avg1('s.total')} AS average FROM trainees t LEFT JOIN sessions s ON s.trainee_id = t.id ")
     args = ()
     if unit:
         sql += "WHERE t.unit = ? "
@@ -99,8 +99,8 @@ def find_or_create_trainee(callsign, unit):
     if row:
         return dict(row), False
     with db:
-        cur = db.execute("INSERT INTO trainees (callsign, unit) VALUES (?, ?)", (callsign, unit))
-    return dict(db.execute("SELECT * FROM trainees WHERE id = ?", (cur.lastrowid,)).fetchone()), True
+        new_id = db.insert("INSERT INTO trainees (callsign, unit) VALUES (?, ?)", (callsign, unit))
+    return dict(db.execute("SELECT * FROM trainees WHERE id = ?", (new_id,)).fetchone()), True
 
 
 @bp.post("/trainees")
@@ -150,7 +150,7 @@ def submit_session():
     started_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     db = get_db()
     with db:  # one transaction: a failure leaves no half-written session
-        cur = db.execute(
+        session_id = db.insert(
             "INSERT INTO sessions (trainee_id, scenario_id, scenario_name, seed, params, started_at, duration_s, "
             "total, detection, classification, engagement, grade, false_alarms, breaches, critical_errors, result) "
             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
@@ -159,7 +159,6 @@ def submit_session():
              result["stages"]["detection"], result["stages"]["classification"], result["stages"]["engagement"],
              result["grade"], result["penalties"]["false_alarms"], result["penalties"]["breaches"],
              result["penalties"]["critical_errors"], json.dumps(result)))
-        session_id = cur.lastrowid
         db.executemany("INSERT INTO events (session_id, t, type, contact_id, data) VALUES (?, ?, ?, ?, ?)",
                        [(session_id, e["t"], e["type"], e["contact_id"], json.dumps(e["data"])) for e in events])
     return jsonify({"session_id": session_id, "trainee": trainee, "started_at": started_at, **result}), 201
@@ -250,7 +249,7 @@ def export_unit(unit):
         raise ApiError("no sessions for that unit", 404)
     header = ["session_id", "date_utc", "callsign", "scenario", "seed", "total", "grade", "detection",
               "classification", "engagement", "false_alarms", "breaches", "critical_errors"]
-    return _csv(f"unit-{unit}.csv", header, [tuple(r) for r in rows])
+    return _csv(f"unit-{unit}.csv", header, [tuple(dict(r).values()) for r in rows])
 
 
 # ---------------------------------------------------------------- analytics
