@@ -10,8 +10,8 @@ Settle these first, because each one changes what gets built. The first four mat
 - [x] Confirm whether a VR demonstration is expected, or desktop is enough (desktop only, decided 2026-10-07)
 - [ ] Find any official reference for threat classes and rules of engagement to align the rubric with
 - [ ] ~~Decide who plays the instructor during the demo~~ (not applicable: no demo scheduled, 2026-10-07)
-- [ ] Confirm the team and who owns the simulator, backend and dashboard
-- [ ] Pick the target laptop and note its GPU and browser
+- [x] Confirm the team and who owns the simulator, backend and dashboard (Ammar owns everything and reviews merges, 2026-10-10)
+- [x] Pick the target laptop and note its GPU and browser (MacBook Pro, M5 Pro 16-core GPU, Chrome 155; see `STATUS.md`)
 - [x] Create the project folder and a Git repository with a first commit
 - [x] Install Python 3.10 or newer, Flask and pytest
 - [x] Copy Three.js and Chart.js into the static folder so nothing loads from the internet
@@ -95,8 +95,8 @@ Nothing should be called done until these pass on the target laptop.
 - [x] API tests pass: submit, read back, analytics shapes, bad input rejected
 - [x] Browser smoke test loads the simulator with no console errors and saves a session
 - [x] The whole system works with Wi-Fi switched off
-- [ ] The simulator holds 30 fps or better with a 12-drone swarm on the target laptop
-- [ ] Launch to first scenario takes under 60 seconds from a clean start
+- [x] The simulator holds 30 fps or better with a 12-drone swarm on the target laptop (120 fps on Auto and Low, the display cap, 2026-10-10)
+- [x] Launch to first scenario takes under 60 seconds from a clean start (0.7 s warm, 5.4 s from a fresh clone, 2026-10-10)
 - [x] Every score change shows a decision-tree reason
 - [x] Keyboard-only run through a full scenario works
 - [x] Text is at least 14 px and focus rings are visible (captions 12 px as allowed; `test_access::test_text_sizes`, `test_finish::test_comparison_chart_and_focus_rings`)

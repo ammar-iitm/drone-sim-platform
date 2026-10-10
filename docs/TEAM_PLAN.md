@@ -17,8 +17,8 @@ These block work below. Decide them and note the answers in `STATUS.md` under "O
 | ~~L3~~ | ~~Who plays the instructor in the demo, and who drives the laptop~~ (no demo) | B4 |
 | L4 | Light theme for the dashboard: needed, or keep the Stitch dark look? | A5 |
 | L5 | Text size: keep 12 px captions, or move all data text to 14 px? | A5 |
-| L6 | Pick the target laptop; record its GPU and browser in `STATUS.md` | A1 to A4 |
-| L7 | Team owners: confirm A and B below, and who reviews merges | Everyone |
+| ~~L6~~ | ~~Pick the target laptop~~ (done 2026-10-10: MacBook Pro, M5 Pro, Chrome 155) | A1 to A4 |
+| ~~L7~~ | ~~Team owners~~ (done 2026-10-10: Ammar owns A and B and reviews merges) | Everyone |
 
 Checklist items covered: "Confirm the date and format…", "Confirm whether a VR demonstration…", "Decide who plays the instructor…", "Confirm the team…", "Pick the demo laptop…".
 
@@ -28,8 +28,8 @@ Checklist items covered: "Confirm the date and format…", "Confirm whether a VR
 
 | # | Task | How to do it | Done when | Size |
 | --- | --- | --- | --- | --- |
-| A1 | 12-drone frame rate on the demo laptop | `git pull`, run `run.py`, open `/sim?callsign=test&unit=test&seed=7&difficulty=5&swarm=12&degradation=0`, wait for the swarm (watch the radar), face it, and read the FPS and Quality chips. Repeat with Graphics quality set to Low on Mission select. | 30 fps or more on Auto or Low. Record both numbers in `STATUS.md`. If under 30 even on Low, open an issue with the laptop model and the numbers. | S |
-| A2 | Launch to first scenario under 60 s | From a terminal with the app stopped, start a stopwatch, run `.venv/bin/python run.py`, open `/mission`, enter a callsign, pick Dawn Recon Pass, press Launch, then Enter. | Stopwatch reads under 60 s. Record the time. | S |
+| ~~A1~~ | ~~12-drone frame rate~~ (done 2026-10-10: 120 fps on Auto and Low) | `git pull`, run `run.py`, open `/sim?callsign=test&unit=test&seed=7&difficulty=5&swarm=12&degradation=0`, wait for the swarm (watch the radar), face it, and read the FPS and Quality chips. Repeat with Graphics quality set to Low on Mission select. | 30 fps or more on Auto or Low. Record both numbers in `STATUS.md`. If under 30 even on Low, open an issue with the laptop model and the numbers. | S |
+| ~~A2~~ | ~~Launch to first scenario under 60 s~~ (done 2026-10-10: 0.7 s warm, 5.4 s cold) | From a terminal with the app stopped, start a stopwatch, run `.venv/bin/python run.py`, open `/mission`, enter a callsign, pick Dawn Recon Pass, press Launch, then Enter. | Stopwatch reads under 60 s. Record the time. | S |
 | A3 | Second machine | On a laptop that has never run the project, follow only `README.md`: clone, create the venv, `pip install`, run. Then switch Wi-Fi off and play one scenario. | It works using only the README. Fix any README gaps you hit. | S |
 | A4 | Human sense checks | The checks under "Needs a human check" in `STATUS.md`: **audio** (hum, tick, chime, buzz, breach alarm, M to mute), **colour-blind** (macOS Greyscale filter: markers and dashboard still readable), **Urban Canyon feel** (a brief window around T+37 s at about 115°). | Each passes, or an issue is filed with a screenshot. | S |
 | A5 | Theme and text size, after L4 and L5 | Light theme: add light-mode tokens to `aegis.css` from the Visual Design doc's light column, applied to the dashboard pages only (the simulator stays dark). Text: if 14 px is chosen, raise `.label` and the table header sizes, then fix any wrapping. | `python -m pytest tests/e2e` passes, including `test_access::test_text_sizes`. Before and after screenshots are attached to the PR. | M |

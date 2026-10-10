@@ -11,7 +11,9 @@ This is the starting page for anyone picking up the project. The detail lives in
   - **F8 audio:** tested in code, but nobody has listened yet.
   - **F9 VR:** not built; desktop only by lead decision.
 - **Tests:** 186 pass in total, 147 Python and 39 browser (Playwright).
-- **Checklist:** 67 of 81 items ticked. Of the 14 left, 5 are not applicable (no demo, no zip submission) and 9 are open (see "What is left").
+- **Checklist:** 71 of 81 items ticked. Of the 10 left, 5 are not applicable (no demo, no zip submission) and 5 are open (see "What is left").
+- **Target laptop:** MacBook Pro, Apple M5 Pro (16-core GPU), 24 GB, Chrome 155. 12-drone swarm at 120 fps (the display cap) on Auto and Low; launch to a running scenario in 0.7 s warm, 5.4 s from a fresh clone.
+- **Team:** Ammar owns every track and reviews merges.
 - **No demo is scheduled** (lead decision, 2026-10-07). [docs/DEMO.md](docs/DEMO.md) is kept as a ready walkthrough in case one is arranged.
 - **No zip submission** (lead decision, 2026-10-10). `scripts/package.py` still builds a zip if one is ever needed.
 - **Problem statement:** the official PS 26247 text is in [docs/PS_MAPPING.md](docs/PS_MAPPING.md); all 24 elements are met, including randomization against rote learning.
@@ -82,10 +84,6 @@ Tracked as GitHub issues with labels `lead`, `track-a` and `track-b`.
 
 | Owner | Issue | Task | Blocked on |
 | --- | --- | --- | --- |
-| Lead | #7 | Confirm the track owners and the merge reviewer; share teammates' GitHub usernames | — |
-| Lead | #6 | Pick the target laptop and record its GPU and browser | — |
-| Track A | #8 | 12-drone swarm at 30 fps or better on the target laptop (so far: 30 fps with 8 drones) | #6 |
-| Track A | #9 | Launch to first scenario in under 60 s, timed by hand (scripted run: 2.3 s warm, 8.4 s cold) | #6 |
 | Track A | #10 | Install on a second machine from the README only; **run `start.bat` on Windows** | — |
 | Track A | #11 | Human checks: listen to the audio cues and M to mute, greyscale colour-blind review, Urban Canyon feel | — |
 | Track A | #13 | Keep the full suite green on every merge | ongoing |
@@ -95,9 +93,9 @@ Tracked as GitHub issues with labels `lead`, `track-a` and `track-b`.
 
 ## Known limits and risks
 
-- **Frame rate headroom is thin.** 30 fps was measured with 8 drones on the team laptop. Quality levels (Auto, High, Medium, Low) exist, but 12 drones has not been measured on real hardware.
+- **The target laptop is fast.** 120 fps with 12 drones on an M5 Pro says little about the PRD baseline (integrated GPU, 8 GB). An earlier laptop run reached only 30 fps with 8 drones, before quality levels existed. If the trainer goes on weaker machines, measure there (Auto steps down quality on its own).
 - **`start.bat` has never run on Windows.**
-- **The cold-start time (8.4 s) had pip's cache warm.** A truly fresh machine will be slower on the first install.
+- **The cold-start times (8.4 s, then 5.4 s on 2026-10-10) had pip's cache warm.** A truly fresh machine will be slower on the first install.
 - **Rubric numbers** (weights, penalties, grade bands, the 300 m "late" range) are team choices. No public source gives them. Say so if anyone asks.
 - **Scoring is server-side only.** If the server is down at the end of a session, the session is kept in the browser and offered for resending on Mission select.
 - **`--lan` mode has no login.** Use it only on a trusted network.

@@ -62,17 +62,34 @@ Of the 21 requirements: **19 Verified, 2 Partial, 0 Present but unverified, 0 Mi
 | Server-owned scoring | Met | `api.submit_session` rebuilds the scenario and ignores any client score (`test_submit_score_store_and_read_back` sends `total: 100`) |
 | No real weapon modelling | Met | Abstract responses with configurable effectiveness only |
 
+## Target laptop (decided 2026-10-10, issue #6)
+
+**MacBook Pro (Mac17,9), Apple M5 Pro (15-core CPU, 16-core GPU), 24 GB, macOS 27.0.1, Google Chrome 155.0.8059.39, 3024 × 1964 Retina display at up to 120 Hz.** This is well above the PRD baseline (integrated GPU, 8 GB RAM), so the results below do not prove the trainer runs on a low-end laptop. The quality levels (Auto steps down after 3 s under 35 fps) are the safeguard there, and the second-machine check (#10) is the place to try a weaker laptop.
+
+| Check | Result on the target laptop (2026-10-10) |
+| --- | --- |
+| 12-drone swarm frame rate (#8) | `/sim?...&seed=7&difficulty=5&swarm=12&degradation=0` in a visible Chrome window at 1920 × 1080 (device pixel ratio 2), view turned to face the swarm, FPS chip sampled every 0.5 s for 13 s once all 12 drones were within 2.5 km: **Auto 120 fps** (min 120, Auto stayed on High) and **Low 120 fps** (min 120). 120 is the display's refresh cap, so the headroom is larger. The swarm comes in on two axes, so one group was in frame at a time; 20 or more contacts were active. Scripted run (Playwright driving headed Chrome) |
+| Launch to first scenario (#9) | App stopped, Chrome already open, stopwatch from starting the server to Dawn Recon running after Launch and Enter: **0.6 to 0.7 s warm** (`run.py` or `./start.sh` with an existing `.venv`), **5.4 s cold** from a fresh clone where `./start.sh` built `.venv` and installed the requirements (pip's download cache was likely warm). Clicks were scripted; a person typing a callsign adds about 10 to 15 s, still far under 60 s |
+
+`start.sh` also refused macOS's built-in Python 3.9 with a clear message (it needs 3.10 or newer); the README already says so.
+
 ## Hand-over readiness (2026-10-07)
 
 | Item | Evidence |
 | --- | --- |
 | One-command start | `start.sh` (macOS/Linux): from an unzipped package with no `.venv`, `./start.sh --demo` created the environment, installed, seeded and served `/mission` in **8.4 s** on the dev Mac (pip cache warm). `start.bat` for Windows is written but **not yet run on Windows** (track A, issue #10) |
-| Launch to first scenario | Warm `./start.sh` to a running scenario took **2.3 s** with scripted clicks on the dev Mac. Still to be timed by hand on the target laptop (issue #9) |
+| Launch to first scenario | Warm `./start.sh` to a running scenario took **2.3 s** with scripted clicks on the dev Mac. Timed on the target laptop on 2026-10-10: see "Target laptop" above |
 | Self-contained package | `scripts/package.py` builds a 0.6 MB zip (71 files, vendored libraries included). The non-browser tests (114 at the time) pass inside the unzipped package |
 | No lost sessions | If saving fails, the session is kept in the browser and Mission select offers to resend it (`test_finish::test_unsaved_session_is_kept_and_resent`) |
 | In-app help | `/help` explains controls, markers, sensors and radar, and draws the scoring tree from the live rubric (`test_finish::test_help_page_shows_live_rubric`) |
 
 ## Decisions
+
+Decided by the lead on 2026-10-10:
+
+- **Target laptop:** the lead's MacBook Pro (M5 Pro), recorded under "Target laptop".
+- **Team:** Ammar owns every track (lead, A and B) and reviews merges. There are no other collaborators.
+- **No zip submission.**
 
 Decided by the lead on 2026-10-07:
 
@@ -89,7 +106,7 @@ Still open (track B, issue #15):
 
 ## Needs a human check
 
-1. ~~**On the target laptop:** Wi-Fi-off run~~ done 2026-10-06. Saturation Swarm (8 drones) measured **30 fps**: passes, but with no headroom. Since then, quality levels have been added (Auto/High/Medium/Low; Auto steps down after 3 s under 35 fps). Re-measure on the target laptop with a 12-drone swarm: `/sim?callsign=test&unit=test&seed=7&difficulty=5&swarm=12&degradation=0`, first on Auto, then on Low.
+1. ~~**On the target laptop:** Wi-Fi-off run~~ done 2026-10-06. ~~12-drone swarm frame rate~~ done 2026-10-10: 120 fps on Auto and Low (see "Target laptop"). The 30 fps measured on 2026-10-06 was with 8 drones, before quality levels existed.
 2. **Audio:** play any scenario with sound on. The rotor hum should rise as a drone closes in, and the chime, buzz and breach alarm should play on their events. Check that **M** mutes.
 3. **Colour-blind review** (my review of the greyscale render `13-greyscale-markers.png` passed: all four states are distinct by shape and text; please confirm by eye): set macOS Display → Colour filters → Greyscale, then check that threat markers (triangle, diamond, circle, square, all with text labels) and the dashboard still read correctly.
 4. **Urban Canyon feel:** the drone should be visible for about 4 s around T+37 s and again on final approach.
