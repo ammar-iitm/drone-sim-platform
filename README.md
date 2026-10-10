@@ -2,7 +2,7 @@
 
 A browser-based simulator that trains unit-level personnel to detect, classify and respond to drone and swarm threats. Every session is scored on the server by an explainable decision tree, and an after-action review (AAR) dashboard tracks trainees and units over repeated sessions. It runs fully offline on an ordinary laptop.
 
-New to the project? Start with [HANDOFF.md](HANDOFF.md). Planning documents: [docs/PRD.md](docs/PRD.md), [docs/AVD.md](docs/AVD.md), [docs/VISUAL_DESIGN.md](docs/VISUAL_DESIGN.md), [docs/CHECKLIST.md](docs/CHECKLIST.md), [docs/STATUS.md](docs/STATUS.md).
+Planning documents: [docs/PRD.md](docs/PRD.md), [docs/AVD.md](docs/AVD.md), [docs/VISUAL_DESIGN.md](docs/VISUAL_DESIGN.md), [docs/CHECKLIST.md](docs/CHECKLIST.md), [docs/STATUS.md](docs/STATUS.md).
 
 ## Install and run
 
