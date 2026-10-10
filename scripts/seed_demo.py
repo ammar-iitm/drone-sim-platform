@@ -5,6 +5,7 @@ scoring engine. Trainees improve over their sessions at different rates.
 
     python scripts/seed_demo.py            # adds the cohort to data/trainer.db
     python scripts/seed_demo.py --reset    # deletes data/trainer.db first
+    DATABASE_URL=<postgres url> python scripts/seed_demo.py   # seeds a hosted Postgres database instead
 """
 
 import argparse
@@ -14,7 +15,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from app import ROOT, create_app, geometry, scenario as scen  # noqa: E402
+from app import ROOT, create_app, db, geometry, scenario as scen  # noqa: E402
 from app.scoring import load_rubric  # noqa: E402
 
 COHORT = {
@@ -78,7 +79,8 @@ def main():
                 res = client.post("/api/sessions", json=body)
                 assert res.status_code == 201, res.get_json()
                 count += 1
-    print(f"Seeded {count} sessions for {sum(len(p) for p in COHORT.values())} trainees in {len(COHORT)} units into {db_path}")
+    target = "the Postgres database in DATABASE_URL" if db.database_url(app) else db_path
+    print(f"Seeded {count} sessions for {sum(len(p) for p in COHORT.values())} trainees in {len(COHORT)} units into {target}")
 
 
 if __name__ == "__main__":

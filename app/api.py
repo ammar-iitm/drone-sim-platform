@@ -5,6 +5,7 @@ import io
 import json
 import re
 from datetime import datetime, timezone
+from urllib.parse import unquote
 
 from flask import Blueprint, Response, current_app, jsonify, request
 from werkzeug.exceptions import HTTPException
@@ -238,9 +239,15 @@ def export_session(session_id):
     return _csv(f"session-{session_id}-{row['callsign']}.csv", header, rows)
 
 
+def _unit_name(raw):
+    # Vercel's Python runtime hands the path segment over still percent-encoded ("4%20GUARDS").
+    # Decoding twice is harmless locally unless a unit name itself contains "%" plus two hex digits.
+    return unquote(raw).upper()
+
+
 @bp.get("/analytics/unit/<unit>/export.csv")
 def export_unit(unit):
-    unit = unit.upper()
+    unit = _unit_name(unit)
     rows = get_db().execute(
         "SELECT s.id, s.started_at, t.callsign, s.scenario_name, s.seed, s.total, s.grade, s.detection, "
         "s.classification, s.engagement, s.false_alarms, s.breaches, s.critical_errors FROM sessions s "
@@ -264,7 +271,7 @@ def trainee_analytics(trainee_id):
 
 @bp.get("/analytics/unit/<unit>")
 def unit_analytics(unit):
-    data = analytics.unit(get_db(), unit.upper())
+    data = analytics.unit(get_db(), _unit_name(unit))
     if data is None:
         raise ApiError("no trainees in that unit", 404)
     return jsonify(data)

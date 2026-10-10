@@ -13,3 +13,8 @@ dist/
 # Vercel
 .vercel
 .env*
+
+# Neon agent skills added by the Vercel integration (not part of the app)
+.agents/
+.claude/
+skills-lock.json
