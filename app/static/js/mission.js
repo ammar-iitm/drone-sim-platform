@@ -81,6 +81,10 @@ async function preview() {
   return { params: data.params, name: data.name, id: data.id };
 }
 
+function randomSeed() {
+  return 1 + Math.floor(Math.random() * 999999);
+}
+
 function launch() {
   if ($('launch').disabled) return;
   const callsign = $('callsign').value.trim();
@@ -90,7 +94,10 @@ function launch() {
   store.set('dtt.quality', $('quality').value);
   const q = new URLSearchParams({ callsign, unit });
   if ($('quality').value !== 'auto') q.set('quality', $('quality').value);
-  if (selection.kind === 'scripted') q.set('id', selection.id);
+  if (selection.kind === 'scripted') {
+    q.set('id', selection.id);
+    if ($('vary').checked) q.set('vary', randomSeed());
+  }
   else Object.entries(selection.params).forEach(([k, v]) => q.set(k, v));
   location.href = '/sim?' + q;
 }
@@ -100,7 +107,11 @@ $('unit').value = store.get('dtt.unit') || '';
 $('quality').value = store.get('dtt.quality') || 'auto';
 ['callsign', 'unit'].forEach((id) => $(id).addEventListener('input', updateHeader));
 $('difficulty').addEventListener('input', () => { $('difficulty-out').textContent = $('difficulty').value; });
-$('reseed').addEventListener('click', () => { $('seed').value = Math.floor(Math.random() * 1e6); preview(); });
+$('vary').checked = store.get('dtt.vary') !== 'off';
+$('vary').addEventListener('change', () => store.set('dtt.vary', $('vary').checked ? 'on' : 'off'));
+// A fresh seed on every visit, so the generator does not hand out the same scenario by default.
+$('seed').value = randomSeed();
+$('reseed').addEventListener('click', () => { $('seed').value = randomSeed(); preview(); });
 $('proc-form').addEventListener('change', preview);
 $('use-proc').addEventListener('click', async () => {
   const p = await preview();

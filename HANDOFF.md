@@ -10,7 +10,7 @@ This is the starting page for anyone picking up the project. The detail lives in
 - **Requirements:** 19 of 21 PRD requirements are verified by tests or screenshots. Two are partial:
   - **F8 audio:** tested in code, but nobody has listened yet.
   - **F9 VR:** not built; desktop only by lead decision.
-- **Tests:** 146 pass in total, 114 Python and 32 browser (Playwright).
+- **Tests:** 186 pass in total, 147 Python and 39 browser (Playwright).
 - **Checklist:** 66 of 81 items ticked. Of the 15 left, 4 are not applicable because there is no demo, and 11 are open (see "What is left").
 - **No demo is scheduled** (lead decision, 2026-10-07). [docs/DEMO.md](docs/DEMO.md) is kept as a ready walkthrough in case one is arranged.
 
@@ -27,9 +27,9 @@ This needs Python 3.10 or newer, and internet once for the first install. The sc
 To run the tests:
 
 ```bash
-.venv/bin/python -m pytest tests --ignore=tests/e2e    # 114 Python tests, under a second
+.venv/bin/python -m pytest tests --ignore=tests/e2e    # 147 Python tests, under a second
 .venv/bin/pip install playwright                        # browser tests use the installed Chrome
-.venv/bin/python -m pytest                              # all 146
+.venv/bin/python -m pytest                              # all 186
 ```
 
 [README.md](README.md) covers controls, options, graphics quality and rubric editing.
@@ -41,7 +41,7 @@ To run the tests:
 | `app/__init__.py` | Flask app factory. The database is `data/trainer.db` (SQLite) and the rubric is `rubric.json` |
 | `app/api.py` | JSON API: scenarios, rubric, trainees, sessions (submit, then score, then store), analytics, CSV export |
 | `app/scoring.py` | The decision tree. A pure function of scenario, events and rubric. **The server owns the score** and ignores any score the browser sends |
-| `app/scenario.py`, `app/scenarios/*.json` | Seeded procedural generator and the six scripted scenarios |
+| `app/scenario.py`, `app/scenarios/*.json` | Seeded procedural generator, the six scripted scenarios and their seeded variants (`vary`) |
 | `app/rng.py` and `app/static/js/sim/rng.js` | Response rolls that are bit-identical in Python and JS (a test enforces this) |
 | `app/analytics.py` | Trainee trends, unit rollup, weakest skill, confusion matrix |
 | `app/static/js/sim/` | The simulator. `main.js` holds the loop, input and HUD; `world.js` the Three.js rendering (the VR seam); `radar.js` the radar model; `audio.js`, `marks.js`, `path.js` |

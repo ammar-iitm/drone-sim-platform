@@ -65,7 +65,7 @@ def get_scenario():
     sid = request.args.get("id")
     try:
         if sid and not sid.startswith("proc-"):
-            return jsonify(scen.build_scripted(sid))
+            return jsonify(scen.build_scripted(sid, request.args.get("vary")))
         return jsonify(scen.generate(request.args.to_dict()))
     except KeyError:
         raise ApiError(f"no scripted scenario with id {sid!r}", 404)

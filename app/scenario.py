@@ -197,11 +197,52 @@ def list_scripted():
     return out
 
 
-def build_scripted(scenario_id):
+# How far a scripted scenario may vary between runs, so trainees cannot learn it by rote.
+# A scenario file can narrow these with a "vary" block; Urban Canyon sets rotate_deg to 0
+# because its route is threaded between buildings that do not rotate with it.
+VARY_DEFAULTS = {"rotate_deg": 30, "shift_s": [-4, 8], "jitter_s": 4}
+
+
+def parse_vary(value):
+    """A variant number from 1 to MAX_SEED, or None for the canonical scenario."""
+    if value in (None, "", 0, "0"):
+        return None
+    if isinstance(value, bool):
+        raise ValueError("vary must be an integer")
+    try:
+        n = int(value)
+    except (TypeError, ValueError):
+        raise ValueError("vary must be an integer") from None
+    if not 1 <= n <= MAX_SEED:
+        raise ValueError(f"vary must be between 1 and {MAX_SEED}")
+    return n
+
+
+def _apply_variant(raw, vary):
+    """Rotate every approach by one angle, shift the start, jitter each contact's spawn time and
+    reseed the response rolls. Relative geometry (axes, swarm formations, the threat mix) is kept,
+    so each scenario still teaches the same thing."""
+    cfg = {**VARY_DEFAULTS, **raw.get("vary", {})}
+    rng = random.Random(f"{raw['id']}:{vary}")
+    turn = rng.uniform(-cfg["rotate_deg"], cfg["rotate_deg"])
+    shift = rng.uniform(*cfg["shift_s"])
+    for entry in raw["contacts"]:
+        jitter = rng.uniform(-cfg["jitter_s"], cfg["jitter_s"])
+        entry["spawn_t"] = round(max(2.0, entry["spawn_t"] + shift + jitter), 1)
+        for w in entry["waypoints"]:
+            w["brg"] = (w["brg"] + turn) % 360
+    raw["seed"] = rng.randrange(1, MAX_SEED)
+    raw["duration_s"] += max(0, math.ceil(shift + cfg["jitter_s"]))
+
+
+def build_scripted(scenario_id, vary=None):
     raw = _scripted_raw().get(scenario_id)
     if raw is None:
         raise KeyError(scenario_id)
     raw = json.loads(json.dumps(raw))  # deep copy
+    vary = parse_vary(vary)
+    if vary is not None:
+        _apply_variant(raw, vary)
     env_in = raw["environment"]
     env = environment_for(env_in["time_of_day"], env_in["terrain"], env_in["terrain_seed"],
                           env_in.get("degradation", 0),
@@ -218,7 +259,7 @@ def build_scripted(scenario_id):
             contacts.append(entry)
     scenario = {
         "id": raw["id"], "name": raw["name"], "kind": "scripted", "seed": raw["seed"],
-        "params": None, "objective": raw["objective"], "duration_s": raw["duration_s"],
+        "params": {"vary": vary} if vary is not None else None, "objective": raw["objective"], "duration_s": raw["duration_s"],
         "environment": env, "contacts": contacts,
     }
     return _finish(scenario)
@@ -344,5 +385,6 @@ def generate(raw_params):
 def get_scenario(scenario_id=None, params=None):
     """Rebuild a scenario from what a client is allowed to send: a scripted id, or procedural params."""
     if scenario_id and not str(scenario_id).startswith("proc-"):
-        return build_scripted(scenario_id)
+        vary = params.get("vary") if isinstance(params, dict) else None
+        return build_scripted(scenario_id, vary)
     return generate(params or {})

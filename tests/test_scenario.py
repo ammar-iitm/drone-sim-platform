@@ -1,8 +1,10 @@
 import json
+import math
 
 import pytest
 
 from app import scenario as scen
+from app import geometry
 from app.geometry import end_time
 
 MODELS = set(scen.BASE_SPEED)
@@ -111,3 +113,70 @@ def test_scripted_catalogue_matches_prd():
 def test_four_degradation_levels_match_visual_design_table(level, expected):
     env = scen.generate({"seed": 3, "degradation": level})["environment"]
     assert {k: env[k] for k in expected} == expected
+
+
+# ---------------------------------------------------------------- scripted variants (rote learning)
+
+SCRIPTED_IDS = [x["id"] for x in scen.list_scripted()]
+
+
+def _bearing(wp):
+    return math.degrees(math.atan2(wp[0], -wp[2])) % 360
+
+
+@pytest.mark.parametrize("scenario_id", SCRIPTED_IDS)
+def test_variant_is_reproducible_and_differs(scenario_id):
+    base = scen.build_scripted(scenario_id)
+    a = scen.build_scripted(scenario_id, 4242)
+    _check_schema(a)
+    assert json.dumps(a, sort_keys=True) == json.dumps(scen.build_scripted(scenario_id, "4242"), sort_keys=True)
+    assert a["params"] == {"vary": 4242} and base["params"] is None
+    assert a["seed"] != base["seed"]  # new response rolls
+    others = [scen.build_scripted(scenario_id, v) for v in (1, 77, 90210)]
+    assert len({json.dumps(o["contacts"], sort_keys=True) for o in others + [a]}) == 4
+    assert scen.build_scripted(scenario_id, None) == base == scen.build_scripted(scenario_id, 0)
+
+
+@pytest.mark.parametrize("scenario_id", SCRIPTED_IDS)
+@pytest.mark.parametrize("vary", [1, 4242, 2**31 - 1])
+def test_variant_keeps_the_learning_objective(scenario_id, vary):
+    base, v = scen.build_scripted(scenario_id), scen.build_scripted(scenario_id, vary)
+    assert v["environment"] == base["environment"]
+    assert v["duration_s"] >= max(geometry.end_time(c) for c in v["contacts"] if c["threat"] == "hostile")
+
+    # Same contacts with the same range and altitude profile: only bearing and timing change.
+    def profile(c):
+        return (c["model"], c["threat"], c["true_class"], json.dumps(c["swarm"], sort_keys=True), c["speed_mps"],
+                tuple(w[1] for w in c["waypoints"]))
+
+    def ranges(c):
+        return [math.hypot(w[0], w[2]) for w in c["waypoints"]]
+    assert sorted(map(profile, base["contacts"])) == sorted(map(profile, v["contacts"]))
+
+    turns = set()
+    for b in base["contacts"]:
+        c = next(x for x in v["contacts"] if profile(x) == profile(b)
+                 and all(abs(r1 - r2) < 1.5 for r1, r2 in zip(ranges(x), ranges(b))))
+        assert c["spawn_t"] >= 2
+        # A drone that reached the post still does; one that turned away still does.
+        assert geometry.ends_inside(c, 120) == geometry.ends_inside(b, 120)
+        for p, q in zip(c["waypoints"], b["waypoints"]):
+            if math.hypot(q[0], q[2]) > 50:
+                turns.add(round(((_bearing(p) - _bearing(q) + 180) % 360) - 180))
+    # One rotation for the whole scenario (within rounding), so the angles between axes are kept.
+    assert max(turns) - min(turns) <= 1, turns
+    assert all(abs(t) <= 30 for t in turns)
+
+
+def test_urban_canyon_variants_keep_the_route_between_the_buildings():
+    base = scen.build_scripted("s3-urban-canyon")
+    for vary in (1, 4242, 99999):
+        v = scen.build_scripted("s3-urban-canyon", vary)
+        assert [c["waypoints"] for c in v["contacts"]] == [c["waypoints"] for c in base["contacts"]]
+        assert [c["par_detect_s"] for c in v["contacts"]] == [c["par_detect_s"] for c in base["contacts"]]
+
+
+@pytest.mark.parametrize("bad", ["abc", -1, 2**31, True, 1.5e12, [3]])
+def test_bad_variant_rejected(bad):
+    with pytest.raises(ValueError):
+        scen.build_scripted("s1-dawn-recon", bad)

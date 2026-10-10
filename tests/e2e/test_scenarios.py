@@ -1,4 +1,5 @@
-"""Play all six scripted scenarios end to end (checklist "Scenarios") at x16 fast-forward.
+"""Play all six scripted scenarios end to end (checklist "Scenarios") at x16 fast-forward,
+both the standard version and a varied run.
 
 A scripted trainee in the page calls the same decision functions the keyboard and mouse
 call (window.__simApi), making the choices each scenario is meant to test. The server
@@ -48,8 +49,9 @@ CASES = {
 }
 
 
-def play(page, server, scenario_id, cfg):
-    page.goto(f"{server}/sim?callsign=bot&unit=e2e&id={scenario_id}&speed=16")
+def play(page, server, scenario_id, cfg, vary=None):
+    extra = f"&vary={vary}" if vary else ""
+    page.goto(f"{server}/sim?callsign=bot&unit=e2e&id={scenario_id}&speed=16{extra}")
     page.wait_for_selector("#begin")
     briefing = page.inner_text("#screen-card")
     page.keyboard.press("Enter")
@@ -60,9 +62,12 @@ def play(page, server, scenario_id, cfg):
     return briefing, detail
 
 
+@pytest.mark.parametrize("vary", [None, 4242], ids=["standard", "variant"])
 @pytest.mark.parametrize("scenario_id", list(CASES))
-def test_scenario_plays_end_to_end(page, server, scenario_id):
-    briefing, detail = play(page, server, scenario_id, CASES[scenario_id])
+def test_scenario_plays_end_to_end(page, server, scenario_id, vary):
+    """Each learning objective holds in the standard scenario and in a varied run."""
+    briefing, detail = play(page, server, scenario_id, CASES[scenario_id], vary)
+    assert detail["params"] == ({"vary": vary} if vary else None)
     result = detail["result"]
     by_threat = lambda t: [c for c in result["contacts"] if c["threat"] == t]  # noqa: E731
     hostiles = by_threat("hostile")

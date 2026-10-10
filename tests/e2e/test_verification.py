@@ -255,3 +255,45 @@ def test_contact_silhouettes(page, server):
     page.locator("#c").screenshot(path=SHOTS / "12-silhouettes.png")
     verts = dict(counts)
     assert len(verts) == 6 and len(set(verts.values())) == 6  # six distinct geometries
+
+
+def test_mission_select_randomises_by_default(page, server):
+    """PS outcome 4: scenario randomization to prevent rote learning."""
+    seeds = set()
+    for _ in range(3):
+        page.goto(f"{server}/mission")
+        page.wait_for_selector(".card")
+        seeds.add(page.input_value("#seed"))
+        assert page.is_checked("#vary")
+    assert len(seeds) == 3 and "" not in seeds and "48213" not in seeds
+
+    launched = []
+    for _ in range(2):
+        page.goto(f"{server}/mission")
+        page.wait_for_selector(".card")
+        page.fill("#callsign", "rote-1")
+        page.fill("#unit", "checks")
+        page.click("button.select[data-id='s4-mixed-traffic']")
+        page.click("#launch")
+        page.wait_for_selector("#begin")
+        launched.append(page.evaluate("window.__sim.scenario"))
+    a, b = launched
+    assert a["params"]["vary"] != b["params"]["vary"]
+    assert a["seed"] != b["seed"] and a["contacts"] != b["contacts"]
+    assert a["id"] == b["id"] == "s4-mixed-traffic"
+
+    # Unticking Vary is remembered and gives the standard scenario.
+    page.goto(f"{server}/mission")
+    page.wait_for_selector(".card")
+    page.uncheck("#vary")
+    page.reload()
+    page.wait_for_selector(".card")
+    assert not page.is_checked("#vary")
+    page.click("button.select[data-id='s4-mixed-traffic']")
+    page.click("#launch")
+    page.wait_for_selector("#begin")
+    assert page.evaluate("window.__sim.scenario.params") is None
+    assert "vary" not in page.url
+    page.goto(f"{server}/mission")
+    page.wait_for_selector(".card")
+    page.check("#vary")

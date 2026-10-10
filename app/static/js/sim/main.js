@@ -71,7 +71,7 @@ function briefing() {
     ['T R J I C', 'Track, Report, Jam, Intercept, Take cover'], ['S', 'Sensor mode: EO, night vision, thermal'],
     ['Q', 'Radar console (full-screen scope and track table)'], ['Space in console', 'Mark the closest unmarked radar track'], ['M', 'Mute or unmute sound'], ['[ ]', 'Radar range 1.5, 3 or 6 km'], ['P / Esc', 'Pause / end session']];
   screen(`
-    <div class="score-head"><div><div class="label cyan">${sc.kind === 'scripted' ? 'Scripted scenario' : 'Procedural · seed ' + sc.seed}</div>
+    <div class="score-head"><div><div class="label cyan">${sc.kind === 'scripted' ? 'Scripted scenario' + (sc.params ? ' · variant ' + sc.params.vary : '') : 'Procedural · seed ' + sc.seed}</div>
       <h2 id="screen-title" class="panel-title" style="font-size:24px">${esc(sc.name)}</h2></div>
       <div class="path"><span class="chip">${env.time_of_day}</span><span class="chip">${env.terrain}</span>
       <span class="chip ${env.degradation ? 'amber' : ''}">Degradation <strong>${env.degradation}</strong></span>

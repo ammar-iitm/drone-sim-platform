@@ -9,7 +9,7 @@
 
 Of the 21 requirements: **19 Verified, 2 Partial, 0 Present but unverified, 0 Missing, 0 Broken.**
 - **Partial:** F8 (every audio cue, the distance-based hum and mute are verified by test, but nobody has listened yet) and F9 (the VR seam is an isolated renderer module, not a WebXR mode).
-- **Tests:** 146 automated tests pass. They cover the generator, every scoring branch, the API, the offline rule, JS/Python roll parity, and 32 browser tests that include all six scenarios played end to end.
+- **Tests:** 186 automated tests pass. They cover the generator, every scoring branch, the API, the offline rule, JS/Python roll parity, and 39 browser tests that include all six scenarios played end to end, both standard and varied.
 - **Checklist:** 66 of 81 items are ticked.
 - **What remains:** checks only a person can do on the target laptop (frame rate with 12 drones, hearing the audio, colour-blind review, a second machine) and the open rubric interpretations. No demo is scheduled.
 
@@ -27,7 +27,7 @@ Of the 21 requirements: **19 Verified, 2 Partial, 0 Present but unverified, 0 Mi
 | F8 | Audio cues and mute (Should) | Partial | **Verified by test:** the hum rises as a drone closes, and the tick, chime, buzz and two-tone breach alarm fire on their events; **M** mutes and unmutes (`test_finish::test_audio_cues_and_mute`, `test_breach_alarm_sounds`). **Not yet:** a person listening | Human check 3 |
 | F9 | Clean seam for VR/WebXR (Could) | Partial | Rendering is isolated in `world.js`; game logic and input live in `main.js` | No WebXR mode, as the PRD states |
 | F10 | Six scripted scenarios with objectives | Verified | `test_scenarios::test_scenario_plays_end_to_end` ×6, each checking its own learning objective | |
-| F11 | Seeded procedural generation; same seed, same scenario | Verified | `test_scenario::test_same_seed_gives_identical_json` ×5, `test_api::test_procedural_via_api_is_deterministic`, `test_verification::test_instructor_settings_and_seed_reuse` | |
+| F11 | Seeded procedural generation; same seed, same scenario | Verified | `test_scenario::test_same_seed_gives_identical_json` ×5, `test_api::test_procedural_via_api_is_deterministic`, `test_verification::test_instructor_settings_and_seed_reuse` | Against rote learning (PS outcome 4): the seed field starts on a new random value each visit, and scripted scenarios launch as a seeded variant by default (one rotation of every approach, shifted and jittered spawn times, new response rolls; Urban Canyon keeps its route). Same `vary` number, same variant. `test_scenario::test_variant_*` (×24), `test_scenario::test_urban_canyon_variants_keep_the_route_between_the_buildings`, `test_api::test_scripted_variant_is_served_scored_and_stored`, `test_scenarios[*-variant]` ×6, `test_verification::test_mission_select_randomises_by_default` |
 | F12 | Difficulty 1–5 (Should) | Verified | `test_scenario::test_difficulty_table_is_respected` (15 cases), mission page slider | |
 | F13 | Decision-tree scoring of detection, classification, engagement | Verified | `tests/test_scoring.py` (43 tests) | |
 | F14 | Tree path and reason for every score change | Verified | `test_scoring::test_every_scored_stage_has_reason_and_node`, `04-score.png`, `05-session.png` | |
@@ -68,7 +68,7 @@ Of the 21 requirements: **19 Verified, 2 Partial, 0 Present but unverified, 0 Mi
 | --- | --- |
 | One-command start | `start.sh` (macOS/Linux): from an unzipped package with no `.venv`, `./start.sh --demo` created the environment, installed, seeded and served `/mission` in **8.4 s** on the dev Mac (pip cache warm). `start.bat` for Windows is written but **not yet run on Windows** (track A, issue #10) |
 | Launch to first scenario | Warm `./start.sh` to a running scenario took **2.3 s** with scripted clicks on the dev Mac. Still to be timed by hand on the target laptop (issue #9) |
-| Self-contained package | `scripts/package.py` builds a 0.6 MB zip (71 files, vendored libraries included). The 114 non-browser tests pass inside the unzipped package |
+| Self-contained package | `scripts/package.py` builds a 0.6 MB zip (71 files, vendored libraries included). The non-browser tests (114 at the time) pass inside the unzipped package |
 | No lost sessions | If saving fails, the session is kept in the browser and Mission select offers to resend it (`test_finish::test_unsaved_session_is_kept_and_resent`) |
 | In-app help | `/help` explains controls, markers, sensors and radar, and draws the scoring tree from the live rubric (`test_finish::test_help_page_shows_live_rubric`) |
 

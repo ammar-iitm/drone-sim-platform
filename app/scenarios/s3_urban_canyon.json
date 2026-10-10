@@ -6,6 +6,7 @@
   "threat_summary": "One quadcopter between buildings",
   "seed": 303,
   "duration_s": 100,
+  "vary": { "rotate_deg": 0 },
   "environment": {
     "time_of_day": "day",
     "terrain": "urban",

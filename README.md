@@ -48,6 +48,8 @@ You can also add `&quality=low` to a simulator URL.
 ## Using it
 
 1. **Mission select** (`/mission`): enter a callsign and unit. Pick one of the six scripted scenarios, or set seed, difficulty, time of day, terrain, degradation, swarm size and threat mix for a procedural one. Then press **Launch**.
+   - **Vary each run** (on by default) launches a scripted scenario as a seeded variant: every approach turns by the same angle (up to 30°), spawn times shift, and response rolls change, so trainees cannot learn it by rote. The learning objective stays the same. Untick it to replay the standard version. A variant is reproducible from its number (`/sim?id=s1-dawn-recon&vary=4242`).
+   - The procedural seed starts on a new random value on every visit.
 2. **Simulator** (`/sim`): read the briefing, press **Enter**, and work the threats.
 
    | Input | Action |
@@ -87,7 +89,7 @@ All scoring numbers live in [`rubric.json`](rubric.json). The next session is sc
 | `responses` | Labels, hot keys, whether a response engages, range limits and effectiveness per drone model |
 | `expected_responses` | Suitable responses per model (a scenario contact can override this) |
 
-The browser never sends a score. It sends raw events (`mark`, `classify`, `respond`, `sensor`, `breach`), and the server rebuilds the scenario from its id or seed and scores it. Response success rolls come from the scenario seed (`app/rng.py`, mirrored in `app/static/js/sim/rng.js`), so the result is reproducible.
+The browser never sends a score. It sends raw events (`mark`, `classify`, `respond`, `sensor`, `breach`), and the server rebuilds the scenario from its id (and variant number) or seed and scores it. Response success rolls come from the scenario seed (`app/rng.py`, mirrored in `app/static/js/sim/rng.js`), so the result is reproducible.
 
 ## Folder layout
 

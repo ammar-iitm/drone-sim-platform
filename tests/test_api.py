@@ -143,3 +143,34 @@ def test_csv_exports(client):
     assert len(unit_rows) == 1 and unit_rows[0]["callsign"] == "CSV-1"
     assert client.get("/api/sessions/999/export.csv").status_code == 404
     assert client.get("/api/analytics/unit/nobody/export.csv").status_code == 404
+
+
+def test_scripted_variant_is_served_scored_and_stored(client):
+    v = client.get("/api/scenario?id=s1-dawn-recon&vary=11").get_json()
+    assert v == scen.build_scripted("s1-dawn-recon", 11) and v["params"] == {"vary": 11}
+    assert client.get("/api/scenario?id=s1-dawn-recon").get_json()["params"] is None
+
+    # Variant 11 launches the drone at T+5.8 s; the standard one launches at T+10 s. A mark at
+    # T+6.8 s is a fast detection only if the server scores the variant the trainee flew.
+    c = next(x for x in v["contacts"] if x["threat"] == "hostile")
+    assert c["spawn_t"] + 1 < first_hostile("s1-dawn-recon")["spawn_t"]
+    events = [{"t": c["spawn_t"] + 1, "type": "mark", "contact_id": c["id"], "data": {"via": "radar"}}]
+    r = post_session(client, events, params={"vary": 11})
+    assert r.status_code == 201
+    res = r.get_json()
+    hostile = next(x for x in res["contacts"] if x["id"] == c["id"])
+    assert hostile["detection"]["node"] == "detected_fast"
+    assert res["penalties"]["false_alarms"] == 0
+    detail = client.get(f"/api/sessions/{res['session_id']}").get_json()
+    assert detail["params"] == {"vary": 11}
+
+    # The same events against the standard scenario are a false alarm: the drone is not up yet.
+    r = post_session(client, events)
+    assert r.get_json()["penalties"]["false_alarms"] == 1
+
+
+def test_bad_variant_rejected_by_api(client):
+    for bad in ("abc", "-3", str(2**31)):
+        assert client.get(f"/api/scenario?id=s1-dawn-recon&vary={bad}").status_code == 400
+    r = post_session(client, [], params={"vary": "nope"})
+    assert r.status_code == 400 and "vary" in r.get_json()["error"]

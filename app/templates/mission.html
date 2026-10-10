@@ -9,6 +9,10 @@
   .card[aria-pressed="true"] { border-color: var(--green); box-shadow: inset 3px 0 0 var(--green); }
   .card h3 { margin: 0; font: 700 16px/1.25 var(--font-sans); color: var(--primary); text-transform: uppercase; }
   .card p { margin: 0; color: var(--on-surface); }
+  .vary { display: flex; gap: var(--s2); align-items: flex-start; cursor: pointer; color: var(--primary); }
+  .vary input { width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--green); flex: none; }
+  .vary input:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+  .vary .label { display: block; margin-top: 2px; }
   .card .tags { display: flex; flex-wrap: wrap; gap: var(--s1); }
   .card button.select { all: unset; cursor: pointer; display: flex; flex-direction: column; gap: var(--s2); }
   .card button.select:focus-visible { outline: 2px solid var(--cyan); outline-offset: 4px; }
@@ -78,7 +82,10 @@
     <section class="panel">
       <div class="panel-head"><h2 class="panel-title"><span class="tag">02</span>Scripted scenarios</h2>
         <span class="label">Each teaches one skill</span></div>
-      <div class="panel-body"><div class="cards" id="cards" role="list"></div></div>
+      <div class="panel-body stack">
+        <label class="vary"><input type="checkbox" id="vary" checked>
+          <span>Vary each run <span class="label">New approach angle, timing and response rolls every launch, so a scenario cannot be learned by rote. Untick to replay the standard version.</span></span></label>
+        <div class="cards" id="cards" role="list"></div></div>
     </section>
 
     <section class="panel">
@@ -87,7 +94,7 @@
       <form class="panel-body stack" id="proc-form">
         <div class="seedrow">
           <div class="field"><label class="label" for="seed">Seed</label>
-            <input id="seed" name="seed" type="number" min="0" max="2147483647" value="48213"></div>
+            <input id="seed" name="seed" type="number" min="0" max="2147483647" value=""></div>
           <button type="button" class="btn" id="reseed">Random</button>
         </div>
         <div class="field"><label class="label" for="difficulty">Difficulty <span id="difficulty-out" class="green">3</span> / 5</label>

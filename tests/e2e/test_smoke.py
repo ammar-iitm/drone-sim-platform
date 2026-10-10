@@ -17,6 +17,7 @@ def test_play_score_and_review(page, server):
     assert page.locator(".card").count() == 6
     page.fill("#callsign", "smoke-1")
     page.fill("#unit", "test unit")
+    page.uncheck("#vary")  # the standard Dawn Recon, so the drone appears where this test looks
     page.click("button.select[data-id='s1-dawn-recon']")
     page.screenshot(path=SHOTS / "01-mission.png")
     page.click("#launch")
