@@ -16,17 +16,17 @@ def create_app(test_config=None):
         MAX_CONTENT_LENGTH=2 * 1024 * 1024,
         JSON_SORT_KEYS=False,
         # Postgres for hosted deployments (Vercel with Neon); unset means the local SQLite file.
-        DATABASE_URL=os.environ.get("DATABASE_URL") or os.environ.get("POSTGRES_URL"),
+        # Read from the environment only for a real start: a test config never inherits a
+        # DATABASE_URL left in the shell, and passes one explicitly to test on Postgres.
+        DATABASE_URL=None if test_config is not None else (
+            os.environ.get("DATABASE_URL") or os.environ.get("POSTGRES_URL")),
     )
     if test_config:
         app.config.update(test_config)
-        if "DATABASE" in test_config and "DATABASE_URL" not in test_config:
-            # An explicit SQLite file (as every test passes) wins over a DATABASE_URL left in
-            # the shell, so tests can never write to a hosted database by accident.
-            app.config["DATABASE_URL"] = None
     app.json.sort_keys = False
 
     from . import api, db, views
+    app.url_map.converters["id"] = db.IdConverter
     db.init_app(app)
     hosted = bool(db.database_url(app))
     app.context_processor(lambda: {"hosted": hosted})

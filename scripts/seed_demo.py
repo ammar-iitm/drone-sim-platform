@@ -10,7 +10,6 @@ scoring engine. Trainees improve over their sessions at different rates.
 """
 
 import argparse
-import os
 import random
 import sys
 from pathlib import Path
@@ -62,19 +61,14 @@ def main():
     parser.add_argument("--reset", action="store_true")
     parser.add_argument("--sessions", type=int, default=5)
     args = parser.parse_args()
-    db_path = ROOT / "data" / "trainer.db"
-    hosted = bool(os.environ.get("DATABASE_URL") or os.environ.get("POSTGRES_URL"))
-    if args.reset and not hosted:
-        for suffix in ("", "-wal", "-shm"):
-            Path(str(db_path) + suffix).unlink(missing_ok=True)
-    app = create_app()
+    app = create_app()  # opens no connection yet: the schema is created on first use
+    hosted = bool(db.database_url(app))
     if args.reset and hosted:
-        # Reset the database being seeded (never the local SQLite file).
         with app.app_context():
-            conn = db.get_db()
-            with conn:
-                for table in ("events", "sessions", "trainees"):
-                    conn.execute(f"DELETE FROM {table}")
+            db.get_db().execute("TRUNCATE events, sessions, trainees RESTART IDENTITY")
+    elif args.reset:
+        for suffix in ("", "-wal", "-shm"):
+            Path(app.config["DATABASE"] + suffix).unlink(missing_ok=True)
     client = app.test_client()
     rubric = load_rubric(ROOT / "rubric.json")
     rnd = random.Random(2026)
@@ -89,7 +83,7 @@ def main():
                 res = client.post("/api/sessions", json=body)
                 assert res.status_code == 201, res.get_json()
                 count += 1
-    target = "the Postgres database in DATABASE_URL" if db.database_url(app) else db_path
+    target = "the Postgres database in DATABASE_URL" if hosted else app.config["DATABASE"]
     print(f"Seeded {count} sessions for {sum(len(p) for p in COHORT.values())} trainees in {len(COHORT)} units into {target}")
 
 

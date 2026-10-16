@@ -128,9 +128,7 @@ def test_correct_but_failed_roll_is_credited_and_breach_still_penalised(rubric):
 def _fail_then_succeed(rubric):
     """A seed and an intercept chance where attempt 1 misses and attempt 2 hits."""
     seed = next(sd for sd in range(1, 500) if rng.roll(sd, "C1", 0) > rng.roll(sd, "C1", 1) + 0.1)
-    chance = (rng.roll(seed, "C1", 0) + rng.roll(seed, "C1", 1)) / 2
-    for model in rubric["responses"]["INTERCEPT"]["effectiveness"]:
-        rubric["responses"]["INTERCEPT"]["effectiveness"][model] = chance
+    sure(rubric, (rng.roll(seed, "C1", 0) + rng.roll(seed, "C1", 1)) / 2)
     return seed
 
 

@@ -10,7 +10,7 @@ from flask import Blueprint, Response, current_app, jsonify, request
 from werkzeug.exceptions import HTTPException
 
 from . import analytics, scenario as scen, scoring
-from .db import avg1, get_db
+from .db import MAX_ID, avg1, get_db
 
 bp = Blueprint("api", __name__, url_prefix="/api")
 
@@ -47,13 +47,11 @@ def _body():
 def _trainee_id(value):
     """A trainee id from JSON or a query string, checked before it reaches the database
     (Postgres rejects a wrong type with an error where SQLite just finds nothing)."""
-    if isinstance(value, bool):
-        raise ApiError("trainee_id must be an integer")
     if isinstance(value, str) and value.strip().isdigit():
         value = int(value)
-    if not isinstance(value, int):
+    if isinstance(value, bool) or not isinstance(value, int):
         raise ApiError("trainee_id must be an integer")
-    if not 1 <= value <= 2**63 - 1:
+    if not 1 <= value <= MAX_ID:
         raise ApiError("unknown trainee_id", 404)
     return value
 
@@ -110,14 +108,17 @@ def list_trainees():
 
 
 def find_or_create_trainee(callsign, unit):
+    db = get_db()
+    find = "SELECT * FROM trainees WHERE callsign = ? AND unit = ?"
+    row = db.execute(find, (callsign, unit)).fetchone()
+    if row:  # the usual case: one round trip
+        return dict(row), False
     # Insert-if-missing, then read back: two first-time saves for the same trainee at once
     # (two browsers, a double-click, concurrent serverless instances) cannot collide.
-    db = get_db()
     with db:
         created = db.execute("INSERT INTO trainees (callsign, unit) VALUES (?, ?) "
                              "ON CONFLICT (callsign, unit) DO NOTHING", (callsign, unit)).rowcount == 1
-    row = db.execute("SELECT * FROM trainees WHERE callsign = ? AND unit = ?", (callsign, unit)).fetchone()
-    return dict(row), created
+    return dict(db.execute(find, (callsign, unit)).fetchone()), created
 
 
 @bp.post("/trainees")
@@ -202,7 +203,7 @@ def list_sessions():
     return jsonify([dict(r) for r in get_db().execute(sql, args)])
 
 
-@bp.get("/sessions/<int(max=9223372036854775807):session_id>")
+@bp.get("/sessions/<id:session_id>")
 def get_session(session_id):
     db = get_db()
     row = db.execute(f"SELECT {SESSION_COLUMNS}, s.params, s.result FROM sessions s "
@@ -229,7 +230,7 @@ def _csv(filename, header, rows):
                     headers={"Content-Disposition": f'attachment; filename="{safe}"'})
 
 
-@bp.get("/sessions/<int(max=9223372036854775807):session_id>/export.csv")
+@bp.get("/sessions/<id:session_id>/export.csv")
 def export_session(session_id):
     row = get_db().execute(f"SELECT {SESSION_COLUMNS}, s.result FROM sessions s JOIN trainees t ON t.id = s.trainee_id "
                            f"WHERE s.id = ?", (session_id,)).fetchone()
@@ -271,7 +272,7 @@ def export_unit(unit):
 
 # ---------------------------------------------------------------- analytics
 
-@bp.get("/analytics/trainee/<int(max=9223372036854775807):trainee_id>")
+@bp.get("/analytics/trainee/<id:trainee_id>")
 def trainee_analytics(trainee_id):
     data = analytics.trainee(get_db(), trainee_id, rubric())
     if data is None:

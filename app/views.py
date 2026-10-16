@@ -30,6 +30,6 @@ def help_page():
     return render_template("help.html", active="help")
 
 
-@bp.get("/dashboard/session/<int:session_id>")
+@bp.get("/dashboard/session/<id:session_id>")
 def session_review(session_id):
     return render_template("session.html", active="dashboard", session_id=session_id)

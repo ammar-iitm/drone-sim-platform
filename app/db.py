@@ -15,8 +15,19 @@ import sqlite3
 from pathlib import Path
 
 from flask import current_app, g
+from werkzeug.routing import IntegerConverter
 
 HERE = Path(__file__).parent
+
+# Largest row id (Postgres BIGINT). Ids beyond it are simply not found, rather than errors.
+MAX_ID = 2**63 - 1
+
+
+class IdConverter(IntegerConverter):
+    """URL converter for row ids: <id:session_id>. Out-of-range ids give 404."""
+
+    def __init__(self, url_map):
+        super().__init__(url_map, min=1, max=MAX_ID)
 
 
 def avg1(expr):
@@ -26,6 +37,7 @@ def avg1(expr):
 
 class SQLiteDB:
     def __init__(self, path):
+        Path(path).parent.mkdir(parents=True, exist_ok=True)
         self.conn = sqlite3.connect(path, timeout=10)
         self.conn.row_factory = sqlite3.Row
         self.conn.execute("PRAGMA foreign_keys = ON")
@@ -121,7 +133,9 @@ def get_db():
     if "db" not in g:
         g.db = connect(current_app)
         if not current_app.extensions.get("db_schema_ready"):
-            g.db.init_schema()  # Postgres: on the first request of each instance, not at import
+            # On first use rather than at import, which keeps a database round trip out of
+            # every serverless cold start.
+            g.db.init_schema()
             current_app.extensions["db_schema_ready"] = True
     return g.db
 
@@ -133,12 +147,4 @@ def close_db(_exc=None):
 
 
 def init_app(app):
-    if not database_url(app):
-        # SQLite is local and instant, so set it up now. Postgres waits for the first request,
-        # which keeps a database round trip out of every serverless cold start.
-        Path(app.config["DATABASE"]).parent.mkdir(parents=True, exist_ok=True)
-        conn = connect(app)
-        conn.init_schema()
-        conn.close()
-        app.extensions["db_schema_ready"] = True
     app.teardown_appcontext(close_db)

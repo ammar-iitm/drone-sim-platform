@@ -230,28 +230,32 @@ def score_session(scenario, events, rubric, ended_t=None):
             resp = decision["data"]["response"] if decision else None
             r = geometry.range_at(c, decision["t"]) if decision else None
             suitable = resp in expected
-            timely = r is not None and r >= geo["late_range_m"]
             engages = bool(resp) and rubric["responses"][resp].get("engages")
             label = rubric["responses"][resp]["label"] if resp else ""
             att = next((a for a in attempts if decision and a["seq"] == decision["seq"]), None)
+            chance = round(att["effectiveness"] * 100) if att else 0
+
+            def in_time(dist):
+                return dist is not None and dist >= geo["late_range_m"]
+            timely = in_time(r)
 
             if suitable and timely and engages:
+                # A failed first try followed by a suitable retry that stops the drone in time
+                # earns full credit, so persisting scores better than giving up (issue #15).
+                retry = None if att and att["success"] else next(
+                    (a for a in attempts if a["success"] and a["response"] in expected
+                     and in_time(geometry.range_at(c, a["t"]))), None)
                 if att and att["success"]:
                     eng = {"points": sc["correct_effective"], "node": "correct_effective",
                            "reason": f"{label} at {round(r)} m was suitable and timely, and it worked "
-                                     f"(chance {round(att['effectiveness'] * 100)}%)."}
-                elif retry := next((a for a in attempts if a["success"] and a["response"] in expected
-                                    and (geometry.range_at(c, a["t"]) or 0) >= geo["late_range_m"]), None):
-                    # The first try failed its roll, but the trainee kept at it and stopped the drone
-                    # in time: full credit, so persisting scores better than giving up (issue #15).
+                                     f"(chance {chance}%)."}
+                elif retry:
                     retry_label = rubric["responses"][retry["response"]]["label"]
-                    chance = round(att["effectiveness"] * 100) if att else 0
                     eng = {"points": sc["correct_effective"], "node": "correct_effective",
                            "reason": f"{label} at {round(r)} m was suitable and timely but did not work "
                                      f"(chance {chance}%); attempt {retry['attempt'] + 1}, "
                                      f"{retry_label} at {round(geometry.range_at(c, retry['t']))} m, stopped it in time."}
                 else:
-                    chance = round(att["effectiveness"] * 100) if att else 0
                     eng = {"points": sc["correct_failed_roll"], "node": "correct_failed_roll",
                            "reason": f"{label} at {round(r)} m was the right decision but did not work this time "
                                      f"(chance {chance}%). The decision is credited, not the luck."}
