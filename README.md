@@ -205,6 +205,7 @@ The browser tests block every non-local request, so they also check that nothing
 | 2026-10-10 | **Hosted on Vercel** with Neon Postgres, public link, no login. Local and offline use stays on SQLite |
 | 2026-10-16 | **Scoring decisions** for issue #15, listed below |
 | 2026-10-16 | **AAR replay** added to the session review, and **instructor login** added (off unless `INSTRUCTOR_PASSWORD` is set) |
+| 2026-10-16 | **Indian conventions:** the banner reads "For training use only" instead of the US-style "Unclassified //" (India's scheme is Top Secret, Secret, Confidential, Restricted). Dates show in IST with the 24-hour clock ("10 Oct 2026, 0945 hrs IST"); CSV exports keep UTC. The page language is `en-IN`, with a GIGW-style "Skip to main content" link and a disclaimer that this is not an official Indian Army or Government of India system. Demo units are fictional ("1 TRG BN", "2 TRG BN") instead of real battalions |
 | 2026-10-16 | **Dawn lighting** for Dawn Recon Pass, which ran at dusk before. It's for scripted scenarios only, so procedural seeds are unchanged |
 
 ## Scoring decisions (issue #15, agreed 2026-10-16)
@@ -228,6 +229,7 @@ Tracked as GitHub issues, all assigned to Ammar:
 | #10 | Install on a second machine using only this README, including the first-ever run of `start.bat` on Windows. Use an ordinary laptop with integrated graphics and confirm 30 fps with the 12-drone swarm (the simulated low-end test is under Status) |
 | #11 | Human checks. Play any scenario with sound on: the rotor hum should rise as a drone closes in, the tick, chime, buzz and breach alarm should play on their events, and **M** should mute. Set macOS Display → Colour filters → Greyscale and check that the threat markers (triangle, diamond, circle, square, each with a text label) and the dashboard still read clearly. In Urban Canyon, the drone should show for about 4 s around T+37 s and again on final approach |
 | #14 | Rubric review done against the May 2025 ATP 3-01.81 (`docs/RUBRIC_SOURCES.md`): 10 rows agreed. **Two decisions remain:** whether Take cover should score 100% when a hostile is out of range of every suitable response (R8), and whether to relabel Jam and Intercept as non-lethal and physical (R6) |
+| — | **Hindi (optional):** GIGW expects bilingual government sites, and the Indian Army site defaults to Hindi. Not done yet: military terms need a careful translation and review
 | #13 | Keep the full test suite passing on every merge (ongoing) |
 
 ## Spec differences (issue #16, checked 2026-10-16)

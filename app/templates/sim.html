@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block skip_target %}sim{% endblock %}
 {% block title %}Simulator{% endblock %}
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/sim.css') }}">
@@ -11,7 +12,7 @@
 <span class="chip">FPS <strong id="fps">--</strong></span>
 {% endblock %}
 {% block content %}
-<main class="sim" id="sim">
+<main class="sim" id="sim" tabindex="-1">
   <section class="opbar sim-opbar" aria-label="Exercise status">
     <div class="group">
       <div class="kv"><span class="label">Evaluation subject</span><span class="value" id="trainee">--</span></div>

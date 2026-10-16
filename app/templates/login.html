@@ -7,7 +7,7 @@
 </style>
 {% endblock %}
 {% block content %}
-<main class="page">
+<main id="main" tabindex="-1" class="page">
   <section class="panel login">
     <div class="panel-head"><h1 class="panel-title"><span class="tag">AAR</span>Instructor login</h1></div>
     <form class="panel-body" method="post" action="{{ url_for('auth.login') }}">

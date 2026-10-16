@@ -4,7 +4,7 @@ import sqlite3
 from app import scenario as scen
 
 
-def post_session(client, events, scenario_id="s1-dawn-recon", callsign="viper-3", unit="4 guards", **extra):
+def post_session(client, events, scenario_id="s1-dawn-recon", callsign="viper-3", unit="1 trg bn", **extra):
     body = {"callsign": callsign, "unit": unit, "scenario_id": scenario_id, "events": events, **extra}
     return client.post("/api/sessions", json=body)
 
@@ -39,9 +39,9 @@ def test_rubric(client):
 
 
 def test_trainees(client):
-    r = client.post("/api/trainees", json={"callsign": " viper-3 ", "unit": "4 guards"})
+    r = client.post("/api/trainees", json={"callsign": " viper-3 ", "unit": "1 trg bn"})
     assert r.status_code == 201 and r.get_json()["callsign"] == "VIPER-3"
-    again = client.post("/api/trainees", json={"callsign": "VIPER-3", "unit": "4 GUARDS"})
+    again = client.post("/api/trainees", json={"callsign": "VIPER-3", "unit": "1 TRG BN"})
     assert again.status_code == 200 and again.get_json()["id"] == r.get_json()["id"]
     assert client.post("/api/trainees", json={"callsign": "", "unit": "X"}).status_code == 400
     assert len(client.get("/api/trainees").get_json()) == 1
@@ -100,19 +100,19 @@ def test_bad_input_rejected_and_database_untouched(client, app):
 
 
 def test_analytics_shapes(client):
-    for unit, callsign, cls in [("4 GUARDS", "VIPER-3", "RECON_UAS"), ("4 GUARDS", "VIPER-3", "BIRD"),
-                                ("4 GUARDS", "HAWK-1", "RECON_UAS")]:
+    for unit, callsign, cls in [("1 TRG BN", "VIPER-3", "RECON_UAS"), ("1 TRG BN", "VIPER-3", "BIRD"),
+                                ("1 TRG BN", "HAWK-1", "RECON_UAS")]:
         c = first_hostile("s1-dawn-recon")
         post_session(client, [{"t": c["spawn_t"] + 5, "type": "mark", "contact_id": c["id"], "data": {}},
                               {"t": c["spawn_t"] + 6, "type": "classify", "contact_id": c["id"], "data": {"class": cls}}],
                      callsign=callsign, unit=unit)
-    trainees = client.get("/api/trainees?unit=4 guards").get_json()
+    trainees = client.get("/api/trainees?unit=1 trg bn").get_json()
     viper = next(t for t in trainees if t["callsign"] == "VIPER-3")
     a = client.get(f"/api/analytics/trainee/{viper['id']}").get_json()
     assert len(a["sessions"]) == 2 and len(a["series"]["detection"]) == 2 and len(a["rolling"]["total"]) == 2
     assert a["confusion"]["counts"]["RECON_UAS"]["BIRD"] == 1
     assert a["confusion"]["counts"]["RECON_UAS"]["RECON_UAS"] == 1
-    u = client.get("/api/analytics/unit/4 guards").get_json()
+    u = client.get("/api/analytics/unit/1 trg bn").get_json()
     assert u["sessions"] == 3 and u["weakest_skill"] in ("detection", "classification", "engagement")
     assert len(u["weakest_trainees"]) == 2
     assert client.get("/api/analytics/unit/nobody").status_code == 404
@@ -220,11 +220,11 @@ def test_vercel_path_decoding(app):
     """Vercel passes PATH_INFO still percent-encoded; app.vercel.DecodePath decodes it once."""
     from app.vercel import DecodePath
     c = app.test_client()
-    post_session(c, [], callsign="ENC-1", unit="4 GUARDS")
+    post_session(c, [], callsign="ENC-1", unit="1 TRG BN")
     post_session(c, [], callsign="ENC-2", unit="A%41")
     app.wsgi_app = DecodePath(app.wsgi_app)
     raw = lambda path: c.get("/", environ_overrides={"PATH_INFO": path})  # noqa: E731
-    assert raw("/api/analytics/unit/4%20GUARDS").get_json()["unit"] == "4 GUARDS"
+    assert raw("/api/analytics/unit/1%20TRG%20BN").get_json()["unit"] == "1 TRG BN"
     assert raw("/api/analytics/unit/A%2541").get_json()["unit"] == "A%41"  # decoded once, not twice
-    assert raw("/api/analytics/unit/4%20GUARDS/export.csv").status_code == 200
+    assert raw("/api/analytics/unit/1%20TRG%20BN/export.csv").status_code == 200
     assert raw("/api/scenarios").status_code == 200

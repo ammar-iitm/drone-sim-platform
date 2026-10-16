@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en-IN">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,6 +9,7 @@
   {% block head %}{% endblock %}
 </head>
 <body class="{{ 'compact' if compact else '' }} {% block body_class %}{% endblock %}">
+  <a class="skip-link" href="#{% block skip_target %}main{% endblock %}">Skip to main content</a>
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <symbol id="i-radar" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><path d="M12 12 19 5"/></g><circle cx="12" cy="12" r="1.6" fill="currentColor"/></symbol>
     <symbol id="i-mission" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V5l8-2 8 2v15"/><path d="M8 9h8M8 13h8M8 17h5"/></g></symbol>
@@ -27,7 +28,7 @@
         <svg aria-hidden="true"><use href="#i-radar"/></svg>
         <span class="brand-name">AEGIS // Drone Threat Trainer</span>
       </a>
-      <span class="chip">Unclassified // Exercise use only</span>
+      <span class="chip" title="Training simulator. Not an operational system.">For training use only</span>
     </div>
     <div class="cmdbar-right">{% block cmdbar %}{% endblock %}</div>
   </header>
@@ -54,6 +55,7 @@
       <div class="row label"><span>Store</span><span class="green">{{ "Postgres hosted" if hosted else "SQLite local" }}</span></div>
       <div class="meter"><span style="width:100%"></span></div>
       <div class="row label"><span>Scoring</span><span>Server</span></div>
+      <p class="disclaimer">Training prototype for SIH PS 26247. Not an official Indian Army or Government of India system; scenarios and demo data are fictional.</p>
     </div>
   </aside>
 

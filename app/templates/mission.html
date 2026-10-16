@@ -29,7 +29,7 @@
 <span class="chip">Procedural <strong>Seeded</strong></span>
 {% endblock %}
 {% block content %}
-<main class="page">
+<main id="main" tabindex="-1" class="page">
   <div class="opbar">
     <div class="group">
       <div class="kv"><span class="label">Mission planning</span><span class="value-lg">SELECT SCENARIO</span></div>
@@ -55,7 +55,7 @@
           <div class="field"><label class="label" for="callsign">Callsign</label>
             <input id="callsign" maxlength="24" required placeholder="e.g. VIPER-3"></div>
           <div class="field"><label class="label" for="unit">Unit</label>
-            <input id="unit" maxlength="24" required placeholder="e.g. 4 GUARDS" list="units"></div>
+            <input id="unit" maxlength="24" required placeholder="e.g. 1 TRG BN" list="units"></div>
           <datalist id="units"></datalist>
           <div class="field"><label class="label" for="quality">Graphics quality</label>
             <select id="quality"><option value="auto">Auto (steps down if slow)</option><option value="high">High</option>

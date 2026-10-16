@@ -4,7 +4,7 @@ from urllib.parse import unquote
 
 
 class DecodePath:
-    """Vercel's Python runtime hands Flask PATH_INFO still percent-encoded ("/unit/4%20GUARDS"),
+    """Vercel's Python runtime hands Flask PATH_INFO still percent-encoded ("/unit/1%20TRG%20BN"),
     where WSGI servers normally decode it, so every route with a space in a path segment would
     miss. Decode it once here, the way a WSGI server would: percent-escapes become raw bytes
     held as latin-1 characters, and Werkzeug then reads them as UTF-8."""

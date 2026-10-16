@@ -20,8 +20,8 @@ from app import ROOT, create_app, db, geometry, scenario as scen  # noqa: E402
 from app.scoring import load_rubric  # noqa: E402
 
 COHORT = {
-    "4 GUARDS": [("VIPER-3", 0.35, 0.12), ("HAWK-1", 0.55, 0.08), ("RAVEN-7", 0.25, 0.15), ("ATLAS-2", 0.6, 0.04)],
-    "21 SIKH": [("KESTREL-4", 0.45, 0.1), ("ORION-9", 0.3, 0.13)],
+    "1 TRG BN": [("VIPER-3", 0.35, 0.12), ("HAWK-1", 0.55, 0.08), ("RAVEN-7", 0.25, 0.15), ("ATLAS-2", 0.6, 0.04)],
+    "2 TRG BN": [("KESTREL-4", 0.45, 0.1), ("ORION-9", 0.3, 0.13)],
 }
 PLAN = ["s1-dawn-recon", "s4-mixed-traffic", "s2-night-loiter", "s5-fog-noise", "s3-urban-canyon", "s6-saturation-swarm"]
 WRONG = {"RECON_UAS": ["ARMED_UAS", "BIRD"], "ARMED_UAS": ["RECON_UAS", "FRIENDLY"], "DECOY": ["RECON_UAS"],

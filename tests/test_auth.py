@@ -8,8 +8,8 @@ from app import create_app
 from test_api import first_hostile, post_session
 
 PROTECTED_API = ["/api/trainees", "/api/sessions", "/api/sessions/1", "/api/sessions/1/export.csv",
-                 "/api/analytics/trainee/1", "/api/analytics/unit/4%20GUARDS",
-                 "/api/analytics/unit/4%20GUARDS/export.csv"]
+                 "/api/analytics/trainee/1", "/api/analytics/unit/1%20TRG%20BN",
+                 "/api/analytics/unit/1%20TRG%20BN/export.csv"]
 PROTECTED_PAGES = ["/dashboard", "/dashboard/session/1"]
 OPEN = ["/mission", "/sim", "/help", "/api/scenarios", "/api/rubric", "/api/scenario?id=s1-dawn-recon"]
 
@@ -20,7 +20,7 @@ def locked(tmp_path):
     c = app.test_client()
     c_hostile = first_hostile("s1-dawn-recon")
     events = [{"t": c_hostile["spawn_t"] + 5, "type": "mark", "contact_id": c_hostile["id"], "data": {}}]
-    assert post_session(c, events, unit="4 guards").status_code == 201  # trainees can still save
+    assert post_session(c, events, unit="1 trg bn").status_code == 201  # trainees can still save
     return app, c
 
 

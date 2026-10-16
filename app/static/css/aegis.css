@@ -114,6 +114,12 @@ a { color: var(--cyan); }
 }
 .rail-foot { padding: var(--s3); border-top: 1px solid var(--outline-variant); background: var(--surface-lowest); }
 .rail-foot .row { display: flex; justify-content: space-between; gap: var(--s2); }
+.skip-link { position: absolute; left: var(--s2); top: -100px; z-index: 1000; padding: var(--s2) var(--s3);
+  background: var(--green); color: #003915; font-weight: 700; text-decoration: none; }
+.skip-link:focus { top: var(--s2); outline: 2px solid var(--cyan); outline-offset: 2px; }
+main:focus { outline: none; }
+.nowrap { white-space: nowrap; }
+.disclaimer { margin: var(--s2) 0 0; font-size: 12px; line-height: 1.4; color: var(--outline); }
 .rail-foot form.row { margin: 0 0 var(--s2); align-items: center; }
 .linkbtn { all: unset; cursor: pointer; color: var(--cyan); text-decoration: underline; }
 .linkbtn:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }

@@ -753,6 +753,7 @@ function bindInput() {
 
   document.addEventListener('keydown', (e) => {
     if (e.target instanceof HTMLInputElement || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.target instanceof HTMLAnchorElement && e.key === 'Enter') return; // let links (e.g. the skip link) work
     const key = e.key;
     if (S.phase === 'briefing' && key === 'Enter') { e.preventDefault(); start(); return; }
     if (S.phase === 'paused' && (key === 'p' || key === 'P' || key === 'Enter')) { e.preventDefault(); pause(false); return; }

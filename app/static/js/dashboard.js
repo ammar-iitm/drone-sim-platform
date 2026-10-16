@@ -1,5 +1,5 @@
 // AAR dashboard: unit overview, trainee progress, comparison, confusion matrix and session log.
-import { esc } from './results.js';
+import { esc, fmtDateIST } from './results.js';
 
 const $ = (id) => document.getElementById(id);
 const METRICS = ['detection', 'classification', 'engagement'];
@@ -55,7 +55,9 @@ function table(el, headers, rows) {
 }
 
 function fmtNum(v) { return v == null ? '--' : Number(v).toFixed(1); }
-function date(s) { return esc(s.replace('T', ' ').slice(0, 16)); }
+// Dates and callsigns never break across lines in table cells ("ATLAS-" / "2").
+function nowrap(text) { return `<span class="nowrap">${esc(text)}</span>`; }
+function date(s) { return `<span class="nowrap">${fmtDateIST(s, { compact: true })}</span>`; }
 
 async function json(url) {
   const res = await fetch(url);
@@ -99,12 +101,12 @@ async function loadUnit() {
       interaction: { mode: 'index', axis: 'y', intersect: false } },
   });
   table($('compare-table'), ['Trainee', 'Sessions', 'Average', ...METRICS, 'Breaches'],
-    sorted.map((t) => [esc(t.callsign), t.sessions, fmtNum(t.total), ...METRICS.map((m) => fmtNum(t[m])), t.breaches ?? 0]));
+    sorted.map((t) => [nowrap(t.callsign), t.sessions, fmtNum(t.total), ...METRICS.map((m) => fmtNum(t[m])), t.breaches ?? 0]));
   $('weakest').innerHTML = '<div class="label" style="margin-top:12px">Weakest trainees</div>' +
     u.weakest_trainees.map((t) => `<div class="row"><span class="value">${esc(t.callsign)}</span><span class="badge ${t.total < 60 ? 'bad' : t.total < 80 ? 'warn' : 'good'}">${fmtNum(t.total)}</span></div>`).join('');
 
-  table($('recent'), ['Date', 'Trainee', 'Scenario', 'Score', 'Grade'],
-    u.recent.map((s) => [date(s.started_at), esc(s.callsign), `<a href="/dashboard/session/${s.id}">${esc(s.scenario_name)}</a>`, fmtNum(s.total), esc(s.grade)]));
+  table($('recent'), ['Date (IST)', 'Trainee', 'Scenario', 'Score', 'Grade'],
+    u.recent.map((s) => [date(s.started_at), nowrap(s.callsign), `<a href="/dashboard/session/${s.id}">${esc(s.scenario_name)}</a>`, fmtNum(s.total), esc(s.grade)]));
   await loadTrainee();
 }
 
@@ -130,7 +132,7 @@ async function loadTrainee() {
       interaction: { mode: 'index', intersect: false }, plugins: { legend: { position: 'bottom' } } },
     plugins: [endLabels],
   });
-  table($('progress-table'), ['Session', 'Date', ...METRICS, 'Total', 'Rolling total'],
+  table($('progress-table'), ['Session', 'Date (IST)', ...METRICS, 'Total', 'Rolling total'],
     a.sessions.map((s, i) => [labels[i], date(s.started_at), ...METRICS.map((m) => fmtNum(s[m])), fmtNum(s.total), fmtNum(a.rolling.total[i])]));
   const ch = a.change;
   $('progress-notes').textContent = `First to latest: total ${ch.total == null ? '--' : (ch.total >= 0 ? '+' : '') + ch.total} · ` +
@@ -152,7 +154,7 @@ async function loadTrainee() {
 }
 
 function renderSessions() {
-  const cols = [['started_at', 'Date'], ['scenario_name', 'Scenario'], ['total', 'Score'], ['grade', 'Grade'],
+  const cols = [['started_at', 'Date (IST)'], ['scenario_name', 'Scenario'], ['total', 'Score'], ['grade', 'Grade'],
     ['detection', 'Det.'], ['classification', 'Class.'], ['engagement', 'Eng.'], ['breaches', 'Breaches'], ['false_alarms', 'False alarms']];
   const { key, dir } = sessionsSort;
   const rows = [...sessionsRows].sort((a, b) => (a[key] > b[key] ? 1 : a[key] < b[key] ? -1 : 0) * dir);

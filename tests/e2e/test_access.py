@@ -124,3 +124,17 @@ def test_swarm_of_twelve_frame_rate(page, server):
     page.screenshot(path=SHOTS / "09-swarm-12.png")
     assert visible >= 12
     assert fps >= 30, f"{fps} fps with {visible} contacts drawn"
+
+
+def test_skip_link_reaches_main_content(page, server):
+    """GIGW / WCAG 2.4.1: the first Tab stop skips the header and navigation."""
+    # (The simulator opens a briefing dialog that takes focus, so its first Tab stop is inside the dialog.)
+    for path, target in (("/mission", "main"), ("/help", "main"), ("/dashboard", "main")):
+        page.goto(server + path)
+        page.wait_for_load_state("networkidle")
+        page.keyboard.press("Tab")
+        assert page.evaluate("document.activeElement.textContent.trim()") == "Skip to main content", path
+        page.keyboard.press("Enter")
+        page.wait_for_function(f"document.activeElement && document.activeElement.id === '{target}'")
+    assert page.evaluate("document.documentElement.lang") == "en-IN"
+    assert "FOR TRAINING USE ONLY" in page.inner_text("header").upper()

@@ -5,6 +5,19 @@ export function esc(s) {
   return String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
+// Dates for Indian users: IST, day-month-year and the 24-hour clock in "hrs", e.g.
+// "10 Oct 2026, 0945 hrs IST". The server stores UTC; exports keep UTC for machines.
+const IST = new Intl.DateTimeFormat('en-IN', { timeZone: 'Asia/Kolkata', day: '2-digit', month: 'short',
+  year: 'numeric', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+export function fmtDateIST(iso, { compact = false } = {}) {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return esc(iso);
+  const p = Object.fromEntries(IST.formatToParts(d).map((x) => [x.type, x.value]));
+  // Compact form for table cells, whose column header already says IST: "10 Oct 26, 0945".
+  if (compact) return `${p.day} ${p.month} ${p.year.slice(-2)}, ${p.hour}${p.minute}`;
+  return `${p.day} ${p.month} ${p.year}, ${p.hour}${p.minute} hrs IST`;
+}
+
 const STAGE_COLOR = { detection: 'var(--series-detection)', classification: 'var(--series-classification)', engagement: 'var(--series-engagement)' };
 
 function outcomeBadge(points) {

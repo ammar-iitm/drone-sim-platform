@@ -119,7 +119,8 @@ $('use-proc').addEventListener('click', async () => {
 });
 $('launch').addEventListener('click', launch);
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && !(e.target instanceof HTMLButtonElement)) { e.preventDefault(); launch(); }
+  // Enter launches, except on buttons and links (such as Skip to main content), which keep their own action.
+  if (e.key === 'Enter' && !(e.target instanceof HTMLButtonElement || e.target instanceof HTMLAnchorElement)) { e.preventDefault(); launch(); }
 });
 
 // Sessions that could not be saved (server down mid-session) are kept in this browser until resent.

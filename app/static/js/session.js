@@ -1,5 +1,5 @@
 // Session review: ordered event timeline with the tree outcome and points behind each event.
-import { esc, renderStages, renderPenalties, renderContacts, gradeBlock } from './results.js';
+import { esc, fmtDateIST, renderStages, renderPenalties, renderContacts, gradeBlock } from './results.js';
 import { Replay, scenarioQuery } from './replay.js';
 
 const $ = (id) => document.getElementById(id);
@@ -33,7 +33,7 @@ async function load() {
     <div class="group">
       <div class="kv"><span class="label">AAR debrief · session ${s.id}</span><span class="value-lg">${esc(s.scenario_name.toUpperCase())}</span></div>
       <div class="kv"><span class="label">Trainee</span><span class="value green">${esc(s.callsign)} / ${esc(s.unit)}</span></div>
-      <div class="kv"><span class="label">Date (UTC)</span><span class="value">${esc(s.started_at.replace('T', ' ').replace('Z', ''))}</span></div>
+      <div class="kv"><span class="label">Date</span><span class="value">${fmtDateIST(s.started_at)}</span></div>
       <div class="kv"><span class="label">Seed · duration</span><span class="value">${s.seed} · ${fmt(s.duration_s)}</span></div>
     </div>
     <div class="group">${gradeBlock(r)}
