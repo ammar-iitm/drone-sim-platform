@@ -9,6 +9,7 @@ import functools
 import hashlib
 import hmac
 import time
+from datetime import timedelta
 
 from flask import Blueprint, current_app, jsonify, redirect, render_template, request, session, url_for
 
@@ -41,8 +42,9 @@ def init_app(app):
         # Serverless instances must agree on the key without shared state, so derive it from the
         # password when no SECRET_KEY is given. Changing the password signs everyone out.
         app.config["SECRET_KEY"] = hashlib.sha256(b"aegis-instructor-session:" + password.encode()).hexdigest()
-    app.config.setdefault("SESSION_COOKIE_SAMESITE", "Lax")
-    app.config.setdefault("PERMANENT_SESSION_LIFETIME", 12 * 3600)
+    # Flask already defines both keys (31 days, no SameSite), so set them outright.
+    app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+    app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(hours=12)
     app.context_processor(lambda: {"login_enabled": bool(password), "instructor": is_instructor()})
     app.register_blueprint(bp)
 

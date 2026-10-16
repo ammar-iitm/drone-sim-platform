@@ -78,3 +78,15 @@ def test_session_key_is_shared_across_instances(tmp_path):
     cb = b.test_client()
     cb.set_cookie("session", cookie.value)
     assert cb.get("/api/sessions").status_code == 200
+
+
+def test_login_cookie_is_short_lived_and_same_site(locked):
+    _, c = locked
+    r = c.post("/login", data={"password": "kestrel-7"})
+    cookie = r.headers["Set-Cookie"]
+    assert "HttpOnly" in cookie and "SameSite=Lax" in cookie
+    from email.utils import parsedate_to_datetime
+    from datetime import datetime, timezone
+    expires = parsedate_to_datetime(cookie.split("Expires=")[1].split(";")[0])
+    hours = (expires - datetime.now(timezone.utc)).total_seconds() / 3600
+    assert 11.9 < hours <= 12
