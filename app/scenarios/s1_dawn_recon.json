@@ -6,7 +6,7 @@
   "threat_summary": "One small quadcopter",
   "seed": 101,
   "duration_s": 150,
-  "environment": { "time_of_day": "dusk", "terrain": "rural", "terrain_seed": 4411, "degradation": 0 },
+  "environment": { "time_of_day": "dawn", "terrain": "rural", "terrain_seed": 4411, "degradation": 0 },
   "contacts": [
     {
       "model": "quadcopter", "threat": "hostile", "spawn_t": 10, "speed_mps": 18,

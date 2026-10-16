@@ -8,6 +8,9 @@ const LOOKS = {
     ground: [0x5c7744, 0x7a8750, 0x8b7b59], urban: 0x6b6f73, building: 0xa9adb2, contact: 0x1a1c1f, stars: false },
   dusk: { top: 0x1c2a52, bottom: 0xe0894e, fog: 0x8e7468, sun: 0xffb27a, sunI: 1.2, sunDir: [-1.0, 0.18, 0.2], amb: 0.45,
     ground: [0x3d4c31, 0x535339, 0x5c4e3d], urban: 0x45474c, building: 0x5a5c62, contact: 0x0e0f11, stars: false },
+  // Dawn: a paler, pinker low sun in the east (dusk sets in the west). Scripted scenarios only.
+  dawn: { top: 0x2a3a66, bottom: 0xe8a07a, fog: 0x9c8a86, sun: 0xffc9a0, sunI: 1.1, sunDir: [1.0, 0.16, -0.2], amb: 0.45,
+    ground: [0x3f4e34, 0x55573d, 0x5e5142], urban: 0x484a50, building: 0x5e6067, contact: 0x0e0f11, stars: false },
   night: { top: 0x02040a, bottom: 0x0c1424, fog: 0x070a12, sun: 0x8fa6d8, sunI: 0.3, sunDir: [0.3, 0.8, -0.5], amb: 0.16,
     ground: [0x151b15, 0x1a1f16, 0x1d1b16], urban: 0x16181c, building: 0x1f2228, contact: 0x07080a, stars: true },
 };
@@ -19,8 +22,9 @@ export const QUALITY = {
   high: { ratio: 1.5, scenery: 1.0 },
   medium: { ratio: 1.0, scenery: 0.6 },
   low: { ratio: 0.75, scenery: 0.35 },
+  minimum: { ratio: 0.5, scenery: 0.2 }, // for laptops with very weak graphics
 };
-export const QUALITY_ORDER = ['high', 'medium', 'low'];
+export const QUALITY_ORDER = ['high', 'medium', 'low', 'minimum'];
 
 export const MODEL_SIZE = { quadcopter: 0.9, hexacopter: 1.6, fixed_wing: 3.0, balloon: 2.8, bird: 0.9, friendly_aircraft: 16 };
 const WOBBLE = { quadcopter: 1.5, hexacopter: 1.0, fixed_wing: 0, balloon: 2.5, bird: 5, friendly_aircraft: 0 };
@@ -128,8 +132,8 @@ export class World {
     this.urban = this.env.terrain === 'urban';
     this.eyeHeight = this.urban ? 24 : 6;
 
-    // Antialiasing is fixed when the WebGL context is made, so only a forced Low start turns it off.
-    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: quality !== 'low', powerPreference: 'low-power' });
+    // Antialiasing is fixed when the WebGL context is made, so only a forced Low or Minimum start turns it off.
+    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: quality !== 'low' && quality !== 'minimum', powerPreference: 'low-power' });
     this.scenery = [];
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(60, 1, 0.5, 10000);

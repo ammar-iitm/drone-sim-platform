@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Instructor login{% endblock %}
+{% block head %}
+<style>
+  .login { max-width: 420px; margin: 10vh auto 0; }
+  .login form { display: flex; flex-direction: column; gap: var(--s3); }
+</style>
+{% endblock %}
+{% block content %}
+<main class="page">
+  <section class="panel login">
+    <div class="panel-head"><h1 class="panel-title"><span class="tag">AAR</span>Instructor login</h1></div>
+    <form class="panel-body" method="post" action="{{ url_for('auth.login') }}">
+      <p>Results, session reviews and exports are for instructors. Trainees can still
+        <a href="{{ url_for('views.mission') }}">pick a scenario and play</a> without logging in.</p>
+      {% if error %}<div class="notice error" role="alert">{{ error }}</div>{% endif %}
+      <div class="field"><label class="label" for="password">Instructor password</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required autofocus></div>
+      <input type="hidden" name="next" value="{{ next }}">
+      <button type="submit" class="btn primary">Log in</button>
+    </form>
+  </section>
+</main>
+{% endblock %}

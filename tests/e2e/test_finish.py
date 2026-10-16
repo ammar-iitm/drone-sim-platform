@@ -199,9 +199,14 @@ def test_quality_levels_and_auto_step_down(page, server):
     assert page.evaluate("window.__sim.world.quality") == "medium"         # 3 s: one step down
     page.evaluate("for (let i = 0; i < 6; i++) window.__sim.autoQuality(60)")
     assert page.evaluate("window.__sim.world.quality") == "medium"         # never steps back up
+    page.evaluate("for (let i = 0; i < 6; i++) window.__sim.autoQuality(20)")
+    assert page.evaluate("window.__sim.world.quality") == "low"
     page.evaluate("for (let i = 0; i < 12; i++) window.__sim.autoQuality(20)")
-    assert page.evaluate("window.__sim.world.quality") == "low"            # and stops at low
-    page.wait_for_function("document.getElementById('quality').textContent.includes('LOW')")
+    assert page.evaluate("window.__sim.world.quality") == "minimum"        # and stops at minimum
+    page.wait_for_function("document.getElementById('quality').textContent.includes('MINIMUM')")
+    lowest = page.evaluate("[window.__sim.world.renderer.getPixelRatio(), window.__sim.world.scenery.map(s => [s.mesh.count, s.total])]")
+    assert lowest[0] <= 0.5
+    assert all(abs(c - max(1, round(t * 0.2))) <= 1 for c, t in lowest[1])
 
     assert page.errors == []
 

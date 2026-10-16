@@ -12,6 +12,20 @@
   .timeline .what { font: 700 14px/1.3 var(--font-mono); text-transform: uppercase; }
   .timeline .note { grid-column: 2 / -1; font-size: 14px; }
   .stack { display: flex; flex-direction: column; gap: var(--s3); }
+  .timeline li[data-t] { cursor: pointer; }
+  .timeline li[data-t]:hover, .timeline li[data-t]:focus-visible { background: var(--surface-high); outline: none; }
+  .replay-stage { position: relative; height: min(62vh, 560px); background: var(--surface-lowest); border: 1px solid var(--outline-variant); }
+  .replay-map { width: 100%; height: 100%; display: block; }
+  .replay-bar { display: flex; gap: var(--s2); align-items: center; margin-top: var(--s2); flex-wrap: wrap; }
+  .replay-scrub { flex: 1; min-width: 160px; accent-color: var(--cyan); }
+  .replay-time { font-family: var(--font-mono); min-width: 150px; }
+  .replay-caption { margin: var(--s2) 0 0; }
+  .replay-legend { display: flex; flex-wrap: wrap; gap: var(--s1) var(--s3); list-style: none; margin: var(--s2) 0 0; padding: 0; }
+  .replay-legend li { display: flex; align-items: center; gap: 6px; }
+  .swatch { display: inline-block; width: 18px; height: 0; }
+  .swatch.ring { width: 12px; height: 12px; border: 1.5px solid #fff; border-radius: 50%; }
+  .swatch.line { border-top: 2px solid var(--cyan); }
+  .swatch.fa { border-top: 2px dashed var(--amber); }
   @media (max-width: 1100px) { .review { grid-template-columns: 1fr; } }
 </style>
 {% endblock %}
@@ -19,6 +33,11 @@
 <main class="page" data-session="{{ session_id }}">
   <div class="opbar" id="head"><span class="label">Loading session {{ session_id }}…</span></div>
   <div class="review">
+    <section class="panel" style="grid-column:1/-1">
+      <div class="panel-head"><h2 class="panel-title"><span class="tag">00</span>Replay</h2>
+        <span class="label">Top-down, true identities · Space plays or pauses · click an event to jump to it</span></div>
+      <div class="panel-body" id="replay"><span class="label">Loading replay…</span></div>
+    </section>
     <section class="panel">
       <div class="panel-head"><h2 class="panel-title"><span class="tag">01</span>Event chronology</h2>
         <span class="label" id="event-count"></span></div>

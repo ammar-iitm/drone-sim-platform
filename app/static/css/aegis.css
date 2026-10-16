@@ -114,6 +114,9 @@ a { color: var(--cyan); }
 }
 .rail-foot { padding: var(--s3); border-top: 1px solid var(--outline-variant); background: var(--surface-lowest); }
 .rail-foot .row { display: flex; justify-content: space-between; gap: var(--s2); }
+.rail-foot form.row { margin: 0 0 var(--s2); align-items: center; }
+.linkbtn { all: unset; cursor: pointer; color: var(--cyan); text-decoration: underline; }
+.linkbtn:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
 .meter { height: 4px; background: var(--surface-highest); margin: var(--s1) 0; }
 .meter > span { display: block; height: 100%; background: var(--green); }
 

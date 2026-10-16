@@ -1,5 +1,6 @@
 // Session review: ordered event timeline with the tree outcome and points behind each event.
 import { esc, renderStages, renderPenalties, renderContacts, gradeBlock } from './results.js';
+import { Replay, scenarioQuery } from './replay.js';
 
 const $ = (id) => document.getElementById(id);
 const id = document.querySelector('main').dataset.session;
@@ -50,9 +51,23 @@ async function load() {
     const neg = item.notes.some((n) => n.stage === 'penalty' || n.points === 0);
     const notes = item.notes.map((n) => `<div class="note"><span class="badge ${n.points < 0 || n.points < 40 ? 'bad' : n.points < 75 ? 'warn' : 'good'}">
         ${esc(n.stage)} · ${esc(n.node.replaceAll('_', ' '))} · ${n.stage === 'penalty' ? n.points : n.points + '%'}</span> ${esc(n.reason)}</div>`).join('');
-    return `<li class="${neg ? 'neg' : ''}"><span class="t">${fmt(item.t)}</span>
+    return `<li class="${neg ? 'neg' : ''}" data-t="${item.t}" tabindex="0" title="Jump the replay to T+${fmt(item.t)}"><span class="t">${fmt(item.t)}</span>
       <span class="what">${esc(describe(item, rubric))}</span><span class="value ${pts < 0 ? 'red' : ''}">${pts ? pts + ' pts' : ''}</span>${notes}</li>`;
   }).join('') || '<li><span></span><span>No events were recorded.</span></li>';
+  await loadReplay(s, r, rubric);
+}
+
+async function loadReplay(s, r, rubric) {
+  const res = await fetch('/api/scenario?' + scenarioQuery(s));
+  if (!res.ok) { $('replay').innerHTML = '<div class="notice error">The scenario for this session could not be rebuilt.</div>'; return; }
+  const replay = new Replay($('replay'), { scenario: await res.json(), result: r, rubric });
+  window.__replay = replay; // exposed for the browser tests
+  const jump = (li) => { replay.pause(); replay.seek(Number(li.dataset.t)); $('replay').scrollIntoView({ block: 'nearest' }); };
+  $('timeline').addEventListener('click', (e) => { const li = e.target.closest('li[data-t]'); if (li) jump(li); });
+  $('timeline').addEventListener('keydown', (e) => {
+    const li = e.target.closest('li[data-t]');
+    if (li && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); jump(li); }
+  });
 }
 
 function replayUrl(s) {

@@ -47,6 +47,10 @@
       </nav>
     </div>
     <div class="rail-foot">
+      {% if login_enabled and instructor %}
+      <form method="post" action="{{ url_for('auth.logout') }}" class="row label"><span>Instructor</span>
+        <button type="submit" class="linkbtn">Log out</button></form>
+      {% endif %}
       <div class="row label"><span>Store</span><span class="green">{{ "Postgres hosted" if hosted else "SQLite local" }}</span></div>
       <div class="meter"><span style="width:100%"></span></div>
       <div class="row label"><span>Scoring</span><span>Server</span></div>

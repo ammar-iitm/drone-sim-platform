@@ -10,6 +10,7 @@ from flask import Blueprint, Response, current_app, jsonify, request
 from werkzeug.exceptions import HTTPException
 
 from . import analytics, scenario as scen, scoring
+from .auth import instructor_required
 from .db import MAX_ID, avg1, get_db
 
 bp = Blueprint("api", __name__, url_prefix="/api")
@@ -95,6 +96,7 @@ def get_rubric():
 # ---------------------------------------------------------------- trainees
 
 @bp.get("/trainees")
+@instructor_required
 def list_trainees():
     unit = request.args.get("unit")
     sql = ("SELECT t.id, t.callsign, t.unit, t.created_at, COUNT(s.id) AS sessions, "
@@ -188,6 +190,7 @@ SESSION_COLUMNS = ("s.id, s.trainee_id, t.callsign, t.unit, s.scenario_id, s.sce
 
 
 @bp.get("/sessions")
+@instructor_required
 def list_sessions():
     clauses, args = [], []
     if request.args.get("trainee_id"):
@@ -204,6 +207,7 @@ def list_sessions():
 
 
 @bp.get("/sessions/<id:session_id>")
+@instructor_required
 def get_session(session_id):
     db = get_db()
     row = db.execute(f"SELECT {SESSION_COLUMNS}, s.params, s.result FROM sessions s "
@@ -231,6 +235,7 @@ def _csv(filename, header, rows):
 
 
 @bp.get("/sessions/<id:session_id>/export.csv")
+@instructor_required
 def export_session(session_id):
     row = get_db().execute(f"SELECT {SESSION_COLUMNS}, s.result FROM sessions s JOIN trainees t ON t.id = s.trainee_id "
                            f"WHERE s.id = ?", (session_id,)).fetchone()
@@ -257,6 +262,7 @@ def export_session(session_id):
 
 
 @bp.get("/analytics/unit/<unit>/export.csv")
+@instructor_required
 def export_unit(unit):
     unit = unit.upper()
     rows = get_db().execute(
@@ -273,6 +279,7 @@ def export_unit(unit):
 # ---------------------------------------------------------------- analytics
 
 @bp.get("/analytics/trainee/<id:trainee_id>")
+@instructor_required
 def trainee_analytics(trainee_id):
     data = analytics.trainee(get_db(), trainee_id, rubric())
     if data is None:
@@ -281,6 +288,7 @@ def trainee_analytics(trainee_id):
 
 
 @bp.get("/analytics/unit/<unit>")
+@instructor_required
 def unit_analytics(unit):
     data = analytics.unit(get_db(), unit.upper())
     if data is None:

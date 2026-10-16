@@ -6,7 +6,11 @@ call (window.__simApi), making the choices each scenario is meant to test. The s
 then scores the saved session and we check the decision-tree outcome.
 """
 
+from pathlib import Path
+
 import pytest
+
+SHOTS = Path(__file__).resolve().parents[2] / "test-results"
 
 BOT = """(cfg) => {
   const S = window.__sim, A = window.__simApi, seen = new Map();
@@ -99,3 +103,31 @@ def test_scenario_plays_end_to_end(page, server, scenario_id, vary):
         assert len(hostiles) == 8
         assert sum(c["detection"]["node"].startswith("detected") for c in hostiles) >= 6
         assert all(d["engagement"]["node"] == "restraint" for d in by_threat("decoy") if d["scored"])
+
+
+def test_session_replay(page, server):
+    """AAR replay: the review page rebuilds the scenario the trainee flew (here a variant), plays
+    it back on a map, and clicking an event jumps the replay to that moment."""
+    _, detail = play(page, server, "s2-night-loiter", CASES["s2-night-loiter"], vary=31)
+    page.goto(f"{server}/dashboard/session/{detail['id']}")
+    page.wait_for_function("window.__replay")
+    rp = page.evaluate("({ n: window.__replay.contacts.length, vary: window.__replay.scenario.params,"
+                       " end: window.__replay.duration })")
+    assert rp["vary"] == {"vary": 31} and rp["n"] == len(detail["result"]["contacts"]) and rp["end"] > 0
+
+    jam = next(e for e in detail["result"]["timeline"] if e["type"] == "respond")
+    page.locator(f"#timeline li[data-t='{jam['t']}']").first.click()
+    assert page.evaluate("window.__replay.t") == pytest.approx(jam["t"])
+    assert "JAM" in page.inner_text(".replay-caption").upper()
+
+    page.locator("[data-act=play]").click()
+    page.wait_for_timeout(600)
+    assert page.evaluate("window.__replay.t") > jam["t"]       # playing moves time forward
+    page.keyboard.press("Space")                               # Space pauses
+    t = page.evaluate("window.__replay.t")
+    page.wait_for_timeout(300)
+    assert page.evaluate("window.__replay.t") == t
+    page.locator(".replay-scrub").fill("0")
+    assert page.evaluate("window.__replay.t") == 0
+    assert page.errors == [] and page.external == []
+    page.locator("#replay").screenshot(path=SHOTS / "14-replay.png")

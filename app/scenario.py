@@ -14,7 +14,8 @@ from . import geometry
 
 SCENARIO_DIR = Path(__file__).resolve().parent / "scenarios"
 
-TIMES_OF_DAY = ("day", "dusk", "night")
+TIMES_OF_DAY = ("day", "dusk", "night")  # procedural choices (changing this changes every seed)
+LIGHTING = TIMES_OF_DAY + ("dawn",)      # every valid time_of_day; scripted scenarios may also use dawn
 TERRAINS = ("rural", "urban")
 
 # AVD difficulty table. Swarm members are counted on top of the hostile contacts.

@@ -22,17 +22,22 @@ The rest of the statement is covered too:
 - **Attacks:** single drones and swarms of up to 12.
 - **Hardware:** it runs offline in a browser on an ordinary laptop.
 
-## Status (2026-10-10)
+## Status (2026-10-16)
 
 - **Requirements:** 19 of the 21 PRD requirements are verified by tests or screenshots. Two are partial:
   - **F8 audio:** every cue and the mute key are tested in code, but nobody has listened yet (issue #11).
   - **F9 VR:** not built, by decision; rendering is isolated in `world.js` so it can be added later.
-- **Tests:** 193 pass: 154 Python tests and 39 browser tests. The browser tests play all six scenarios end to end, both standard and varied.
+- **Tests:** 199 pass: 159 Python tests and 40 browser tests. The browser tests play all six scenarios end to end, both standard and varied.
 - **Offline:** verified. Every browser test blocks non-local requests, and a full run with Wi-Fi off was done by hand on 2026-10-06.
 - **Target laptop:** MacBook Pro (Mac17,9), Apple M5 Pro (15-core CPU, 16-core GPU), 24 GB, macOS 27.0.1, Chrome 155.0.8059.39.
   - **12-drone swarm:** 120 fps on both Auto and Low quality at 1920 × 1080. That is the display's refresh cap.
   - **Launch to first scenario:** 0.7 s with `.venv` already built; 5.4 s from a fresh clone, where `start.sh` builds `.venv` and installs everything first. The target is under 60 s.
   - Both were measured on 2026-10-10 by a script driving a visible Chrome window.
+- **Low-end laptops (simulated on 2026-10-16, issue #10):** a real low-end laptop hasn't been tested yet, so Chrome was forced onto software rendering, which is slower than any integrated graphics.
+  - The 12-drone swarm ran at 15–23 fps.
+  - The same page with the 3D scene hidden still topped out at about 33 fps, so the limit is software rendering's fixed cost for any page, not the trainer's scene (3 draw calls, 13,000–47,000 triangles).
+  - A 6× slower CPU made no difference on a real GPU (still 120 fps).
+  - 30 fps on real integrated graphics is therefore likely, but must still be confirmed on a real machine. A **Minimum** quality level was added as an extra fallback.
 
 ## Install and run
 
@@ -71,6 +76,7 @@ NO_BROWSER=1 ./start.sh                          # start without opening a brows
 **Graphics quality.** On a slow laptop, choose **Graphics quality** on Mission select:
 - **Auto** (the default) starts at High and steps down if the frame rate stays under 35 fps for 3 seconds.
 - **Low** renders at 0.75× resolution with no antialiasing and draws only the nearest 35% of scenery.
+- **Minimum** (for the weakest graphics) renders at 0.5× resolution and draws the nearest 20% of scenery. Auto steps down to it as a last resort.
 
 You can also add `&quality=low` to a simulator URL.
 
@@ -85,6 +91,10 @@ Live at **https://drone-sim-platform.vercel.app**. It's public, with no login.
 - **Deploying:** run `npx vercel deploy --prod` from the repo root. The project is **not** connected to GitHub, so pushing doesn't deploy. `.vercelignore` keeps tests, archive, screenshots and local data out of the upload.
 - **Testing on Postgres:** `TEST_DATABASE_URL=<url> .venv/bin/python -m pytest tests --ignore=tests/e2e` runs the Python tests on Postgres. The test tables are dropped before every test, so point it at a throwaway database (for example, run `CREATE DATABASE trainer_test` in the Neon project and use that URL), **never** the live `neondb`.
 - **Sidebar labels:** the sidebar and simulator show **Hosted / Postgres hosted** instead of **Offline / SQLite local**.
+- **Instructor login:** set `INSTRUCTOR_PASSWORD` (and optionally `SECRET_KEY`) as Vercel environment variables, then redeploy.
+  - With it set, the dashboard, session reviews, CSV exports and the results APIs need an instructor login (`/login`); trainees can still choose a scenario, play and see their own score.
+  - Without it, everything stays open, as on an offline laptop.
+  - The session cookie is signed with `SECRET_KEY`. If that isn't set, a key is derived from the password, so changing the password signs everyone out.
 
 ## Using it
 
@@ -111,7 +121,11 @@ Live at **https://drone-sim-platform.vercel.app**. It's public, with no login.
 
 3. **Score screen**: shows the composite score, grade, stage bars and the decision-tree path with a reason for every contact. **Run same seed again** replays the identical scenario, including the same variant of a scripted one.
 4. **Help and scoring** (`/help`): controls, threat markers, sensors and radar, and the full scoring tree drawn live from `rubric.json`.
-5. **AAR dashboard** (`/dashboard`): shows the unit overview, trainee progress (with a table view), unit comparison, confusion matrix and session log. Each session links to the session review timeline.
+5. **AAR dashboard** (`/dashboard`): shows the unit overview, trainee progress (with a table view), unit comparison, confusion matrix and session log. Each session links to its review.
+6. **Session review** (`/dashboard/session/<id>`):
+   - **Replay:** a top-down map of the whole engagement, showing every contact's true identity and track, the trainee's marks (white rings), responses (cyan lines from the post), false alarms (amber rays), and where each drone was stopped or breached. It has play/pause (**Space**), speed ×1/×4/×16 and a time scrubber.
+   - **Event timeline:** clicking an event jumps the replay to that moment.
+   - **Score detail:** stage scores, penalties and the decision tree for every contact.
 
 ## Editing the rubric
 
@@ -137,6 +151,7 @@ The browser never sends a score. It sends raw events (`mark`, `classify`, `respo
 ```
 app/
   __init__.py        Flask app factory
+  auth.py            Instructor login (only when INSTRUCTOR_PASSWORD is set)
   api.py             JSON API (scenarios, rubric, trainees, sessions, analytics)
   views.py           Pages: /mission, /sim, /dashboard, /dashboard/session/<id>, /help
   scenario.py        Seeded generator: scripted + procedural scenarios, difficulty table
@@ -149,7 +164,7 @@ app/
   templates/         Pages in the AEGIS (Stitch) style
   static/css/        aegis.css (design system), sim.css (HUD)
   static/js/sim/     Simulator: world.js (Three.js scene), radar.js, main.js (loop, input, HUD)
-  static/js/         mission.js, dashboard.js, session.js, help.js, results.js
+  static/js/         mission.js, dashboard.js, session.js, replay.js (AAR replay map), help.js, results.js
   static/vendor/     Three.js 0.186.1, Chart.js 4.5.1 (with licences)
 rubric.json          Editable scoring rubric
 run.py               Start the app (start.sh / start.bat wrap it with first-run setup)
@@ -168,7 +183,7 @@ data/                SQLite database (created on first run; delete to reset)
 ```bash
 .venv/bin/pip install -r requirements-dev.txt         # once: pytest and Playwright (the browser tests drive the installed Chrome)
 .venv/bin/python -m pytest tests --ignore=tests/e2e    # Python tests, under a second
-.venv/bin/python -m pytest                              # all 193, about 5 minutes
+.venv/bin/python -m pytest                              # all 199, about 5 minutes
 TEST_DATABASE_URL=<postgres url> .venv/bin/python -m pytest tests --ignore=tests/e2e   # same tests on Postgres
 ```
 
@@ -189,6 +204,8 @@ The browser tests block every non-local request, so they also check that nothing
 | 2026-10-10 | **Team:** Ammar owns every track and reviews merges |
 | 2026-10-10 | **Hosted on Vercel** with Neon Postgres, public link, no login. Local and offline use stays on SQLite |
 | 2026-10-16 | **Scoring decisions** for issue #15, listed below |
+| 2026-10-16 | **AAR replay** added to the session review, and **instructor login** added (off unless `INSTRUCTOR_PASSWORD` is set) |
+| 2026-10-16 | **Dawn lighting** for Dawn Recon Pass, which ran at dusk before. It's for scripted scenarios only, so procedural seeds are unchanged |
 
 ## Scoring decisions (issue #15, agreed 2026-10-16)
 
@@ -208,11 +225,27 @@ Tracked as GitHub issues, all assigned to Ammar:
 
 | Issue | Task |
 | --- | --- |
-| #10 | Install on a second machine using only this README, including the first-ever run of `start.bat` on Windows. A weaker laptop would also test performance |
+| #10 | Install on a second machine using only this README, including the first-ever run of `start.bat` on Windows. Use an ordinary laptop with integrated graphics and confirm 30 fps with the 12-drone swarm (the simulated low-end test is under Status) |
 | #11 | Human checks. Play any scenario with sound on: the rotor hum should rise as a drone closes in, the tick, chime, buzz and breach alarm should play on their events, and **M** should mute. Set macOS Display → Colour filters → Greyscale and check that the threat markers (triangle, diamond, circle, square, each with a text label) and the dashboard still read clearly. In Urban Canyon, the drone should show for about 4 s around T+37 s and again on final approach |
-| #14 | Review `docs/RUBRIC_SOURCES.md` against public counter-drone guidance (read ATP 3-01.81 directly), and mark each row Agreed, Changed or Rejected |
-| #16 | Read the PRD, AVD and Visual Design docs against the running app and list any disagreements |
+| #14 | Rubric review done against the May 2025 ATP 3-01.81 (`docs/RUBRIC_SOURCES.md`): 10 rows agreed. **Two decisions remain:** whether Take cover should score 100% when a hostile is out of range of every suitable response (R8), and whether to relabel Jam and Intercept as non-lethal and physical (R6) |
 | #13 | Keep the full test suite passing on every merge (ongoing) |
+
+## Spec differences (issue #16, checked 2026-10-16)
+
+The original PRD, AVD and Visual Design docs were read against the running app. Each difference is either fixed or a deliberate choice:
+
+| Spec says | App does | Status |
+| --- | --- | --- |
+| PRD: Dawn Recon Pass is at dawn | It ran with dusk lighting and showed a DUSK tag | **Fixed:** new dawn lighting (pinker, sun in the east) |
+| PRD: three expected outcomes | The official statement has four; the fourth is adjustable difficulty and randomisation | **Covered:** random seeds and scripted variants (see Problem statement) |
+| PRD: sessions stored in SQLite | SQLite offline; Postgres when hosted | **Deliberate** (hosted version) |
+| PRD non-goal: no VR | No VR | As specified |
+| AVD: radar updates "about once per second" | The radar sweeps at 30 RPM, so each track updates every 2 s, with clutter, false returns and 2-of-3 track initiation | **Deliberate:** a more realistic radar model; tested |
+| AVD: quadcopters can hover | Drones fly their waypoint paths at constant speed, with seeded wobble | **Simplification**, kept |
+| AVD: session review lists the decisions | Event timeline plus a visual replay | **Exceeded** |
+| AVD: add instructor login before any shared deployment | Instructor login exists (off unless a password is set) | **Done** |
+| Visual Design: light dashboard theme, blue accent palette | Stitch "AEGIS" dark theme with green and cyan accents | **Deliberate** (decision of 2026-10-07) |
+| Visual Design: threat markers pair colour, shape and label | Triangle, diamond, circle and square, each with a text label, in the simulator and the replay | As specified |
 
 ## Known limits and risks
 
@@ -224,9 +257,8 @@ Tracked as GitHub issues, all assigned to Ammar:
 - **Scoring needs the server.** If the server is down when a session ends, the session is kept in the browser and offered for resending on Mission select.
 - **Identity:** trainees are identified by callsign and unit only.
 - **`--lan` mode has no login.** Use it only on a trusted network.
-- **The hosted version is public with no login.** Anyone with the link can create trainees and sessions, and read the dashboard and CSV exports. Keep real personnel data off it. Before wider use, add instructor login or turn on Vercel Deployment Protection.
+- **The hosted version's results are public until `INSTRUCTOR_PASSWORD` is set** on Vercel. Until then, anyone with the link can read the dashboard and CSV exports, so keep real personnel data off it. Trainee play stays open by design, so anyone can add sessions. The login has a 0.5 s delay after a wrong password but no lockout.
 - **Hosted latency:** every request opens a new database connection to Neon, and Neon's free tier sleeps when idle. The first request after a quiet spell takes a second or two longer.
-- **A known flaky test:** `test_verification::test_look_and_zoom_by_mouse_and_keyboard` failed once in a full run on 2026-10-16 and passed 3 of 3 alone. It times a mouse drag, so a busy machine can trip it.
 - **Visual effects are not scored.** Swarm separation and wobble are drawn on top of each drone's path; the server always scores the clean path.
 
 ## Working rules

@@ -32,10 +32,11 @@ def test_look_and_zoom_by_mouse_and_keyboard(page, server):
     page.mouse.up()
     yaw1 = page.evaluate("window.__sim.yaw")
     assert yaw1 > yaw0 + 20  # dragging left turns the view right ("grab the world")
+    # Turning happens in the simulation tick, which runs once per drawn frame. Hold the key until
+    # the view has turned rather than for a fixed time, so a slow first frame cannot fail the test.
     page.keyboard.down("ArrowLeft")
-    page.wait_for_timeout(500)
+    page.wait_for_function(f"window.__sim.yaw < {yaw1} - 10", timeout=10_000)
     page.keyboard.up("ArrowLeft")
-    assert page.evaluate("window.__sim.yaw") < yaw1 - 10
     page.mouse.move(cx, cy)
     page.mouse.wheel(0, -200)
     page.wait_for_timeout(100)

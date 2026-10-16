@@ -67,7 +67,7 @@ def test_invalid_params_rejected(bad):
 def _check_schema(s):
     assert {"id", "name", "kind", "seed", "objective", "duration_s", "environment", "contacts"} <= set(s)
     env = s["environment"]
-    assert env["time_of_day"] in scen.TIMES_OF_DAY and env["terrain"] in scen.TERRAINS
+    assert env["time_of_day"] in scen.LIGHTING and env["terrain"] in scen.TERRAINS
     assert {"terrain_seed", "fog", "noise", "radar_dropout", "visual_range_m"} <= set(env)
     ids = [c["id"] for c in s["contacts"]]
     assert len(ids) == len(set(ids))

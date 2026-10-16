@@ -2,6 +2,8 @@
 
 from flask import Blueprint, redirect, render_template, url_for
 
+from .auth import instructor_required
+
 bp = Blueprint("views", __name__)
 
 
@@ -21,6 +23,7 @@ def sim():
 
 
 @bp.get("/dashboard")
+@instructor_required
 def dashboard():
     return render_template("dashboard.html", active="dashboard")
 
@@ -31,5 +34,6 @@ def help_page():
 
 
 @bp.get("/dashboard/session/<id:session_id>")
+@instructor_required
 def session_review(session_id):
     return render_template("session.html", active="dashboard", session_id=session_id)
