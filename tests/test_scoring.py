@@ -323,3 +323,36 @@ def test_scoring_is_pure(rubric):
 def test_bad_events_rejected(rubric, bad):
     with pytest.raises(ValueError):
         validate_events(bad, scenario(contact(**HOSTILE)), rubric)
+
+
+def test_take_cover_is_right_when_the_drone_stays_out_of_reach(rubric):
+    """Issue #14, R8 (ATP 3-01.81): when the threat stays outside the range of every suitable
+    response (jam 2,000 m, intercept 1,500 m), taking cover scores full engagement credit."""
+    far = contact("C1", start=4000.0, end=2500.0, par=20.0)
+    r = run(rubric, scenario(far), [ev(5, "mark", "C1"), ev(6, "classify", "C1", **{"class": "RECON_UAS"}),
+                                    ev(8, "respond", "C1", response="TAKE_COVER")])
+    c = by_id(r, "C1")
+    assert c["engagement"]["node"] == "correct_passive" and c["engagement"]["points"] == 1.0
+    assert "2000 m" in c["engagement"]["reason"]
+
+
+def test_take_cover_is_unsuitable_when_the_drone_comes_in_range(rubric):
+    """The same choice against a drone that later closes in (and could have been engaged) stays 20%."""
+    r = run(rubric, scenario(contact(**HOSTILE)), [ev(5, "mark", "C1"), ev(6, "classify", "C1", **{"class": "RECON_UAS"}),
+                                                   ev(8, "respond", "C1", response="TAKE_COVER")])
+    assert by_id(r, "C1")["engagement"]["node"] in ("unsuitable", "breach")
+    assert by_id(r, "C1")["engagement"]["points"] <= 0.2
+
+
+def test_cover_first_then_engaging_in_range_is_scored_on_the_engagement(rubric):
+    sure(rubric, 1.0)
+    r = run(rubric, scenario(contact(**HOSTILE)), [ev(5, "mark", "C1"), ev(6, "classify", "C1", **{"class": "RECON_UAS"}),
+                                                   ev(8, "respond", "C1", response="TAKE_COVER"),
+                                                   ev(50, "respond", "C1", response="INTERCEPT")])
+    assert by_id(r, "C1")["engagement"]["node"] == "correct_effective"
+
+
+def test_relabelled_responses(rubric):
+    """Issue #14, R6: soft kill and hard kill, the terms in India's counter-drone guidelines."""
+    assert rubric["responses"]["JAM"]["label"] == "Jam (soft kill)"
+    assert rubric["responses"]["INTERCEPT"]["label"] == "Intercept (hard kill)"

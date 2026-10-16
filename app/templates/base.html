@@ -29,6 +29,7 @@
         <span class="brand-name">AEGIS // Drone Threat Trainer</span>
       </a>
       <span class="chip" title="Training simulator. Not an operational system.">For training use only</span>
+      <button type="button" class="btn lang-toggle" id="lang-toggle" lang="hi" data-no-i18n>हिंदी</button>
     </div>
     <div class="cmdbar-right">{% block cmdbar %}{% endblock %}</div>
   </header>
@@ -60,6 +61,7 @@
   </aside>
 
   {% block content %}{% endblock %}
+  <script type="module" src="{{ url_for('static', filename='js/i18n.js') }}"></script>
   {% block scripts %}{% endblock %}
 </body>
 </html>

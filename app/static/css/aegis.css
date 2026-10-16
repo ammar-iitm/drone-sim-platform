@@ -33,8 +33,10 @@
   --series-classification: #d95926;
   --series-engagement: #199e70;
 
-  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-mono: "Space Mono", ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+    "Kohinoor Devanagari", "Nirmala UI", "Noto Sans Devanagari", "Mangal", sans-serif;
+  --font-mono: "Space Mono", ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, "Liberation Mono",
+    "Kohinoor Devanagari", "Nirmala UI", "Noto Sans Devanagari", "Mangal", monospace;
 
   --rail-w: 232px;
   --bar-h: 56px;
@@ -119,6 +121,9 @@ a { color: var(--cyan); }
 .skip-link:focus { top: var(--s2); outline: 2px solid var(--cyan); outline-offset: 2px; }
 main:focus { outline: none; }
 .nowrap { white-space: nowrap; }
+/* Devanagari letters join; letter spacing pulls them apart, so turn it off in Hindi. */
+:lang(hi) * { letter-spacing: 0 !important; }
+.btn.lang-toggle { min-height: 30px; padding: 0 var(--s2); font-size: 14px; text-transform: none; letter-spacing: 0; }
 .disclaimer { margin: var(--s2) 0 0; font-size: 12px; line-height: 1.4; color: var(--outline); }
 .rail-foot form.row { margin: 0 0 var(--s2); align-items: center; }
 .linkbtn { all: unset; cursor: pointer; color: var(--cyan); text-decoration: underline; }

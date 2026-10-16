@@ -8,6 +8,7 @@ import { rollFor } from './rng.js';
 import { positionAt, endTime, rangeAt, endsInside, bearingOf } from './path.js';
 import { drawShape, badge, STATE_COLOR, STATE_LABEL, FAMILY_STATE } from './marks.js';
 import { esc, renderStages, renderPenalties, renderContacts, gradeBlock } from '../results.js';
+import { t as tr } from '../i18n.js'; // canvas text is not in the page, so translate it where it is drawn
 
 const $ = (id) => document.getElementById(id);
 const TICK = 1 / 30;
@@ -530,7 +531,7 @@ function drawFrame() {
     if (p.x < -20 || p.y < -20 || p.x > vw + 20 || p.y > vh + 20) continue;
     const y = p.y - 22;
     drawShape(ctx, m.state, p.x, y, 7, STATE_COLOR[m.state]);
-    const text = `${id} · ${STATE_LABEL[m.state]}`;
+    const text = `${id} · ${tr(STATE_LABEL[m.state])}`;
     const tw = ctx.measureText(text).width;
     ctx.fillStyle = 'rgba(13, 14, 17, 0.78)'; ctx.fillRect(p.x + 12, y - 10, tw + 10, 20);
     ctx.fillStyle = STATE_COLOR[m.state]; ctx.fillText(text, p.x + 17, y);

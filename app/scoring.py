@@ -64,6 +64,21 @@ def validate_events(raw_events, scenario, rubric):
 
 # ---------------------------------------------------------------- helpers
 
+def stays_out_of_reach(rubric, contact, t, responses, step=0.5):
+    """The farthest any of these responses can reach (max_range_m), if the contact never comes
+    within it from time t to the end of its path; otherwise None."""
+    reach = max((rubric["responses"][x].get("max_range_m", 0) for x in responses), default=0)
+    if not reach:
+        return None
+    end, s = geometry.end_time(contact), t
+    while s <= end:
+        r = geometry.range_at(contact, s)
+        if r is not None and r <= reach:
+            return None
+        s += step
+    return reach
+
+
 def effectiveness(rubric, response, contact, t):
     spec = rubric["responses"][response]
     if not spec.get("engages"):
@@ -262,6 +277,13 @@ def score_session(scenario, events, rubric, ended_t=None):
             elif suitable and timely and not breached:
                 eng = {"points": sc["correct_effective"], "node": "correct_effective",
                        "reason": f"{label} at {round(r)} m was the expected response."}
+            elif (not engaging and resp in rubric.get("passive_responses", [])
+                  and (reach := stays_out_of_reach(rubric, c, decision["t"], expected))):
+                # ATP 3-01.81: when the threat is outside the range of the unit's weapons, the best
+                # option can be to disperse and seek cover (issue #14, R8).
+                eng = {"points": sc["correct_effective"], "node": "correct_passive",
+                       "reason": f"{label} at {round(r)} m was right: it never came within {reach} m, "
+                                 f"the reach of the suitable responses, so cover was the best option."}
             elif breached:
                 eng = {"points": sc["none_or_breach"], "node": "breach",
                        "reason": f"Reached the inner ring at {_fmt(end_t)} without being stopped."}

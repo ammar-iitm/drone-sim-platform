@@ -1,6 +1,6 @@
 # Rubric sources (issue #14)
 
-Oct 16, 2026 · Every row below has been checked against the sources and marked **Agreed** or **Proposed change**. Nothing in `rubric.json` has been changed by this review. The proposed changes need the lead's decision.
+Oct 16, 2026 · Every row below has been checked against the sources. The two proposed changes were agreed by the lead on 2026-10-16 and are now in `rubric.json` (version 2).
 
 ## How to read this
 
@@ -31,17 +31,14 @@ Only public, unclassified material is used, as the PRD requires.
 | R3 | Calling a hostile a non-threat or friendly is a critical error (−25) | "Soldiers that encounter UAS should consider them as a threat eligible for engagement unless positively identified as friendly" (S1, 5-39). Early identification is needed "to maximize engagement times and avoid fratricide" (S1, 5-28) | **Agreed.** The −25 size is a team choice |
 | R4 | Engaging a friendly is critical (−25); engaging a non-threat scores 0 | Timely identification "reduces the risk of friendly fire"; defeat must "confirm the identity of the UAS and prevent fratricide" (S1, 5-28, 5-33) | **Agreed** |
 | R5 | Jam is suitable for quadcopters and hexacopters; intercept only for fixed-wing (jam 10% effective) | "Autonomous operations do not need a data link, can be programmed from launch to recovery" (S1, 1-14); a pre-programmed flight profile lets the link be disconnected in flight (S1, 5-24). Electronic defeat works best on small drones; kinetic options work better against drones on pre-programmed waypoints (S2) | **Agreed.** The help page should say the fixed-wing is assumed to fly pre-programmed waypoints |
-| R6 | Jam = non-destructive, intercept = destructive | S1 splits defeat into "non-lethal or lethal procedures" (5-33) and methods into "physical and nonphysical" (5-31). India's guidelines call them soft kill and hard kill (S4, secondary only) | **Proposed change (labels only):** "Jam (non-lethal)" and "Intercept (physical)", or the S4 terms for an Indian audience. No scoring change |
+| R6 | Jam = non-destructive, intercept = destructive | S1 splits defeat into "non-lethal or lethal procedures" (5-33) and methods into "physical and nonphysical" (5-31). India's guidelines call them soft kill and hard kill (S4, secondary only) | **Changed (labels only):** "Jam (soft kill)" and "Intercept (hard kill)", the S4 terms, for an Indian audience. No scoring change |
 | R7 | Detection scored against a par time per scenario | Detection depends on "time of day, ambient light levels, meteorological conditions, and observer alertness" (S1, 5-24); terrain-masked drones may be seen only seconds away (S2) | **Agreed.** Par times already depend on visibility and model |
-| R8 | **Report** and **Take cover** against a hostile score 20% ("unsuitable") | "Reporting of a threat UAS should utilize a standard reporting format", the SALUTE spot report, so units can "quickly adjust force protection measures and coordinate immediate response" (S1, 5-8, table 5-1). Reporting supports the response rather than replacing it. Passive defence: "In cases where the enemy aerial platforms are outside the range of the unit's weapons, a unit's most lucrative option can be to disperse and seek cover" (S1, chapter 5 introduction) | **Proposed change:** credit **Take cover** (100%) when the hostile is beyond the range of every suitable response at the moment it is chosen. Keep **Report** at 20% as an engagement decision, since reporting accompanies a response. Needs a small change to `app/scoring.py` and tests |
+| R8 | **Report** and **Take cover** against a hostile score 20% ("unsuitable") | "Reporting of a threat UAS should utilize a standard reporting format", the SALUTE spot report, so units can "quickly adjust force protection measures and coordinate immediate response" (S1, 5-8, table 5-1). Reporting supports the response rather than replacing it. Passive defence: "In cases where the enemy aerial platforms are outside the range of the unit's weapons, a unit's most lucrative option can be to disperse and seek cover" (S1, chapter 5 introduction) | **Changed:** **Take cover** scores 100% (`correct_passive`) when the hostile then stays beyond the reach of every suitable response (`passive_responses` in the rubric). If it later comes within reach, the trainee should have engaged, so cover alone stays 20%. **Report** stays 20% as an engagement decision, since reporting accompanies a response |
 | R9 | Hostile drones fly at up to 150 m and 49 m/s (≈95 kt) | S1 uses the DoD groups (table 5-4 aims by Group 1, 2, 3–5). Group 1: under 20 lb, below 1,200 ft AGL, under 100 kt (S6). India: micro 250 g–2 kg, small 2–25 kg (S5) | **Agreed** |
 | R10 | Weights 30/30/40, detection tiers 100/75/40/10 %, penalties 2/10/25, grade bands A90 to F | No public numbers found (S1 to S6) | **Agreed as a team choice.** Say so; do not cite doctrine for them |
 | R11 | "Late" means a response from inside 300 m | S1 gives no number: "The farther out an aircraft is positively identified, the more time is given to make engagement decisions" (5-5) | **Agreed as a team choice** |
 | R12 | A timely successful retry after a missed first attempt scores 100% (issue #15) | Other C-UAS capabilities "continue to track the threat UAS in case the target was initially missed, and they can engage or re-engage as necessary" (S1, 5-36); "continue jamming, until the UAS is inoperable" (S1, 5-34) | **Agreed.** Doctrine supports re-engaging |
 
-## Decisions still needed from the lead
+## Decisions
 
-1. **R8:** credit Take cover when the hostile is out of range of every suitable response. Yes or no.
-2. **R6:** relabel the two engaging responses. Which wording, if any.
-
-Once both are decided, close issue #14.
+Both proposals were agreed on 2026-10-16 (R6 and R8 above). Issue #14 is closed.

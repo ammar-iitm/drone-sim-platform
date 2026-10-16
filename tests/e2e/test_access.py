@@ -138,3 +138,36 @@ def test_skip_link_reaches_main_content(page, server):
         page.wait_for_function(f"document.activeElement && document.activeElement.id === '{target}'")
     assert page.evaluate("document.documentElement.lang") == "en-IN"
     assert "FOR TRAINING USE ONLY" in page.inner_text("header").upper()
+
+
+def test_hindi_switch(page, server):
+    """GIGW bilingual content: the हिंदी switch translates the interface, survives a reload and
+    switches back to English exactly; the simulator still runs in Hindi."""
+    page.goto(server + "/mission")
+    page.wait_for_selector(".card")
+    assert page.inner_text("#lang-toggle") == "हिंदी"
+    page.click("#lang-toggle")
+    page.wait_for_selector(".card")
+    page.wait_for_function("document.documentElement.lang === 'hi'")
+    nav = page.inner_text(".rail nav")
+    assert "मिशन चयन" in nav and "सिम्युलेटर" in nav
+    assert "केवल प्रशिक्षण उपयोग हेतु" in page.inner_text("header")
+    assert "भोर टोही उड़ान" in page.inner_text("#cards")              # scenario names
+    assert page.get_attribute("#callsign", "placeholder") == "जैसे VIPER-3"
+
+    page.goto(server + "/sim?callsign=hi-1&unit=test&id=s4-mixed-traffic&speed=16")
+    page.wait_for_selector("#begin")
+    assert "प्रशिक्षण उद्देश्य" in page.inner_text("#screen-card")       # Learning objective
+    page.keyboard.press("Enter")
+    page.wait_for_function("window.__sim.t > 2")
+    buttons = page.inner_text("#classify-bar, .actions, body")
+    assert "टोही क्वाडकॉप्टर" in buttons and "आड़ लें" in buttons
+    assert page.errors == []
+
+    page.goto(server + "/mission")
+    page.wait_for_selector(".card")
+    assert page.inner_text("#lang-toggle") == "English"
+    page.click("#lang-toggle")
+    page.wait_for_function("document.documentElement.lang === 'en-IN'")
+    assert "Mission select" in page.inner_text(".rail nav") or "MISSION SELECT" in page.inner_text(".rail nav")
+    assert page.errors == []

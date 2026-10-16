@@ -44,6 +44,7 @@ async function load() {
     ['Hostile: suitable, timely, worked', pct(es.correct_effective)],
     [`Hostile: suitable and timely, missed, then a suitable retry stopped it before ${r.geometry.late_range_m} m`, pct(es.correct_effective)],
     ['Hostile: suitable and timely, but the roll failed (decision credited)', pct(es.correct_failed_roll)],
+    ['Hostile: took cover, and it never came within reach of a suitable response', pct(es.correct_effective)],
     [`Hostile: late (inside ${r.geometry.late_range_m} m) or unsuitable`, pct(es.late_or_unsuitable)],
     ['Hostile: no response, or it breached the inner ring', pct(es.none_or_breach)],
     ['Not a threat: held fire (restraint)', pct(es.restraint)],

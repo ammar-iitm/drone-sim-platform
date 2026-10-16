@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "notes": "Training rubric built from public counter-drone principles. Every number here can be edited without code changes; the next session is scored with the new values.",
   "weights": {
     "detection": 30,
@@ -57,7 +57,7 @@
     "TRACK": { "label": "Track only", "key": "T", "engages": false },
     "REPORT": { "label": "Report", "key": "R", "engages": false },
     "JAM": {
-      "label": "Jam",
+      "label": "Jam (soft kill)",
       "key": "J",
       "engages": true,
       "max_range_m": 2000,
@@ -72,7 +72,7 @@
       }
     },
     "INTERCEPT": {
-      "label": "Intercept",
+      "label": "Intercept (hard kill)",
       "key": "I",
       "engages": true,
       "max_range_m": 1500,
@@ -95,6 +95,7 @@
     "hexacopter": ["JAM", "INTERCEPT"],
     "fixed_wing": ["INTERCEPT"]
   },
+  "passive_responses": ["TAKE_COVER"],
   "models": {
     "quadcopter": { "true_class": "RECON_UAS" },
     "hexacopter": { "true_class": "ARMED_UAS" },

@@ -216,7 +216,7 @@ def test_help_page_shows_live_rubric(page, server):
     page.wait_for_selector("#t-responses tbody tr")
     text = page.inner_text("main").lower()
     for phrase in ("quick start", "threat markers", "detected fast", "critical misclassification",
-                   "restraint", "grade a", "fixed wing", "intercept chance"):
+                   "restraint", "grade a", "fixed wing", "intercept (hard kill) chance"):
         assert phrase in text, phrase
     assert page.locator("#t-responses tbody tr").count() == 6
     rubric = page.evaluate("fetch('/api/rubric').then(r => r.json())")

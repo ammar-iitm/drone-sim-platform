@@ -1,5 +1,6 @@
 // AAR dashboard: unit overview, trainee progress, comparison, confusion matrix and session log.
 import { esc, fmtDateIST } from './results.js';
+import { t as tr } from './i18n.js'; // chart text is drawn on canvas, so translate it here
 
 const $ = (id) => document.getElementById(id);
 const METRICS = ['detection', 'classification', 'engagement'];
@@ -96,7 +97,7 @@ async function loadUnit() {
   charts.compare = new Chart($('compare'), {
     type: 'bar',
     data: { labels: sorted.map((t) => t.callsign),
-      datasets: [{ label: 'Average score', data: sorted.map((t) => t.total), backgroundColor: '#00e3fd', borderRadius: 4, barThickness: 14 }] },
+      datasets: [{ label: tr('Average score'), data: sorted.map((t) => t.total), backgroundColor: '#00e3fd', borderRadius: 4, barThickness: 14 }] },
     options: { indexAxis: 'y', maintainAspectRatio: false, scales: { x: { min: 0, max: 100 } }, plugins: { legend: { display: false } },
       interaction: { mode: 'index', axis: 'y', intersect: false } },
   });
@@ -124,8 +125,8 @@ async function loadTrainee() {
     data: {
       labels,
       datasets: [
-        ...METRICS.map((m) => ({ label: `${m[0].toUpperCase() + m.slice(1)}`, data: a.series[m], borderColor: COLOR[m], backgroundColor: COLOR[m], borderWidth: 2, pointRadius: 3, tension: 0 })),
-        { label: 'Total, rolling mean of 3', data: a.rolling.total, borderColor: '#e3e2e6', borderDash: [5, 4], borderWidth: 1.5, pointRadius: 0, noLabel: true },
+        ...METRICS.map((m) => ({ label: tr(m[0].toUpperCase() + m.slice(1)), data: a.series[m], borderColor: COLOR[m], backgroundColor: COLOR[m], borderWidth: 2, pointRadius: 3, tension: 0 })),
+        { label: tr('Total, rolling mean of 3'), data: a.rolling.total, borderColor: '#e3e2e6', borderDash: [5, 4], borderWidth: 1.5, pointRadius: 0, noLabel: true },
       ],
     },
     options: { maintainAspectRatio: false, layout: { padding: { right: 118 } }, scales: { y: { min: 0, max: 100 } },
