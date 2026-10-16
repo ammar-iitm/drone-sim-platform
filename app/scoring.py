@@ -240,6 +240,16 @@ def score_session(scenario, events, rubric, ended_t=None):
                     eng = {"points": sc["correct_effective"], "node": "correct_effective",
                            "reason": f"{label} at {round(r)} m was suitable and timely, and it worked "
                                      f"(chance {round(att['effectiveness'] * 100)}%)."}
+                elif retry := next((a for a in attempts if a["success"] and a["response"] in expected
+                                    and (geometry.range_at(c, a["t"]) or 0) >= geo["late_range_m"]), None):
+                    # The first try failed its roll, but the trainee kept at it and stopped the drone
+                    # in time: full credit, so persisting scores better than giving up (issue #15).
+                    retry_label = rubric["responses"][retry["response"]]["label"]
+                    chance = round(att["effectiveness"] * 100) if att else 0
+                    eng = {"points": sc["correct_effective"], "node": "correct_effective",
+                           "reason": f"{label} at {round(r)} m was suitable and timely but did not work "
+                                     f"(chance {chance}%); attempt {retry['attempt'] + 1}, "
+                                     f"{retry_label} at {round(geometry.range_at(c, retry['t']))} m, stopped it in time."}
                 else:
                     chance = round(att["effectiveness"] * 100) if att else 0
                     eng = {"points": sc["correct_failed_roll"], "node": "correct_failed_roll",

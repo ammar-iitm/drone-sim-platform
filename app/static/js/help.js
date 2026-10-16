@@ -42,6 +42,7 @@ async function load() {
   const es = r.engagement_scores;
   rows($('t-engagement'), ['Situation', 'Score'], [
     ['Hostile: suitable, timely, worked', pct(es.correct_effective)],
+    [`Hostile: suitable and timely, missed, then a suitable retry stopped it before ${r.geometry.late_range_m} m`, pct(es.correct_effective)],
     ['Hostile: suitable and timely, but the roll failed (decision credited)', pct(es.correct_failed_roll)],
     [`Hostile: late (inside ${r.geometry.late_range_m} m) or unsuitable`, pct(es.late_or_unsuitable)],
     ['Hostile: no response, or it breached the inner ring', pct(es.none_or_breach)],

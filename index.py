@@ -5,5 +5,7 @@ because the function's disk does not persist. Locally, use run.py or start.sh in
 """
 
 from app import create_app
+from app.vercel import DecodePath
 
 app = create_app()
+app.wsgi_app = DecodePath(app.wsgi_app)

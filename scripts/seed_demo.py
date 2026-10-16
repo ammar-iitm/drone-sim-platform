@@ -5,10 +5,12 @@ scoring engine. Trainees improve over their sessions at different rates.
 
     python scripts/seed_demo.py            # adds the cohort to data/trainer.db
     python scripts/seed_demo.py --reset    # deletes data/trainer.db first
-    DATABASE_URL=<postgres url> python scripts/seed_demo.py   # seeds a hosted Postgres database instead
+    DATABASE_URL=<postgres url> python scripts/seed_demo.py           # seeds a hosted Postgres database instead
+    DATABASE_URL=<postgres url> python scripts/seed_demo.py --reset   # empties that database first
 """
 
 import argparse
+import os
 import random
 import sys
 from pathlib import Path
@@ -61,10 +63,18 @@ def main():
     parser.add_argument("--sessions", type=int, default=5)
     args = parser.parse_args()
     db_path = ROOT / "data" / "trainer.db"
-    if args.reset:
+    hosted = bool(os.environ.get("DATABASE_URL") or os.environ.get("POSTGRES_URL"))
+    if args.reset and not hosted:
         for suffix in ("", "-wal", "-shm"):
             Path(str(db_path) + suffix).unlink(missing_ok=True)
     app = create_app()
+    if args.reset and hosted:
+        # Reset the database being seeded (never the local SQLite file).
+        with app.app_context():
+            conn = db.get_db()
+            with conn:
+                for table in ("events", "sessions", "trainees"):
+                    conn.execute(f"DELETE FROM {table}")
     client = app.test_client()
     rubric = load_rubric(ROOT / "rubric.json")
     rnd = random.Random(2026)

@@ -125,6 +125,53 @@ def test_correct_but_failed_roll_is_credited_and_breach_still_penalised(rubric):
     assert r["total"] == pytest.approx(30 + 30 + 40 * 0.6 - 10)
 
 
+def _fail_then_succeed(rubric):
+    """A seed and an intercept chance where attempt 1 misses and attempt 2 hits."""
+    seed = next(sd for sd in range(1, 500) if rng.roll(sd, "C1", 0) > rng.roll(sd, "C1", 1) + 0.1)
+    chance = (rng.roll(seed, "C1", 0) + rng.roll(seed, "C1", 1)) / 2
+    for model in rubric["responses"]["INTERCEPT"]["effectiveness"]:
+        rubric["responses"]["INTERCEPT"]["effectiveness"][model] = chance
+    return seed
+
+
+def test_timely_successful_retry_scores_full_credit(rubric):
+    """Issue #15: a suitable first try that misses, then a retry that stops the drone before
+    the late line, earns 100%, not the 60% of someone who gave up after the miss."""
+    seed = _fail_then_succeed(rubric)
+    r = run(rubric, scenario(contact(**HOSTILE), seed=seed),
+            [ev(5, "mark", "C1"), ev(6, "classify", "C1", **{"class": "RECON_UAS"}),
+             ev(50, "respond", "C1", response="INTERCEPT"), ev(60, "respond", "C1", response="INTERCEPT")])
+    c = by_id(r, "C1")
+    assert [a["success"] for a in c["attempts"]] == [False, True]
+    assert c["engagement"]["node"] == "correct_effective" and c["engagement"]["points"] == 1.0
+    assert "attempt 2" in c["engagement"]["reason"] and not c["breached"]
+    assert r["total"] == 100.0
+
+
+def test_late_successful_retry_keeps_the_failed_roll_credit(rubric):
+    """The retry has to come before the late line (300 m) to count as timely."""
+    seed = _fail_then_succeed(rubric)
+    # At 20 m/s from 2000 m, the contact is inside 300 m after about 85 s.
+    r = run(rubric, scenario(contact(**HOSTILE), seed=seed),
+            [ev(5, "mark", "C1"), ev(6, "classify", "C1", **{"class": "RECON_UAS"}),
+             ev(50, "respond", "C1", response="INTERCEPT"), ev(90, "respond", "C1", response="INTERCEPT")])
+    c = by_id(r, "C1")
+    assert [a["success"] for a in c["attempts"]] == [False, True]
+    assert c["engagement"]["node"] == "correct_failed_roll" and c["engagement"]["points"] == 0.6
+
+
+def test_unsuitable_first_choice_is_not_rescued_by_a_retry(rubric):
+    """Choosing right the first time is the skill (Night Loiter): jamming a fixed-wing stays 20%
+    even if a later intercept stops it."""
+    sure(rubric, 1.0)
+    r = run(rubric, scenario(contact(model="fixed_wing", **HOSTILE)),
+            [ev(5, "mark", "C1"), ev(6, "classify", "C1", **{"class": "ARMED_UAS"}),
+             ev(40, "respond", "C1", response="JAM"), ev(45, "respond", "C1", response="INTERCEPT")])
+    c = by_id(r, "C1")
+    assert c["neutralised_t"] is not None
+    assert c["engagement"]["node"] == "unsuitable" and c["engagement"]["points"] == 0.2
+
+
 def test_unsuitable_response(rubric):
     fw = contact("C1", model="fixed_wing", speed=35)
     r = run(rubric, scenario(fw), [ev(5, "mark", "C1"), ev(20, "respond", "C1", response="JAM")])

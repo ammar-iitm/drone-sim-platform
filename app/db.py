@@ -82,7 +82,13 @@ class PostgresDB:
         return self.conn.execute(self._sql(sql) + " RETURNING id", args).fetchone()["id"]
 
     def init_schema(self):
-        self.conn.execute((HERE / "schema_pg.sql").read_text())
+        """Create the tables if they are missing. One cheap check when they exist; when they
+        don't, an advisory lock stops two instances starting at once from racing on CREATE."""
+        if self.conn.execute("SELECT to_regclass('public.events') IS NOT NULL AS ready").fetchone()["ready"]:
+            return
+        with self.conn.transaction():
+            self.conn.execute("SELECT pg_advisory_xact_lock(26247)")
+            self.conn.execute((HERE / "schema_pg.sql").read_text())
 
     def __enter__(self):
         tx = self.conn.transaction()
@@ -98,7 +104,8 @@ class PostgresDB:
 
 
 def database_url(app):
-    return app.config.get("DATABASE_URL") or os.environ.get("DATABASE_URL") or os.environ.get("POSTGRES_URL")
+    """The Postgres URL, read from the environment once by create_app (see app/__init__.py)."""
+    return app.config.get("DATABASE_URL")
 
 
 def connect(app):
@@ -113,6 +120,9 @@ def connect(app):
 def get_db():
     if "db" not in g:
         g.db = connect(current_app)
+        if not current_app.extensions.get("db_schema_ready"):
+            g.db.init_schema()  # Postgres: on the first request of each instance, not at import
+            current_app.extensions["db_schema_ready"] = True
     return g.db
 
 
@@ -124,8 +134,11 @@ def close_db(_exc=None):
 
 def init_app(app):
     if not database_url(app):
+        # SQLite is local and instant, so set it up now. Postgres waits for the first request,
+        # which keeps a database round trip out of every serverless cold start.
         Path(app.config["DATABASE"]).parent.mkdir(parents=True, exist_ok=True)
-    conn = connect(app)
-    conn.init_schema()
-    conn.close()
+        conn = connect(app)
+        conn.init_schema()
+        conn.close()
+        app.extensions["db_schema_ready"] = True
     app.teardown_appcontext(close_db)

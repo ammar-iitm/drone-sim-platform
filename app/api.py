@@ -5,7 +5,6 @@ import io
 import json
 import re
 from datetime import datetime, timezone
-from urllib.parse import unquote
 
 from flask import Blueprint, Response, current_app, jsonify, request
 from werkzeug.exceptions import HTTPException
@@ -45,10 +44,26 @@ def _body():
     return data
 
 
+def _trainee_id(value):
+    """A trainee id from JSON or a query string, checked before it reaches the database
+    (Postgres rejects a wrong type with an error where SQLite just finds nothing)."""
+    if isinstance(value, bool):
+        raise ApiError("trainee_id must be an integer")
+    if isinstance(value, str) and value.strip().isdigit():
+        value = int(value)
+    if not isinstance(value, int):
+        raise ApiError("trainee_id must be an integer")
+    if not 1 <= value <= 2**63 - 1:
+        raise ApiError("unknown trainee_id", 404)
+    return value
+
+
 def _clean_name(value, field):
     if not isinstance(value, str) or not value.strip():
         raise ApiError(f"{field} is required")
     value = " ".join(value.strip().split())
+    if any(ord(ch) < 32 or ord(ch) == 127 for ch in value):
+        raise ApiError(f"{field} must not contain control characters")
     if len(value) > CALLSIGN_MAX:
         raise ApiError(f"{field} must be at most {CALLSIGN_MAX} characters")
     return value.upper()
@@ -95,13 +110,14 @@ def list_trainees():
 
 
 def find_or_create_trainee(callsign, unit):
+    # Insert-if-missing, then read back: two first-time saves for the same trainee at once
+    # (two browsers, a double-click, concurrent serverless instances) cannot collide.
     db = get_db()
-    row = db.execute("SELECT * FROM trainees WHERE callsign = ? AND unit = ?", (callsign, unit)).fetchone()
-    if row:
-        return dict(row), False
     with db:
-        new_id = db.insert("INSERT INTO trainees (callsign, unit) VALUES (?, ?)", (callsign, unit))
-    return dict(db.execute("SELECT * FROM trainees WHERE id = ?", (new_id,)).fetchone()), True
+        created = db.execute("INSERT INTO trainees (callsign, unit) VALUES (?, ?) "
+                             "ON CONFLICT (callsign, unit) DO NOTHING", (callsign, unit)).rowcount == 1
+    row = db.execute("SELECT * FROM trainees WHERE callsign = ? AND unit = ?", (callsign, unit)).fetchone()
+    return dict(row), created
 
 
 @bp.post("/trainees")
@@ -121,7 +137,7 @@ def submit_session():
 
     trainee_id = data.get("trainee_id")
     if trainee_id is not None:
-        row = get_db().execute("SELECT * FROM trainees WHERE id = ?", (trainee_id,)).fetchone()
+        row = get_db().execute("SELECT * FROM trainees WHERE id = ?", (_trainee_id(trainee_id),)).fetchone()
         if row is None:
             raise ApiError("unknown trainee_id", 404)
         trainee = dict(row)
@@ -175,7 +191,7 @@ def list_sessions():
     clauses, args = [], []
     if request.args.get("trainee_id"):
         clauses.append("s.trainee_id = ?")
-        args.append(request.args["trainee_id"])
+        args.append(_trainee_id(request.args["trainee_id"]))
     if request.args.get("unit"):
         clauses.append("t.unit = ?")
         args.append(request.args["unit"].upper())
@@ -186,7 +202,7 @@ def list_sessions():
     return jsonify([dict(r) for r in get_db().execute(sql, args)])
 
 
-@bp.get("/sessions/<int:session_id>")
+@bp.get("/sessions/<int(max=9223372036854775807):session_id>")
 def get_session(session_id):
     db = get_db()
     row = db.execute(f"SELECT {SESSION_COLUMNS}, s.params, s.result FROM sessions s "
@@ -213,7 +229,7 @@ def _csv(filename, header, rows):
                     headers={"Content-Disposition": f'attachment; filename="{safe}"'})
 
 
-@bp.get("/sessions/<int:session_id>/export.csv")
+@bp.get("/sessions/<int(max=9223372036854775807):session_id>/export.csv")
 def export_session(session_id):
     row = get_db().execute(f"SELECT {SESSION_COLUMNS}, s.result FROM sessions s JOIN trainees t ON t.id = s.trainee_id "
                            f"WHERE s.id = ?", (session_id,)).fetchone()
@@ -239,15 +255,9 @@ def export_session(session_id):
     return _csv(f"session-{session_id}-{row['callsign']}.csv", header, rows)
 
 
-def _unit_name(raw):
-    # Vercel's Python runtime hands the path segment over still percent-encoded ("4%20GUARDS").
-    # Decoding twice is harmless locally unless a unit name itself contains "%" plus two hex digits.
-    return unquote(raw).upper()
-
-
 @bp.get("/analytics/unit/<unit>/export.csv")
 def export_unit(unit):
-    unit = _unit_name(unit)
+    unit = unit.upper()
     rows = get_db().execute(
         "SELECT s.id, s.started_at, t.callsign, s.scenario_name, s.seed, s.total, s.grade, s.detection, "
         "s.classification, s.engagement, s.false_alarms, s.breaches, s.critical_errors FROM sessions s "
@@ -261,7 +271,7 @@ def export_unit(unit):
 
 # ---------------------------------------------------------------- analytics
 
-@bp.get("/analytics/trainee/<int:trainee_id>")
+@bp.get("/analytics/trainee/<int(max=9223372036854775807):trainee_id>")
 def trainee_analytics(trainee_id):
     data = analytics.trainee(get_db(), trainee_id, rubric())
     if data is None:
@@ -271,7 +281,7 @@ def trainee_analytics(trainee_id):
 
 @bp.get("/analytics/unit/<unit>")
 def unit_analytics(unit):
-    data = analytics.unit(get_db(), _unit_name(unit))
+    data = analytics.unit(get_db(), unit.upper())
     if data is None:
         raise ApiError("no trainees in that unit", 404)
     return jsonify(data)

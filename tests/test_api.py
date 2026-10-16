@@ -175,3 +175,56 @@ def test_bad_variant_rejected_by_api(client):
         assert client.get(f"/api/scenario?id=s1-dawn-recon&vary={bad}").status_code == 400
     r = post_session(client, [], params={"vary": "nope"})
     assert r.status_code == 400 and "vary" in r.get_json()["error"]
+
+
+def test_shell_database_url_never_reaches_tests(tmp_path, monkeypatch):
+    """An explicit SQLite file wins over a DATABASE_URL left in the shell (code review)."""
+    from app import create_app
+    monkeypatch.setenv("DATABASE_URL", "postgresql://must-not-be-used.invalid/neondb")
+    monkeypatch.setenv("POSTGRES_URL", "postgresql://must-not-be-used.invalid/neondb")
+    app = create_app({"DATABASE": str(tmp_path / "t.db"), "TESTING": True})
+    assert app.config["DATABASE_URL"] is None
+    c = app.test_client()
+    assert post_session(c, []).status_code == 201
+    assert "SQLite local" in c.get("/mission").get_data(as_text=True)
+
+
+def test_bad_ids_and_names_are_rejected_not_crashed(client):
+    """Inputs that SQLite shrugged off but Postgres would turn into a 500 (code review)."""
+    for bad in ("abc", True, 1.5, [1], {"a": 1}):
+        r = client.post("/api/sessions", json={"trainee_id": bad, "scenario_id": "s1-dawn-recon", "events": []})
+        assert r.status_code == 400 and "trainee_id" in r.get_json()["error"], bad
+    for missing in (0, -4, 2**63, "99999999999999999999999"):
+        r = client.post("/api/sessions", json={"trainee_id": missing, "scenario_id": "s1-dawn-recon", "events": []})
+        assert r.status_code == 404, missing
+    assert client.get("/api/sessions?trainee_id=abc").status_code == 400
+    assert client.get("/api/sessions?trainee_id=7").get_json() == []
+    for name in ("VIPER\x00", "A\x07B", "X\x7f"):
+        r = post_session(client, [], callsign=name)
+        assert r.status_code == 400 and "control characters" in r.get_json()["error"]
+    big = 2**64
+    assert client.get(f"/api/sessions/{big}").status_code == 404
+    assert client.get(f"/api/sessions/{big}/export.csv").status_code == 404
+    assert client.get(f"/api/analytics/trainee/{big}").status_code == 404
+
+
+def test_trainee_creation_is_idempotent(client):
+    """Insert-if-missing: the same callsign and unit twice gives one trainee (code review)."""
+    a = post_session(client, [], callsign="twin-1", unit="race").get_json()["trainee"]
+    b = post_session(client, [], callsign="TWIN-1", unit="RACE").get_json()["trainee"]
+    assert a["id"] == b["id"]
+    assert len(client.get("/api/trainees?unit=race").get_json()) == 1
+
+
+def test_vercel_path_decoding(app):
+    """Vercel passes PATH_INFO still percent-encoded; app.vercel.DecodePath decodes it once."""
+    from app.vercel import DecodePath
+    c = app.test_client()
+    post_session(c, [], callsign="ENC-1", unit="4 GUARDS")
+    post_session(c, [], callsign="ENC-2", unit="A%41")
+    app.wsgi_app = DecodePath(app.wsgi_app)
+    raw = lambda path: c.get("/", environ_overrides={"PATH_INFO": path})  # noqa: E731
+    assert raw("/api/analytics/unit/4%20GUARDS").get_json()["unit"] == "4 GUARDS"
+    assert raw("/api/analytics/unit/A%2541").get_json()["unit"] == "A%41"  # decoded once, not twice
+    assert raw("/api/analytics/unit/4%20GUARDS/export.csv").status_code == 200
+    assert raw("/api/scenarios").status_code == 200

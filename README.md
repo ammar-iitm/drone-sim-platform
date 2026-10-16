@@ -27,7 +27,7 @@ The rest of the statement is covered too:
 - **Requirements:** 19 of the 21 PRD requirements are verified by tests or screenshots. Two are partial:
   - **F8 audio:** every cue and the mute key are tested in code, but nobody has listened yet (issue #11).
   - **F9 VR:** not built, by decision; rendering is isolated in `world.js` so it can be added later.
-- **Tests:** 186 pass: 147 Python tests and 39 browser tests. The browser tests play all six scenarios end to end, both standard and varied.
+- **Tests:** 193 pass: 154 Python tests and 39 browser tests. The browser tests play all six scenarios end to end, both standard and varied.
 - **Offline:** verified. Every browser test blocks non-local requests, and a full run with Wi-Fi off was done by hand on 2026-10-06.
 - **Target laptop:** MacBook Pro (Mac17,9), Apple M5 Pro (15-core CPU, 16-core GPU), 24 GB, macOS 27.0.1, Chrome 155.0.8059.39.
   - **12-drone swarm:** 120 fps on both Auto and Low quality at 1920 × 1080. That is the display's refresh cap.
@@ -62,6 +62,7 @@ Options:
 
 ```bash
 .venv/bin/python scripts/seed_demo.py --reset    # reset the database to the demo cohort
+DATABASE_URL=<postgres url> .venv/bin/python scripts/seed_demo.py --reset   # same, for a hosted database
 .venv/bin/python run.py --port 8000 --lan        # expose on the local network (no login; trusted networks only)
 NO_BROWSER=1 ./start.sh                          # start without opening a browser
 .venv/bin/python scripts/package.py              # build dist/drone-threat-trainer-<date>.zip to copy to another machine
@@ -165,9 +166,9 @@ data/                SQLite database (created on first run; delete to reset)
 ## Tests
 
 ```bash
-.venv/bin/python -m pytest tests --ignore=tests/e2e    # 147 Python tests, under a second
-.venv/bin/pip install playwright                        # once: the browser tests drive the installed Chrome
-.venv/bin/python -m pytest                              # all 186, about 5 minutes
+.venv/bin/pip install -r requirements-dev.txt         # once: pytest and Playwright (the browser tests drive the installed Chrome)
+.venv/bin/python -m pytest tests --ignore=tests/e2e    # Python tests, under a second
+.venv/bin/python -m pytest                              # all 193, about 5 minutes
 TEST_DATABASE_URL=<postgres url> .venv/bin/python -m pytest tests --ignore=tests/e2e   # same tests on Postgres
 ```
 
@@ -187,17 +188,19 @@ The browser tests block every non-local request, so they also check that nothing
 | 2026-10-10 | **Target laptop:** the MacBook Pro listed under Status |
 | 2026-10-10 | **Team:** Ammar owns every track and reviews merges |
 | 2026-10-10 | **Hosted on Vercel** with Neon Postgres, public link, no login. Local and offline use stays on SQLite |
+| 2026-10-16 | **Scoring decisions** for issue #15, listed below |
 
-## Open scoring questions (issue #15)
+## Scoring decisions (issue #15, agreed 2026-10-16)
 
-These are how the code reads the AVD today. Each one needs a yes or a change:
-
-1. A correct, timely response that fails its success roll keeps 60% of the engagement points even if the drone then breaches. The 10-point breach penalty still applies.
-2. Decoys count as non-threats: they are scored only if marked, and engaging one is an unnecessary engagement.
-3. "Late" means engaging inside 300 m.
-4. Suitable responses: jam or intercept for quadcopters and hexacopters, and intercept only for fixed-wing drones.
-5. Swarm members are counted on top of the difficulty table's hostile count.
-6. Should **Take cover** or **Report** earn credit against a hostile drone?
+| # | Rule | Decision |
+| --- | --- | --- |
+| 1 | A correct, timely response that fails its success roll keeps 60% of the engagement points, even if the drone then breaches. The 10-point breach penalty still applies | **Kept.** The AVD says a trainee is not punished for bad luck |
+| 2 | Decoys are non-threats: scored only if marked, and engaging one is an unnecessary engagement (0%) | **Kept.** Decoys exist to waste defences |
+| 3 | "Late" means engaging inside 300 m | **Kept, as a team choice.** At difficulty 5 a fixed-wing covers the last 300 m in about 4 s, against about 9 s for a quadcopter. A time-to-impact rule may be fairer later |
+| 4 | Suitable responses: jam or intercept for quadcopters and hexacopters; intercept only for fixed-wing drones | **Kept.** Matches public sources (electronic defeat for small drones, kinetic for pre-programmed ones) |
+| 5 | Swarm members are counted on top of the difficulty table's hostile count | **Kept.** The AVD lists them as separate columns |
+| 6 | Take cover or Report against a hostile scores 20% (unsuitable) | **Kept for now.** Crediting Take cover when it is too late to engage is a possible future change |
+| 7 | A suitable first response that fails its roll, followed by a retry that stops the drone before the 300 m line | **Changed: now scores 100%** (it was 60%). Persisting should beat giving up. A retry inside 300 m keeps 60%, and an unsuitable first choice stays 20% even if a later response works |
 
 ## What is left
 
@@ -208,7 +211,6 @@ Tracked as GitHub issues, all assigned to Ammar:
 | #10 | Install on a second machine using only this README, including the first-ever run of `start.bat` on Windows. A weaker laptop would also test performance |
 | #11 | Human checks. Play any scenario with sound on: the rotor hum should rise as a drone closes in, the tick, chime, buzz and breach alarm should play on their events, and **M** should mute. Set macOS Display → Colour filters → Greyscale and check that the threat markers (triangle, diamond, circle, square, each with a text label) and the dashboard still read clearly. In Urban Canyon, the drone should show for about 4 s around T+37 s and again on final approach |
 | #14 | Review `docs/RUBRIC_SOURCES.md` against public counter-drone guidance (read ATP 3-01.81 directly), and mark each row Agreed, Changed or Rejected |
-| #15 | Settle the open scoring questions above |
 | #16 | Read the PRD, AVD and Visual Design docs against the running app and list any disagreements |
 | #13 | Keep the full test suite passing on every merge (ongoing) |
 
@@ -224,6 +226,7 @@ Tracked as GitHub issues, all assigned to Ammar:
 - **`--lan` mode has no login.** Use it only on a trusted network.
 - **The hosted version is public with no login.** Anyone with the link can create trainees and sessions, and read the dashboard and CSV exports. Keep real personnel data off it. Before wider use, add instructor login or turn on Vercel Deployment Protection.
 - **Hosted latency:** every request opens a new database connection to Neon, and Neon's free tier sleeps when idle. The first request after a quiet spell takes a second or two longer.
+- **A known flaky test:** `test_verification::test_look_and_zoom_by_mouse_and_keyboard` failed once in a full run on 2026-10-16 and passed 3 of 3 alone. It times a mouse drag, so a busy machine can trip it.
 - **Visual effects are not scored.** Swarm separation and wobble are drawn on top of each drone's path; the server always scores the clean path.
 
 ## Working rules
