@@ -4,7 +4,7 @@
 
 A browser-based 3D simulator that trains unit-level personnel to recognise, classify and respond to drone and swarm threats. Every session is scored on the server by an explainable decision tree, and an after-action review (AAR) dashboard tracks trainees and units over repeated sessions. It runs fully offline on an ordinary laptop, and a hosted version is online.
 
-**Live demo: https://drone-sim-platform.vercel.app** · English and हिंदी · [Run it locally](#install-and-run)
+**Live demo: https://drone-sim-platform.vercel.app** · English and हिंदी · [Run it locally](#install-and-run) · [MIT licence](LICENSE)
 
 ![Simulator: a recon quadcopter marked as hostile at dawn, with the radar scope and contact list](docs/img/simulator.png)
 
@@ -184,7 +184,7 @@ tests/               pytest: generator, scenario variants, scoring tree, API, of
 tests/e2e/           Browser tests (Playwright with the installed Chrome); screenshots go to test-results/
 archive/             Earlier Antigravity prototype (Node/React/Unity) and the original Stitch screens
 docs/                PRD, AVD and Visual Design specs; rubric sources (ATP 3-01.81 review); img/ README screenshots
-data/                SQLite database (created on first run; delete to reset)
+data/                SQLite database (created on first run, not committed; delete to reset)
 ```
 
 ## Tests
@@ -292,9 +292,10 @@ Tracked as GitHub issues, all assigned to Ammar:
 | #11 | Human checks. Play any scenario with sound on: the rotor hum should rise as a drone closes in, the tick, chime, buzz and breach alarm should play on their events, and **M** should mute. Set macOS Display → Colour filters → Greyscale and check that the threat markers (triangle, diamond, circle, square, each with a text label) and the dashboard still read clearly. In Urban Canyon, the drone should show for about 4 s around T+37 s and again on final approach |
 | #13 | Keep the full test suite passing on every merge (ongoing) |
 
-## Working rules
+## Contributing
 
-- Run `.venv/bin/python -m pytest` before every merge. All tests must pass.
-- Never hand-edit `data/trainer.db`. Regenerate it with `scripts/seed_demo.py --reset`.
-- Keep retired code in `archive/` rather than deleting it.
-- Commit messages are plain text with no tool attribution.
+Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, tests, commit style and the ground rules: a training aid, public sources only, no official branding, no real personal data, offline first.
+
+## Licence
+
+[MIT](LICENSE) © 2026 Ammar Hashmi. The bundled Three.js and Chart.js keep their own MIT licences in `app/static/vendor/`. This is a training prototype and is not an official Indian Army or Government of India system.
