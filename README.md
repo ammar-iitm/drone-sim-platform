@@ -4,7 +4,7 @@
 
 A browser-based 3D simulator that trains unit-level personnel to recognise, classify and respond to drone and swarm threats. Every session is scored on the server by an explainable decision tree, and an after-action review (AAR) dashboard tracks trainees and units over repeated sessions. It runs fully offline on an ordinary laptop, and a hosted version is online.
 
-**Live demo: https://drone-sim-platform.vercel.app** · English and हिंदी · [Run it locally](#install-and-run) · [MIT licence](LICENSE)
+**Live demo: https://drone-sim-platform.vercel.app** · [Demo video (2 min)](https://github.com/ammar-iitm/drone-sim-platform/releases/download/v1.0-sih/aegis-demo.mp4) · English and हिंदी · [Run it locally](#install-and-run) · [MIT licence](LICENSE)
 
 ![Simulator: a recon quadcopter marked as hostile at dawn, with the radar scope and contact list](docs/img/simulator.png)
 
