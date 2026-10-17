@@ -24,6 +24,7 @@ A browser-based 3D simulator that trains unit-level personnel to recognise, clas
 - **After-action review:** trainee trends, unit averages, weakest skill and weakest trainees, a confusion matrix, CSV export, and a top-down replay of every session.
 - **Built for Indian users:** a हिंदी / English switch, dates in IST, accessibility per GIGW (WCAG 2.1 AA contrast, a skip link, keyboard-only play), and a clear disclaimer that it is a training tool.
 - **Runs anywhere:** a browser and Python on an ordinary laptop, offline after the first install. Graphics quality steps down by itself on weak machines.
+- **Works on phones for review:** the dashboard, session replays and help read cleanly on a phone; the simulator itself needs a keyboard and mouse and says so.
 - **Optional instructor login** for the hosted version: results can be restricted to instructors while trainees keep playing. It's off for now.
 
 ![Mission select in Hindi](docs/img/hindi.png)
@@ -192,7 +193,7 @@ data/                SQLite database (created on first run, not committed; delet
 ```bash
 .venv/bin/pip install -r requirements-dev.txt         # once: pytest and Playwright (the browser tests drive the installed Chrome)
 .venv/bin/python -m pytest tests --ignore=tests/e2e    # Python tests, under a second
-.venv/bin/python -m pytest                              # all 206, about 6 minutes
+.venv/bin/python -m pytest                              # all 207, about 6 minutes
 TEST_DATABASE_URL=<postgres url> .venv/bin/python -m pytest tests --ignore=tests/e2e   # same tests on Postgres
 ```
 
@@ -203,7 +204,7 @@ The browser tests block every non-local request, so they also check that nothing
 - **Requirements:** 19 of the 21 PRD requirements are verified by tests or screenshots. Two are partial:
   - **F8 audio:** every cue and the mute key are tested in code, but nobody has listened yet (issue #11).
   - **F9 VR:** not built, by decision; rendering is isolated in `world.js` so it can be added later.
-- **Tests:** 206 pass: 164 Python tests and 42 browser tests. The browser tests play all six scenarios end to end, both standard and varied.
+- **Tests:** 207 pass: 164 Python tests and 43 browser tests. The browser tests play all six scenarios end to end, both standard and varied.
 - **Offline:** verified. Every browser test blocks non-local requests, and a full run with Wi-Fi off was done by hand on 2026-10-06.
 - **Target laptop:** MacBook Pro (Mac17,9), Apple M5 Pro (15-core CPU, 16-core GPU), 24 GB, macOS 27.0.1, Chrome 155.0.8059.39.
   - **12-drone swarm:** 120 fps on both Auto and Low quality at 1920 × 1080. That is the display's refresh cap.

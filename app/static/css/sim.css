@@ -92,3 +92,10 @@
 /* The radar console needs room for the full track table. */
 .sim.console .sim-main { grid-template-columns: minmax(0, 1fr) 470px; }
 .track-table table.data td { white-space: nowrap; }
+
+/* Phones: stack the view, radar and controls (the simulator itself is best on a laptop). */
+@media (max-width: 760px) {
+  .sim-main { grid-template-columns: 1fr; }
+  .brief-grid { grid-template-columns: 1fr; gap: var(--s3); }
+  .action-row { grid-template-columns: 1fr; }
+}

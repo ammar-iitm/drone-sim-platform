@@ -215,3 +215,25 @@ table.data th button:focus-visible { outline: 2px solid var(--cyan); }
 @media (max-width: 1100px) {
   .stat-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+/* ------------------------------------------------------------ phones
+   The trainer is built for a laptop, but judges and instructors often open the link on a phone:
+   keep every page readable with an icon-only rail, a one-line command bar and single columns. */
+@media (max-width: 760px) {
+  body { --rail-w: 56px; }
+  .rail-head, .rail nav a span, .rail-foot { display: none; }
+  .rail nav a { justify-content: center; padding: var(--s3) 0; }
+  .cmdbar { gap: var(--s2); padding: 0 var(--s2); }
+  .cmdbar-left { gap: var(--s2); }
+  .cmdbar-right { display: none; }
+  .brand-name { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .page { padding-left: calc(var(--rail-w) + var(--s2)); padding-right: var(--s2); }
+  .stat-tiles { grid-template-columns: 1fr; }
+  .opbar { flex-direction: column; align-items: stretch; gap: var(--s2); }
+  .opbar .group { flex-wrap: wrap; }
+}
+.small-screen-note { display: none; }
+@media (max-width: 760px), (pointer: coarse) {
+  .small-screen-note { display: block; margin: 0 0 var(--s2); padding: var(--s2) var(--s3); border: 1px solid var(--amber);
+    color: var(--amber); background: var(--surface-lowest); font-size: 14px; }
+}

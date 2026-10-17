@@ -171,3 +171,17 @@ def test_hindi_switch(page, server):
     page.wait_for_function("document.documentElement.lang === 'en-IN'")
     assert "Mission select" in page.inner_text(".rail nav") or "MISSION SELECT" in page.inner_text(".rail nav")
     assert page.errors == []
+
+
+@pytest.mark.parametrize("page", [{"viewport": {"width": 390, "height": 844}, "is_mobile": True, "has_touch": True}], indirect=True)
+def test_phone_layout(page, server):
+    """Phones: no sideways scrolling, an icon-only rail, and a note that the simulator is best on a laptop."""
+    for path in ("/mission", "/dashboard", "/help"):
+        page.goto(server + path)
+        page.wait_for_load_state("networkidle")
+        assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth"), path
+        assert page.evaluate("document.querySelector('.rail').getBoundingClientRect().width") <= 60, path
+    page.goto(server + "/sim?callsign=p&unit=t&id=s1-dawn-recon")
+    page.wait_for_selector("#begin")
+    assert page.locator(".small-screen-note").is_visible()
+    assert page.errors == []

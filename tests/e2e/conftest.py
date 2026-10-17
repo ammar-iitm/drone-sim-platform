@@ -38,7 +38,7 @@ def browser():
 @pytest.fixture
 def page(browser, server, request):
     opts = getattr(request, "param", {})
-    ctx = browser.new_context(viewport={"width": 1600, "height": 960}, **opts)
+    ctx = browser.new_context(**{"viewport": {"width": 1600, "height": 960}, **opts})  # a test may override the size
     pg = ctx.new_page()
     pg.errors, pg.external = [], []
     pg.on("console", lambda m: m.type == "error" and pg.errors.append(m.text))
