@@ -16,8 +16,9 @@ This report documents the completion of the development, integration, hardening,
 
 > [!IMPORTANT]
 > **Key Quality Gate Metrics:**
-> - **Full Regression Test Suite:** **377/377 tests passed (100% pass rate)** in 453.36s (`reports/FINAL_DEVELOPMENT_REGRESSION_RESULTS.xml`).
-> - **End-to-End Browser Coverage:** 44 browser tests passing across desktop and mobile (390×844) viewports in Chromium, validating 0 console errors and 0 network failures.
+> - **Full Regression Test Suite:** **377/377 tests passed (100% pass rate)** with **330 Python unit/integration tests** and **47 browser/E2E tests**.
+> - **Suite Timing:** **450.288s** XML-measured duration (`reports/FINAL_DEVELOPMENT_REGRESSION_RESULTS.xml`) / **453.36s** console wall-clock duration (07:33).
+> - **End-to-End Browser Coverage:** 47 browser tests passing across desktop and mobile (390×844) viewports in Chromium, validating 0 console errors and 0 network failures.
 > - **Database Schema:** Version 4 across both SQLite (offline) and PostgreSQL (hosted) with transactional advisory locking.
 > - **Working Tree Cleanliness:** `git diff --check` executed with code 0 (0 whitespace/formatting errors).
 > - **Deployment Scope:** Distinct separation between development (our responsibility: completed) and hosted production release/migration (operator/Ammar's responsibility).
@@ -98,29 +99,34 @@ All local architectural enhancements across Phases 1–4 have been preserved int
 - **Test Framework:** `pytest 9.1.1` under Python 3.13.5 (Win32)
 - **Execution Command:** `python -m pytest -v --junitxml=reports/FINAL_DEVELOPMENT_REGRESSION_RESULTS.xml`
 - **Machine Report Path:** `reports/FINAL_DEVELOPMENT_REGRESSION_RESULTS.xml`
-- **Execution Duration:** 453.36s (07:33)
+- **Execution Timing:**
+  - **XML-Measured Suite Time:** 450.288s
+  - **Console Wall-Clock Duration:** 453.36s (07:33)
 - **Overall Result:** **377 PASSED / 377 TOTAL (100% Pass Rate, Exit Code 0)**
+- **Test Category Breakdown:**
+  - **Python Unit & Integration Tests:** **330 passed** (34 ops, 73 security, 88 scenario, 50 scoring, 31 reliability, 28 adaptive, 17 api, 6 auth, 3 offline/parity)
+  - **Browser / E2E Tests (Chromium):** **47 passed** (13 scenarios, 12 finish/quality, 11 verification, 7 access/phone, 2 adaptive e2e, 2 smoke)
 
 ### Detailed Test Module Breakdown
 
-| Test Suite Module | Test Count | Status | Focus Area |
-|---|---|---|---|
-| `tests/e2e/test_access.py` | 7 | PASSED | Keyboard navigation, text sizing, GIGW bilingual, phone layout |
-| `tests/e2e/test_adaptive_e2e.py` | 2 | PASSED | Adaptive curriculum selection & dashboard profile |
-| `tests/e2e/test_finish.py` | 12 | PASSED | End dialogs, quality step-down, DPI clamping |
-| `tests/e2e/test_scenarios.py` | 13 | PASSED | 6 scripted scenarios, variants, sensor degradation |
-| `tests/e2e/test_smoke.py` | 2 | PASSED | Route smoke test & DOM rendering |
-| `tests/e2e/test_verification.py` | 11 | PASSED | End-to-end rubric verification |
-| `tests/test_adaptive_phase3.py` | 28 | PASSED | Adaptive engine heuristics & cutoffs |
-| `tests/test_api.py` | 17 | PASSED | Core API endpoints & session ingestion |
-| `tests/test_auth.py` | 6 | PASSED | Instructor authentication & secure cookies |
-| `tests/test_offline_and_parity.py` | 3 | PASSED | Offline mode & database engine parity |
-| `tests/test_ops_phase4.py` | 34 | PASSED | Read-only `/health`, check_env CLI, audit logging, startup scripts |
-| `tests/test_reliability_phase2.py` | 31 | PASSED | Schema v1-v4 migrations, backup CLI, atomic replace |
-| `tests/test_scenario.py` | 88 | PASSED | Procedural generation, seeds, difficulty parameters |
-| `tests/test_scoring.py` | 50 | PASSED | Server-side scoring tree, breach deductions |
-| `tests/test_security_phase1.py` | 73 | PASSED | Assessment tokens, anti-replay, rate limiting |
-| **TOTAL** | **377** | **PASSED** | **Zero Failures, Zero Errors, Zero Skips** |
+| Test Suite Module | Test Count | Category | Status | Focus Area |
+|---|---|---|---|---|
+| `tests/e2e/test_access.py` | 7 | Browser / E2E | PASSED | Keyboard navigation, text sizing, GIGW bilingual, phone layout |
+| `tests/e2e/test_adaptive_e2e.py` | 2 | Browser / E2E | PASSED | Adaptive curriculum selection & dashboard profile |
+| `tests/e2e/test_finish.py` | 12 | Browser / E2E | PASSED | End dialogs, quality step-down, DPI clamping |
+| `tests/e2e/test_scenarios.py` | 13 | Browser / E2E | PASSED | 6 scripted scenarios, variants, sensor degradation |
+| `tests/e2e/test_smoke.py` | 2 | Browser / E2E | PASSED | Route smoke test & DOM rendering |
+| `tests/e2e/test_verification.py` | 11 | Browser / E2E | PASSED | End-to-end rubric verification |
+| `tests/test_adaptive_phase3.py` | 28 | Python Unit | PASSED | Adaptive engine heuristics & cutoffs |
+| `tests/test_api.py` | 17 | Python Unit | PASSED | Core API endpoints & session ingestion |
+| `tests/test_auth.py` | 6 | Python Unit | PASSED | Instructor authentication & secure cookies |
+| `tests/test_offline_and_parity.py` | 3 | Python Unit | PASSED | Offline mode & database engine parity |
+| `tests/test_ops_phase4.py` | 34 | Python Unit | PASSED | Read-only `/health`, check_env CLI, audit logging, startup scripts |
+| `tests/test_reliability_phase2.py` | 31 | Python Unit | PASSED | Schema v1-v4 migrations, backup CLI, atomic replace |
+| `tests/test_scenario.py` | 88 | Python Unit | PASSED | Procedural generation, seeds, difficulty parameters |
+| `tests/test_scoring.py` | 50 | Python Unit | PASSED | Server-side scoring tree, breach deductions |
+| `tests/test_security_phase1.py` | 73 | Python Unit | PASSED | Assessment tokens, anti-replay, rate limiting |
+| **TOTAL** | **377** | **330 Unit + 47 E2E** | **PASSED** | **Zero Failures, Zero Errors, Zero Skips** |
 
 ---
 
@@ -146,5 +152,6 @@ All local architectural enhancements across Phases 1–4 have been preserved int
   - `requirements.txt`: Production runtime dependencies.
   - `rubric.json`: Authoritative counter-drone decision-tree scoring configuration.
   - `scripts/migrate.py`: Database schema v4 migration CLI.
-- **Git Branch:** `master` (and `release/v1.0-sih-hardened`).
-- **Integrated Candidate Code SHA:** `b5fd4e53a5cef29a97b070caee1758f25baede7a`.
+- **Git Branches:** `master` and `release/v1.0-sih-hardened`.
+- **Final Published Commit SHA:** `07ee89fc6c00ddc848a16f93e1985f1622d24111`.
+- **Integrated Code Base Merge SHA:** `b5fd4e53a5cef29a97b070caee1758f25baede7a`.

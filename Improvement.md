@@ -3,8 +3,8 @@
 **Project:** SIH 2026 — PS 26247: AI-Enabled Drone & Counter-Drone Threat Simulation Trainer  
 **Primary Directory:** `c:\Users\Kmano\Dropbox\Project\Current_Project\drone-sim-platform`  
 **Specification:** `c:\Users\Kmano\Dropbox\Project\Current_Project\Project.md`  
-**Authoritative Date:** 2026-10-18  
-**Status:** **Integrated Production Release Candidate (Phase 1–4 Hardening + GitHub Master Merged) — COMPLETE & VERIFIED (376/376 PASSING)**  
+**Authoritative Date:** 2026-10-19<br>
+**Status:** **Final Production Release Candidate (Phase 1–4 Hardening + GitHub Master Merged + Script Parity) — PUBLISHED TO GITHUB (377/377 PASSING: 330 Python + 47 Browser/E2E)**
 
 ---
 
@@ -963,6 +963,7 @@ All acceptance criteria across Priorities R-01 through R-06, SEC-01 through SEC-
 - **Authoritative Date:** 2026-10-19
 - **Scope:** Completion of development, hardening, operational script parity, regression verification, and GitHub publication preparation.
 - **Release Candidate Baseline:** Commit `b5fd4e5` (Merge AEGIS Phase 1-4 hardening with GitHub master) + `be69d8e` (Release test audit).
+- **Final Published Commit SHA:** `07ee89fc6c00ddc848a16f93e1985f1622d24111` (published to `origin/master` and `origin/release/v1.0-sih-hardened`).
 
 ### 20.1 Windows Startup Script Parity (`start.bat`)
 - **Defect/Limitation:** `start.bat` previously hardcoded port 5050, passed only up to 4 arguments (`%1 %2 %3 %4`), did not honor `NO_BROWSER=1`, and had never been verified on Windows in Issue #10.
@@ -977,11 +978,14 @@ All acceptance criteria across Priorities R-01 through R-06, SEC-01 through SEC-
 - **Implementation:**
   - Added "Hosted Deployment Architecture & Directory" section explicitly documenting the repository root (`.`) as the deployment directory containing `index.py`, `app/`, `requirements.txt`, and `rubric.json`.
   - Documented WSGI `DecodePath` middleware, schema v4 migration CLI (`scripts/migrate.py`), and read-only `/health` readiness check.
-  - Updated test counts to 377 passing tests (333 Python + 44 browser tests).
+  - Updated test counts to 377 passing tests (330 Python unit/integration tests + 47 browser/E2E tests).
   - Updated Issue #10 status reflecting Windows execution verification.
 
 ### 20.3 Test Suite Expansion & Re-Verification
-- **Test Suite Total:** 377 tests (333 Python unit/integration tests, 44 Playwright browser e2e tests).
+- **Test Suite Total:** 377 tests (330 Python unit/integration tests, 47 Playwright browser/E2E tests).
 - **Execution Target:** Isolated temporary databases, clean local environment.
-- **Pass Rate:** 100% (377/377 passing).
+- **Pass Rate:** 100% (377/377 passing, exit code 0).
+- **Execution Timing:**
+  - **XML-Measured Suite Time:** 450.288s (`reports/FINAL_DEVELOPMENT_REGRESSION_RESULTS.xml`).
+  - **Console Wall-Clock Duration:** 453.36s (07:33).
 - **Format Integrity:** `git diff --check` clean with 0 whitespace errors.
