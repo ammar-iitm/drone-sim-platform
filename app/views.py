@@ -1,10 +1,30 @@
-"""Server-rendered pages. All data is loaded from the JSON API by page scripts."""
-
-from flask import Blueprint, redirect, render_template, url_for
+from flask import Blueprint, jsonify, redirect, render_template, url_for
 
 from .auth import instructor_required
+from .db import check_database_health
 
 bp = Blueprint("views", __name__)
+
+
+@bp.get("/health")
+def health():
+    """Readiness probe checking database reachability and schema version (Phase 4 OPS-01).
+
+    Returns:
+        HTTP 200 with {"status": "ok", "checks": {"database": "ok", "schema": "ok"}} if healthy.
+        HTTP 503 with {"status": "unhealthy", "checks": {...}} if database or schema is degraded.
+    """
+    db_ok, schema_ok = check_database_health()
+    status_str = "ok" if (db_ok and schema_ok) else "unhealthy"
+    payload = {
+        "status": status_str,
+        "checks": {
+            "database": "ok" if db_ok else "error",
+            "schema": "ok" if schema_ok else "error",
+        },
+    }
+    http_code = 200 if (db_ok and schema_ok) else 503
+    return jsonify(payload), http_code
 
 
 @bp.get("/")

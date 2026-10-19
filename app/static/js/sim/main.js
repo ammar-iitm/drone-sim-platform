@@ -72,6 +72,7 @@ function briefing() {
     ['T R J I C', 'Track, Report, Jam, Intercept, Take cover'], ['S', 'Sensor mode: EO, night vision, thermal'],
     ['Q', 'Radar console (full-screen scope and track table)'], ['Space in console', 'Mark the closest unmarked radar track'], ['M', 'Mute or unmute sound'], ['[ ]', 'Radar range 1.5, 3 or 6 km'], ['P / Esc', 'Pause / end session']];
   screen(`
+    <p class="small-screen-note" role="note">The simulator needs a keyboard and mouse and works best on a laptop or desktop. On a phone you can still look around, but the dashboard and session replays are the better view here.</p>
     <div class="score-head"><div><div class="label cyan">${sc.kind === 'scripted' ? 'Scripted scenario' + (sc.params ? ' · variant ' + sc.params.vary : '') : 'Procedural · seed ' + sc.seed}</div>
       <h2 id="screen-title" class="panel-title" style="font-size:24px">${esc(sc.name)}</h2></div>
       <div class="path"><span class="chip">${env.time_of_day}</span><span class="chip">${env.terrain}</span>
@@ -95,6 +96,34 @@ function start() {
   hideScreen();
   S.phase = 'running';
   S.last = performance.now();
+
+  if (S.scenario) {
+    S.startSessionPromise = fetch('/api/session/start', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        scenario_id: S.scenario.id,
+        seed: S.scenario.seed,
+        params: S.scenario.params
+      })
+    }).then(async (res) => {
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.assessment_token) {
+          S.assessmentToken = data.assessment_token;
+          S.runId = data.run_id;
+        }
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        const errMsg = errData.error || `HTTP ${res.status}`;
+        toast(`Could not start assessment session: ${errMsg}`);
+        S.assessmentToken = null;
+      }
+    }).catch(() => {
+      // Offline mode / network disconnected: clear hosted token so unauthenticated offline mode is preserved
+      S.assessmentToken = null;
+    });
+  }
 }
 
 function pause(on) {
@@ -634,9 +663,20 @@ async function finish() {
   S.phase = 'submitting';
   S.sound.rotor(0, false);
   screen('<h2 id="screen-title" class="panel-title">Scoring on the server…</h2><p class="label">Raw events only are sent; the server rebuilds the scenario and scores them.</p>');
+  if (S.startSessionPromise) {
+    try { await S.startSessionPromise; } catch { /* ignore */ }
+  }
   S.clientId ??= `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-  const body = { client_id: S.clientId, callsign: trainee.callsign, unit: trainee.unit, scenario_id: S.scenario.id,
-    params: S.scenario.params, events: S.events, ended_t: round3(Math.min(S.t, S.scenario.duration_s)) };
+  const body = {
+    client_id: S.clientId,
+    assessment_token: S.assessmentToken,
+    callsign: trainee.callsign,
+    unit: trainee.unit,
+    scenario_id: S.scenario.id,
+    params: S.scenario.params,
+    events: S.events,
+    ended_t: round3(Math.min(S.t, S.scenario.duration_s))
+  };
   try {
     const res = await fetch('/api/sessions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     const data = await res.json();
@@ -811,6 +851,7 @@ async function boot() {
     const [sRes, rRes] = await Promise.all([fetch('/api/scenario?' + scenarioQuery), fetch('/api/rubric')]);
     const sc = await sRes.json();
     if (!sRes.ok) throw new Error(sc.error);
+    S.assessmentToken = null;
     S.scenario = sc;
     S.rubric = await rRes.json();
   } catch (err) {

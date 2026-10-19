@@ -18,3 +18,10 @@ dist/
 .agents/
 .claude/
 skills-lock.json
+
+# Local database (created on first run; seed with scripts/seed_demo.py)
+data/*.db
+
+# Local backups and scratch scripts
+backups/
+scratch/

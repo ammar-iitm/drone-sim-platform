@@ -1,8 +1,33 @@
-# AEGIS // Drone Threat Trainer (SIH PS 26247)
+# AEGIS // Drone Threat Trainer
 
-A browser-based simulator that trains unit-level personnel to detect, classify and respond to drone and swarm threats. Every session is scored on the server by an explainable decision tree, and an after-action review (AAR) dashboard tracks trainees and units over repeated sessions. It runs fully offline on an ordinary laptop.
+**Smart India Hackathon, problem statement 26247 · Theme: Drone Defence**
 
-This README is the single place for how to run the trainer, where it stands and what is left. The original design specs are in [docs/PRD.md](docs/PRD.md) (requirements F1–F21), [docs/AVD.md](docs/AVD.md) (architecture) and [docs/VISUAL_DESIGN.md](docs/VISUAL_DESIGN.md). [docs/RUBRIC_SOURCES.md](docs/RUBRIC_SOURCES.md) is the working draft for the rubric review (issue #14).
+A browser-based 3D simulator that trains unit-level personnel to recognise, classify and respond to drone and swarm threats. Every session is scored on the server by an explainable decision tree, and an after-action review (AAR) dashboard tracks trainees and units over repeated sessions. It runs fully offline on an ordinary laptop, and a hosted version is online.
+
+**Live demo: https://drone-sim-platform.vercel.app** · [Demo video (2 min)](https://github.com/ammar-iitm/drone-sim-platform/releases/download/v1.0-sih/aegis-demo.mp4) · English and हिंदी · [Run it locally](#install-and-run) · [MIT licence](LICENSE)
+
+![Simulator: a recon quadcopter marked as hostile at dawn, with the radar scope and contact list](docs/img/simulator.png)
+
+| Mission select | Score screen with decision-tree reasons |
+| --- | --- |
+| ![Mission select](docs/img/mission.png) | ![Score screen](docs/img/score.png) |
+| **AAR dashboard** | **Replay of a session** |
+| ![AAR dashboard](docs/img/dashboard.png) | ![Session replay](docs/img/replay.png) |
+
+## Features at a glance
+
+- **Simulator:** a 3D observation post with day, dawn, dusk and night lighting; urban and rural terrain; EO, night-vision and thermal sensors; four levels of sensor degradation (noise, fog, shorter range, radar dropout); a 30 RPM surveillance radar with clutter, false returns and track latency; and audio cues.
+- **Threats:** recon quadcopters, armed hexacopters and fixed-wing loitering drones, with birds, decoy balloons and a friendly aircraft to tell apart; swarms of up to 12 that fly in formation and spread out when engaged.
+- **Decisions:** mark, classify (5 classes) and respond: Track only, Report, Jam (soft kill), Intercept (hard kill) or Take cover. Everything works by mouse or keyboard.
+- **Scenarios:** six scripted scenarios, each with a learning objective, plus unlimited procedural scenarios from a seed. Difficulty runs from 1 to 5, and every run is a fresh variant, so trainees cannot learn a scenario by rote.
+- **Explainable scoring:** detection time, classification accuracy and engagement decisions are scored by a decision tree in an editable `rubric.json`. Every point shows its tree path and a plain-language reason. Rules are checked against the US Army's public C-UAS manual, ATP 3-01.81 (2025).
+- **After-action review:** trainee trends, unit averages, weakest skill and weakest trainees, a confusion matrix, CSV export, and a top-down replay of every session.
+- **Built for Indian users:** a हिंदी / English switch, dates in IST, accessibility per GIGW (WCAG 2.1 AA contrast, a skip link, keyboard-only play), and a clear disclaimer that it is a training tool.
+- **Runs anywhere:** a browser and Python on an ordinary laptop, offline after the first install. Graphics quality steps down by itself on weak machines.
+- **Works on phones for review:** the dashboard, session replays and help read cleanly on a phone; the simulator itself needs a keyboard and mouse and says so.
+- **Optional instructor login** for the hosted version: results can be restricted to instructors while trainees keep playing. It's off for now.
+
+![Mission select in Hindi](docs/img/hindi.png)
 
 ## Problem statement (SIH PS 26247)
 
@@ -12,7 +37,7 @@ The official statement asks for a software platform that trains personnel to rec
 | --- | --- |
 | Desktop or VR-capable simulator with scripted and procedurally generated threat scenarios | Browser 3D simulator (Three.js) with six scripted scenarios, each with a learning objective, and a seeded procedural generator. Desktop only; the statement accepts desktop **or** VR |
 | Decision-tree based scoring on detection time, threat classification accuracy and engagement decisions | Server-side decision tree from `rubric.json`; every score shows its tree path and a reason |
-| After-action review (AAR) dashboard tracking individual and unit performance over repeated sessions | `/dashboard`: trainee trends, unit rollup, weakest skill and trainees, confusion matrix, session timelines, CSV export |
+| After-action review (AAR) dashboard tracking individual and unit performance over repeated sessions | `/dashboard`: trainee trends, unit rollup, weakest skill and trainees, confusion matrix, CSV export, and a top-down replay of every session |
 | Adjustable difficulty and scenario randomization to prevent rote learning | Difficulty 1–5 scales speed, counts, decoys and degradation together. The procedural seed is random on every visit, and scripted scenarios launch as a seeded variant by default (**Vary each run**) |
 
 The rest of the statement is covered too:
@@ -21,23 +46,6 @@ The rest of the statement is covered too:
 - **Conditions:** day, dusk and night; EO, night vision and thermal; four sensor degradation levels with fog, noise and radar dropout; urban and rural terrain.
 - **Attacks:** single drones and swarms of up to 12.
 - **Hardware:** it runs offline in a browser on an ordinary laptop.
-
-## Status (2026-10-16)
-
-- **Requirements:** 19 of the 21 PRD requirements are verified by tests or screenshots. Two are partial:
-  - **F8 audio:** every cue and the mute key are tested in code, but nobody has listened yet (issue #11).
-  - **F9 VR:** not built, by decision; rendering is isolated in `world.js` so it can be added later.
-- **Tests:** 206 pass: 164 Python tests and 42 browser tests. The browser tests play all six scenarios end to end, both standard and varied.
-- **Offline:** verified. Every browser test blocks non-local requests, and a full run with Wi-Fi off was done by hand on 2026-10-06.
-- **Target laptop:** MacBook Pro (Mac17,9), Apple M5 Pro (15-core CPU, 16-core GPU), 24 GB, macOS 27.0.1, Chrome 155.0.8059.39.
-  - **12-drone swarm:** 120 fps on both Auto and Low quality at 1920 × 1080. That is the display's refresh cap.
-  - **Launch to first scenario:** 0.7 s with `.venv` already built; 5.4 s from a fresh clone, where `start.sh` builds `.venv` and installs everything first. The target is under 60 s.
-  - Both were measured on 2026-10-10 by a script driving a visible Chrome window.
-- **Low-end laptops (simulated on 2026-10-16, issue #10):** a real low-end laptop hasn't been tested yet, so Chrome was forced onto software rendering, which is slower than any integrated graphics.
-  - The 12-drone swarm ran at 15–23 fps.
-  - The same page with the 3D scene hidden still topped out at about 33 fps, so the limit is software rendering's fixed cost for any page, not the trainer's scene (3 draw calls, 13,000–47,000 triangles).
-  - A 6× slower CPU made no difference on a real GPU (still 120 fps).
-  - 30 fps on real integrated graphics is therefore likely, but must still be confirmed on a real machine. A **Minimum** quality level was added as an extra fallback.
 
 ## Install and run
 
@@ -71,6 +79,11 @@ DATABASE_URL=<postgres url> .venv/bin/python scripts/seed_demo.py --reset   # sa
 .venv/bin/python run.py --port 8000 --lan        # expose on the local network (no login; trusted networks only)
 NO_BROWSER=1 ./start.sh                          # start without opening a browser
 .venv/bin/python scripts/package.py              # build dist/drone-threat-trainer-<date>.zip to copy to another machine
+.venv/bin/python scripts/backup.py backup        # create verified SQLite backup in backups/
+.venv/bin/python scripts/backup.py verify <file> # verify backup integrity & checksum
+.venv/bin/python scripts/backup.py restore <file> --dest <target.db>  # restore to destination
+.venv/bin/python scripts/migrate.py --check      # verify database schema readiness (schema v4)
+.venv/bin/python scripts/check_env.py --mode offline  # preflight environment validator
 ```
 
 **Graphics quality.** On a slow laptop, choose **Graphics quality** on Mission select:
@@ -81,20 +94,6 @@ NO_BROWSER=1 ./start.sh                          # start without opening a brows
 You can also add `&quality=low` to a simulator URL.
 
 **If a save fails.** If the server is unreachable when a session ends, the session is kept in the browser. Mission select then offers to send it once the server is back.
-
-## Hosted version (Vercel)
-
-Live at **https://drone-sim-platform.vercel.app**. It's public, with no login.
-
-- **Hosting:** the Vercel project `drone-sim-platform` on team `the-layers`, running as one Flask function in `iad1` (US East). `index.py` is the entrypoint.
-- **Database:** Neon Postgres from the Vercel Marketplace (`drone-trainer-db`). Neon sets `DATABASE_URL` on the project. When `DATABASE_URL` is set the app uses Postgres (`app/schema_pg.sql`); otherwise it uses the local SQLite file, so the laptop version stays fully offline. Queries are written once; `app/db.py` translates them for Postgres.
-- **Deploying:** run `npx vercel deploy --prod` from the repo root. The project is **not** connected to GitHub, so pushing doesn't deploy. `.vercelignore` keeps tests, archive, screenshots and local data out of the upload.
-- **Testing on Postgres:** `TEST_DATABASE_URL=<url> .venv/bin/python -m pytest tests --ignore=tests/e2e` runs the Python tests on Postgres. The test tables are dropped before every test, so point it at a throwaway database (for example, run `CREATE DATABASE trainer_test` in the Neon project and use that URL), **never** the live `neondb`.
-- **Sidebar labels:** the sidebar and simulator show **Hosted / Postgres hosted** instead of **Offline / SQLite local**.
-- **Instructor login:** set `INSTRUCTOR_PASSWORD` (and optionally `SECRET_KEY`) as Vercel environment variables, then redeploy.
-  - With it set, the dashboard, session reviews, CSV exports and the results APIs need an instructor login (`/login`); trainees can still choose a scenario, play and see their own score.
-  - Without it, everything stays open, as on an offline laptop.
-  - The session cookie is signed with `SECRET_KEY`. If that isn't set, a key is derived from the password, so changing the password signs everyone out.
 
 ## Using it
 
@@ -117,6 +116,7 @@ Live at **https://drone-sim-platform.vercel.app**. It's public, with no login.
    | `[` / `]` | Radar range 1.5, 3 or 6 km |
    | `Space` in the console | Mark the closest unmarked radar track |
    | `M` | Mute or unmute the audio cues |
+   | हिंदी / English button | Switch the interface language (remembered per browser) |
    | `P` / `Esc` | Pause / end the session |
 
 3. **Score screen**: shows the composite score, grade, stage bars and the decision-tree path with a reason for every contact. **Run same seed again** replays the identical scenario, including the same variant of a scripted one.
@@ -126,6 +126,20 @@ Live at **https://drone-sim-platform.vercel.app**. It's public, with no login.
    - **Replay:** a top-down map of the whole engagement, showing every contact's true identity and track, the trainee's marks (white rings), responses (cyan lines from the post), false alarms (amber rays), and where each drone was stopped or breached. It has play/pause (**Space**), speed ×1/×4/×16 and a time scrubber.
    - **Event timeline:** clicking an event jumps the replay to that moment.
    - **Score detail:** stage scores, penalties and the decision tree for every contact.
+
+## Hosted version (Vercel)
+
+Live at **https://drone-sim-platform.vercel.app**. It's public. The instructor login is built but **turned off for now** (see below).
+
+- **Hosting:** the Vercel project `drone-sim-platform` on team `the-layers`, running as one Flask function in `iad1` (US East). `index.py` is the entrypoint.
+- **Database:** Neon Postgres from the Vercel Marketplace (`drone-trainer-db`). Neon sets `DATABASE_URL` on the project. When `DATABASE_URL` is set the app uses Postgres (`app/schema_pg.sql`); otherwise it uses the local SQLite file, so the laptop version stays fully offline. Queries are written once; `app/db.py` translates them for Postgres.
+- **Deploying:** run `npx vercel deploy --prod` from the repo root. The project is **not** connected to GitHub, so pushing doesn't deploy. `.vercelignore` keeps tests, archive, screenshots and local data out of the upload.
+- **Testing on Postgres:** `TEST_DATABASE_URL=<url> .venv/bin/python -m pytest tests --ignore=tests/e2e` runs the Python tests on Postgres. The test tables are dropped before every test, so point it at a throwaway database (for example, run `CREATE DATABASE trainer_test` in the Neon project and use that URL), **never** the live `neondb`.
+- **Sidebar labels:** the sidebar and simulator show **Hosted / Postgres hosted** instead of **Offline / SQLite local**.
+- **Instructor login (optional, off for now):** to turn it on, set `INSTRUCTOR_PASSWORD` as a Vercel environment variable (`npx vercel env add INSTRUCTOR_PASSWORD production`) and redeploy. `SECRET_KEY` is already set on the project. To turn it off again, remove the variable and redeploy.
+  - With it set, the dashboard, session reviews, CSV exports and the results APIs need an instructor login (`/login`); trainees can still choose a scenario, play and see their own score.
+  - Without it, everything stays open, as on an offline laptop.
+  - The session cookie is signed with `SECRET_KEY`. If that isn't set, a key is derived from the password, so changing the password signs everyone out.
 
 ## Editing the rubric
 
@@ -143,6 +157,7 @@ All scoring numbers live in [`rubric.json`](rubric.json). The next session is sc
 | `classes` | Class labels, families and hot keys; `critical_misclassification` says which wrong calls are critical |
 | `responses` | Labels, hot keys, whether a response engages, range limits and effectiveness per drone model |
 | `expected_responses` | Suitable responses per model (a scenario contact can override this) |
+| `passive_responses` | Responses credited when a hostile stays beyond the reach of every suitable response (Take cover) |
 
 The browser never sends a score. It sends raw events (`mark`, `classify`, `respond`, `sensor`, `breach`), and the server rebuilds the scenario from its id (and variant number) or seed and scores it. Response success rolls come from the scenario seed (`app/rng.py`, mirrored in `app/static/js/sim/rng.js`), so the result is reproducible.
 
@@ -160,6 +175,8 @@ app/
   geometry.py        Contact paths (shared maths with static/js/sim/path.js)
   rng.py             Seeded rolls (bit-identical with static/js/sim/rng.js)
   analytics.py       Trends, confusion matrix, unit rollup
+  adaptive.py        Explainable adaptive training engine (curriculum recommendations)
+  audit.py           Structured JSON security audit logging with redaction
   db.py, schema.sql  Storage: SQLite (data/trainer.db) by default; Postgres (schema_pg.sql) when DATABASE_URL is set
   templates/         Pages in the AEGIS (Stitch) style
   static/css/        aegis.css (design system), sim.css (HUD)
@@ -171,11 +188,14 @@ run.py               Start the app (start.sh / start.bat wrap it with first-run 
 index.py             Vercel entrypoint (hosted version)
 scripts/seed_demo.py Seed a demo cohort through the real API
 scripts/package.py   Build a clean zip to copy to another machine
+scripts/backup.py    Online database backup, verification and safe restore
+scripts/migrate.py   Database migration runner (schema v4)
+scripts/check_env.py Preflight environment validation (offline/hosted)
 tests/               pytest: generator, scenario variants, scoring tree, API, offline check, JS/Python roll parity
 tests/e2e/           Browser tests (Playwright with the installed Chrome); screenshots go to test-results/
 archive/             Earlier Antigravity prototype (Node/React/Unity) and the original Stitch screens
-docs/                PRD, AVD and Visual Design specs; rubric sources draft
-data/                SQLite database (created on first run; delete to reset)
+docs/                PRD, AVD and Visual Design specs; rubric sources (ATP 3-01.81 review); img/ README screenshots
+data/                SQLite database (created on first run, not committed; delete to reset)
 ```
 
 ## Tests
@@ -183,11 +203,32 @@ data/                SQLite database (created on first run; delete to reset)
 ```bash
 .venv/bin/pip install -r requirements-dev.txt         # once: pytest and Playwright (the browser tests drive the installed Chrome)
 .venv/bin/python -m pytest tests --ignore=tests/e2e    # Python tests, under a second
-.venv/bin/python -m pytest                              # all 206, about 6 minutes
+.venv/bin/python -m pytest                              # all 376, about 7 minutes
 TEST_DATABASE_URL=<postgres url> .venv/bin/python -m pytest tests --ignore=tests/e2e   # same tests on Postgres
 ```
 
 The browser tests block every non-local request, so they also check that nothing is fetched from the internet.
+
+## Status (2026-10-18)
+
+- **Requirements:** 19 of the 21 PRD requirements are verified by tests or screenshots. Two are partial:
+  - **F8 audio:** every cue and the mute key are tested in code, but nobody has listened yet (issue #11).
+  - **F9 VR:** not built, by decision; rendering is isolated in `world.js` so it can be added later.
+- **Tests:** 376 pass: 332 Python tests and 44 browser tests (100% pass rate). The test suite covers security hardening, database schema v4 migrations, server-authoritative scoring, adaptive training recommendations, operational health checks, phone viewport layout responsiveness, and full end-to-end browser journeys in Chrome across desktop and mobile viewports.
+- **Security & Integrity:** Server-authoritative anti-tamper scoring, single-use signed assessment tokens (`/api/session/start`), replay protection, sliding-window rate limiting, and chronological event state machine.
+- **Database & Parity:** Versioned schema migrations (v1-v4) with transactional rollback across offline SQLite and hosted PostgreSQL, read-only `/health` endpoint, and verified online backup/restore CLI (`scripts/backup.py`).
+- **AI Adaptive Practice:** Deterministic, explainable recommendation engine (`app/adaptive.py`) evaluating detection speed, classification precision, false alarms, and breach prevention.
+- **Observability:** Structured JSON security audit logging for authentication, data exports, and rubric provenance (`app/audit.py`), plus preflight environment validation (`scripts/check_env.py`).
+- **Offline:** verified. Every browser test blocks non-local requests, and a full run with Wi-Fi off was done by hand on 2026-10-06.
+- **Target laptop:** MacBook Pro (Mac17,9), Apple M5 Pro (15-core CPU, 16-core GPU), 24 GB, macOS 27.0.1, Chrome 155.0.8059.39.
+  - **12-drone swarm:** 120 fps on both Auto and Low quality at 1920 × 1080. That is the display's refresh cap.
+  - **Launch to first scenario:** 0.7 s with `.venv` already built; 5.4 s from a fresh clone, where `start.sh` builds `.venv` and installs everything first. The target is under 60 s.
+  - Both were measured on 2026-10-10 by a script driving a visible Chrome window.
+- **Low-end laptops (simulated on 2026-10-16, issue #10):** a real low-end laptop hasn't been tested yet, so Chrome was forced onto software rendering, which is slower than any integrated graphics.
+  - The 12-drone swarm ran at 15–23 fps.
+  - The same page with the 3D scene hidden still topped out at about 33 fps, so the limit is software rendering's fixed cost for any page, not the trainer's scene (3 draw calls, 13,000–47,000 triangles).
+  - A 6× slower CPU made no difference on a real GPU (still 120 fps).
+  - 30 fps on real integrated graphics is therefore likely, but must still be confirmed on a real machine. A **Minimum** quality level was added as an extra fallback.
 
 ## Decisions
 
@@ -209,6 +250,7 @@ The browser tests block every non-local request, so they also check that nothing
 | 2026-10-16 | **Rubric version 2 (issue #14):** Take cover scores 100% when the hostile stays beyond reach of every suitable response, and Jam and Intercept are renamed "soft kill" and "hard kill" |
 | 2026-10-16 | **Indian conventions:** the banner reads "For training use only" instead of the US-style "Unclassified //" (India's scheme is Top Secret, Secret, Confidential, Restricted). Dates show in IST with the 24-hour clock ("10 Oct 2026, 0945 hrs IST"); CSV exports keep UTC. The page language is `en-IN`, with a GIGW-style "Skip to main content" link and a disclaimer that this is not an official Indian Army or Government of India system. Demo units are fictional ("1 TRG BN", "2 TRG BN") instead of real battalions |
 | 2026-10-16 | **Dawn lighting** for Dawn Recon Pass, which ran at dusk before. It's for scripted scenarios only, so procedural seeds are unchanged |
+| 2026-10-17 | **Instructor login is optional and off for now** on the hosted version; the feature stays in the code and can be turned on with one environment variable |
 
 ## Scoring decisions (issue #15, agreed 2026-10-16)
 
@@ -223,16 +265,6 @@ The browser tests block every non-local request, so they also check that nothing
 | 7 | A suitable first response that fails its roll, followed by a retry that stops the drone before the 300 m line | **Changed: now scores 100%** (it was 60%). Persisting should beat giving up. A retry inside 300 m keeps 60%, and an unsuitable first choice stays 20% even if a later response works |
 | 8 | Take cover against a hostile that then stays beyond the reach of every suitable response (issue #14, from ATP 3-01.81) | **Changed: now scores 100%.** If the drone later comes within reach, cover alone stays 20% |
 | 9 | Response names (issue #14) | **Renamed:** "Jam (soft kill)" and "Intercept (hard kill)", the terms in India's counter-drone guidelines |
-
-## What is left
-
-Tracked as GitHub issues, all assigned to Ammar:
-
-| Issue | Task |
-| --- | --- |
-| #10 | Install on a second machine using only this README, including the first-ever run of `start.bat` on Windows. Use an ordinary laptop with integrated graphics and confirm 30 fps with the 12-drone swarm (the simulated low-end test is under Status) |
-| #11 | Human checks. Play any scenario with sound on: the rotor hum should rise as a drone closes in, the tick, chime, buzz and breach alarm should play on their events, and **M** should mute. Set macOS Display → Colour filters → Greyscale and check that the threat markers (triangle, diamond, circle, square, each with a text label) and the dashboard still read clearly. In Urban Canyon, the drone should show for about 4 s around T+37 s and again on final approach |
-| #13 | Keep the full test suite passing on every merge (ongoing) |
 
 ## Spec differences (issue #16, checked 2026-10-16)
 
@@ -261,13 +293,24 @@ The original PRD, AVD and Visual Design docs were read against the running app. 
 - **Scoring needs the server.** If the server is down when a session ends, the session is kept in the browser and offered for resending on Mission select.
 - **Identity:** trainees are identified by callsign and unit only.
 - **`--lan` mode has no login.** Use it only on a trusted network.
-- **The hosted version's results are public until `INSTRUCTOR_PASSWORD` is set** on Vercel. Until then, anyone with the link can read the dashboard and CSV exports, so keep real personnel data off it. Trainee play stays open by design, so anyone can add sessions. The login has a 0.5 s delay after a wrong password but no lockout.
+- **The hosted version's results are public while the instructor login is off** (the current setting). Anyone with the link can read the dashboard and CSV exports, so keep real personnel data off it. Trainee play stays open by design, so anyone can add sessions. When the login is on, it adds a 0.5 s delay after a wrong password but has no lockout.
 - **Hosted latency:** every request opens a new database connection to Neon, and Neon's free tier sleeps when idle. The first request after a quiet spell takes a second or two longer.
 - **Visual effects are not scored.** Swarm separation and wobble are drawn on top of each drone's path; the server always scores the clean path.
 
-## Working rules
+## What is left
 
-- Run `.venv/bin/python -m pytest` before every merge. All tests must pass.
-- Never hand-edit `data/trainer.db`. Regenerate it with `scripts/seed_demo.py --reset`.
-- Keep retired code in `archive/` rather than deleting it.
-- Commit messages are plain text with no tool attribution.
+Tracked as GitHub issues, all assigned to Ammar:
+
+| Issue | Task |
+| --- | --- |
+| #10 | Install on a second machine using only this README, including the first-ever run of `start.bat` on Windows. Use an ordinary laptop with integrated graphics and confirm 30 fps with the 12-drone swarm (the simulated low-end test is under Status) |
+| #11 | Human checks. Play any scenario with sound on: the rotor hum should rise as a drone closes in, the tick, chime, buzz and breach alarm should play on their events, and **M** should mute. Set macOS Display → Colour filters → Greyscale and check that the threat markers (triangle, diamond, circle, square, each with a text label) and the dashboard still read clearly. In Urban Canyon, the drone should show for about 4 s around T+37 s and again on final approach |
+| #13 | Keep the full test suite passing on every merge (ongoing) |
+
+## Contributing
+
+Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, tests, commit style and the ground rules: a training aid, public sources only, no official branding, no real personal data, offline first.
+
+## Licence
+
+[MIT](LICENSE) © 2026 Ammar Hashmi. The bundled Three.js and Chart.js keep their own MIT licences in `app/static/vendor/`. This is a training prototype and is not an official Indian Army or Government of India system.

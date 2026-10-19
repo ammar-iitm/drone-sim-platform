@@ -198,6 +198,8 @@ const T = {
   'End the session now?': 'क्या सत्र अभी समाप्त करें?',
   'Scoring on the server…': 'सर्वर पर स्कोरिंग…',
   'Exercise status': 'अभ्यास स्थिति',
+  'The simulator needs a keyboard and mouse and works best on a laptop or desktop. On a phone you can still look around, but the dashboard and session replays are the better view here.':
+    'सिम्युलेटर के लिए कीबोर्ड और माउस चाहिए और यह लैपटॉप या डेस्कटॉप पर सबसे अच्छा चलता है। फ़ोन पर आप चारों ओर देख सकते हैं, पर यहाँ डैशबोर्ड और सत्र पुनःप्रदर्शन बेहतर रहेंगे।',
 
   // Score screen and session review
   'Composite score': 'समग्र स्कोर',

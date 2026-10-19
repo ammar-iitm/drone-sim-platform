@@ -15,8 +15,13 @@ SHOTS = Path(__file__).resolve().parents[2] / "test-results"
 
 
 @pytest.fixture(scope="module")
-def server(tmp_path_factory):
-    app = create_app({"DATABASE": str(tmp_path_factory.mktemp("e2e") / "e2e.db")})
+def db_path(tmp_path_factory):
+    return str(tmp_path_factory.mktemp("e2e") / "e2e.db")
+
+
+@pytest.fixture(scope="module")
+def server(db_path):
+    app = create_app({"DATABASE": db_path, "TESTING": True})
     srv = make_server("127.0.0.1", 0, app, threaded=True)
     thread = threading.Thread(target=srv.serve_forever, daemon=True)
     thread.start()
@@ -38,7 +43,7 @@ def browser():
 @pytest.fixture
 def page(browser, server, request):
     opts = getattr(request, "param", {})
-    ctx = browser.new_context(viewport={"width": 1600, "height": 960}, **opts)
+    ctx = browser.new_context(**{"viewport": {"width": 1600, "height": 960}, **opts})  # a test may override the size
     pg = ctx.new_page()
     pg.errors, pg.external = [], []
     pg.on("console", lambda m: m.type == "error" and pg.errors.append(m.text))

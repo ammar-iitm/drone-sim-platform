@@ -63,6 +63,25 @@
           <p class="label">Callsign and unit only. No personal data is stored.</p>
         </form>
       </div>
+      <div class="panel" id="adaptive-panel" style="border: 1px solid var(--cyan); background: rgba(0, 240, 255, 0.03);">
+        <div class="panel-head">
+          <h2 class="panel-title"><span class="tag" style="background:var(--cyan); color:#000;">AI</span>Adaptive Trainer</h2>
+          <span class="chip cyan" id="adaptive-mastery">Novice</span>
+        </div>
+        <div class="panel-body stack" style="gap:10px" id="adaptive-body">
+          <div id="adaptive-prompt" class="label data">Enter Callsign & Unit to get AI-tailored scenario recommendation.</div>
+          <div id="adaptive-card" hidden class="stack" style="gap:8px">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+              <span class="label">Recommended:</span>
+              <span class="chip green" id="adaptive-scen-name" style="font-weight:700;">-</span>
+            </div>
+            <div id="adaptive-focus">-</div>
+            <div style="padding:8px; background:var(--surface-lowest); border-left:2px solid var(--cyan);" id="adaptive-rationale">-</div>
+            <div class="label" id="adaptive-criteria"></div>
+            <button type="button" class="btn primary" id="btn-accept-rec" style="width:100%; margin-top:4px;">Accept Recommendation</button>
+          </div>
+        </div>
+      </div>
       <div class="panel">
         <div class="panel-head"><h2 class="panel-title"><span class="tag">??</span>Controls</h2></div>
         <div class="panel-body stack" style="gap:6px">

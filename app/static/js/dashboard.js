@@ -150,6 +150,53 @@ async function loadTrainee() {
       return `<td class="cell" style="background: rgba(57,135,229,${alpha.toFixed(2)}); ${ring}">${n}</td>`;
     }).join('')}</tr>`).join('')}</tbody>`;
 
+  // Load Adaptive Training Intelligence profile and recommendation
+  try {
+    const rec = await json(`/api/adaptive/recommendation?trainee_id=${id}`);
+    const sp = rec.skill_profile || {};
+    const rm = rec.recommendation || {};
+    if ($('adaptive-dash-name')) $('adaptive-dash-name').textContent = name;
+    if ($('adaptive-dash-badge')) $('adaptive-dash-badge').textContent = `Mastery: ${sp.mastery_level || 'NOVICE'} (${sp.confidence || 'NONE'} CONF)`;
+
+    const dims = sp.dimensions || {};
+    const hotspots = sp.diagnostics?.confusion_hotspots || [];
+    const hotspotText = hotspots.length
+      ? hotspots.map((h) => (typeof h === 'object' && h !== null ? `${h.pattern || 'unknown'} (${h.count || 1})` : String(h))).join(', ')
+      : 'None';
+    const dCards = [
+      { key: 'detection', label: 'Detection', score: dims.detection?.score, rating: dims.detection?.rating, note: `MTTD: ${sp.diagnostics?.mean_time_to_detect_s ?? '--'}s · False alarms: ${sp.diagnostics?.false_alarms_per_session ?? 0}/sess` },
+      { key: 'classification', label: 'Classification', score: dims.classification?.score, rating: dims.classification?.rating, note: `Confusion: ${hotspotText}` },
+      { key: 'engagement', label: 'Engagement', score: dims.engagement?.score, rating: dims.engagement?.rating, note: `Breaches: ${sp.diagnostics?.total_breaches ?? 0} · Critical: ${sp.diagnostics?.critical_errors ?? 0}` },
+      { key: 'environmental_resilience', label: 'Env. Resilience', score: dims.environmental_resilience?.score, rating: dims.environmental_resilience?.rating, note: `Degraded: ${fmtNum(dims.environmental_resilience?.degraded_avg)} vs Clean: ${fmtNum(dims.environmental_resilience?.clean_avg)}` }
+    ];
+
+    if ($('adaptive-dims')) {
+      $('adaptive-dims').innerHTML = dCards.map((c) => {
+        const cls = c.rating === 'STRONG' ? 'green' : c.rating === 'SATISFACTORY' ? 'cyan' : c.rating === 'WEAK' ? 'amber' : '';
+        return `
+          <div class="panel" style="padding: var(--s2); background: var(--surface-lowest); border: 1px solid var(--outline-variant);">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span class="label">${esc(c.label)}</span>
+              <span class="chip ${cls}" style="padding:1px 6px;">${esc(c.rating || 'UNTESTED')}</span>
+            </div>
+            <div class="value-lg ${cls}" style="margin:4px 0;">${fmtNum(c.score)}</div>
+            <div class="label">${esc(c.note)}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    const diffLabel = rm.scenario_kind === 'scripted'
+      ? `Curriculum Tier ${rm.difficulty || 1}`
+      : `Difficulty ${rm.difficulty || 1}`;
+    if ($('adaptive-dash-target')) $('adaptive-dash-target').textContent = `${rm.scenario_name || rm.scenario_id} [${diffLabel}]`;
+    if ($('adaptive-dash-focus')) $('adaptive-dash-focus').textContent = `Target Focus: ${rm.focus_area || '--'}`;
+    if ($('adaptive-dash-rationale')) $('adaptive-dash-rationale').textContent = `Evidence Rationale: ${rm.rationale || '--'}`;
+    if ($('adaptive-dash-criteria')) $('adaptive-dash-criteria').textContent = `Progression Gate: ${rm.progression_criteria || '--'}`;
+  } catch {
+    /* ignore adaptive profile load failure if unexpected */
+  }
+
   sessionsRows = a.sessions;
   renderSessions();
 }

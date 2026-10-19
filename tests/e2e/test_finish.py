@@ -112,12 +112,12 @@ def test_motion_cues_differ_by_type(page, server):
             const b = S.world.meshes.get('C1');
             if (b.userData.wings) wing.add(b.userData.wings[0].rotation.z.toFixed(2));
             nav.add(S.world.meshes.get('C3').userData.nav.visible);
-            if (++n > 60) {
+            if (++n > 120) {
                 clearInterval(timer);
                 const max = (a) => a.length ? Math.max(...a) : null;
                 resolve({ bird: max(dev.bird), friendly: max(dev.friendly), quad: max(dev.quad), wing: wing.size, nav: [...nav] });
             }
-        }, 50);
+        }, 20);
     })""")
     assert stats["bird"] > 3 and stats["quad"] is not None and stats["bird"] > stats["quad"], stats   # erratic bird
     assert stats["friendly"] is not None and stats["friendly"] < 0.5, stats                          # steady aircraft
@@ -193,22 +193,133 @@ def test_quality_levels_and_auto_step_down(page, server):
 
     begin(page, server, "seed=7&difficulty=5&swarm=12&degradation=0&terrain=urban")
     assert "AUTO" in page.inner_text("#quality") and "HIGH" in page.inner_text("#quality")
-    page.evaluate("for (let i = 0; i < 5; i++) window.__sim.autoQuality(20)")
-    assert page.evaluate("window.__sim.world.quality") == "high"           # 2.5 s of low fps: no change yet
-    page.evaluate("window.__sim.autoQuality(20)")
-    assert page.evaluate("window.__sim.world.quality") == "medium"         # 3 s: one step down
+
+    # Prevent background 500ms RAF timer from calling autoQuality during the test
+    page.evaluate("window.__sim.fpsT = Date.now() + 600000")
+
+    # Production threshold boundary test: fps < 35 triggers step-down counter; >= 35 resets it
+    # 1. 36 fps (above threshold) -> lowFpsWindows remains 0
+    page.evaluate("window.__sim.world.setQuality('high'); window.__sim.lowFpsWindows = 0; window.__sim.autoQuality(36)")
+    assert page.evaluate("window.__sim.lowFpsWindows") == 0
+    assert page.evaluate("window.__sim.world.quality") == "high"
+
+    # 2. 35 fps (exact threshold boundary: fps < 35 is false) -> resets lowFpsWindows
+    page.evaluate("window.__sim.autoQuality(35)")
+    assert page.evaluate("window.__sim.lowFpsWindows") == 0
+    assert page.evaluate("window.__sim.world.quality") == "high"
+
+    # 3. 34 fps (just below threshold) -> increments lowFpsWindows
+    page.evaluate("window.__sim.autoQuality(34)")
+    assert page.evaluate("window.__sim.lowFpsWindows") == 1
+    assert page.evaluate("window.__sim.world.quality") == "high"
+
+    # 4. Sustained low fps just before trigger interval (5 half-second windows = 2.5s)
+    page.evaluate("for (let i = 0; i < 4; i++) window.__sim.autoQuality(34)")
+    assert page.evaluate("window.__sim.lowFpsWindows") == 5
+    assert page.evaluate("window.__sim.world.quality") == "high"
+
+    # 5. Exactly at trigger interval (6th window = 3.0s) -> steps down to medium
+    page.evaluate("window.__sim.autoQuality(34)")
+    assert page.evaluate("window.__sim.world.quality") == "medium"
+    assert page.evaluate("window.__sim.lowFpsWindows") == 0
+
+    # 6. High FPS (60 fps) never restores quality (avoids frame-rate oscillation)
     page.evaluate("for (let i = 0; i < 6; i++) window.__sim.autoQuality(60)")
-    assert page.evaluate("window.__sim.world.quality") == "medium"         # never steps back up
-    page.evaluate("for (let i = 0; i < 6; i++) window.__sim.autoQuality(20)")
+    assert page.evaluate("window.__sim.world.quality") == "medium"
+    assert page.evaluate("window.__sim.lowFpsWindows") == 0
+
+    # 7. Another 6 low windows -> steps down to low
+    page.evaluate("for (let i = 0; i < 6; i++) window.__sim.autoQuality(25)")
     assert page.evaluate("window.__sim.world.quality") == "low"
-    page.evaluate("for (let i = 0; i < 12; i++) window.__sim.autoQuality(20)")
-    assert page.evaluate("window.__sim.world.quality") == "minimum"        # and stops at minimum
+    assert page.evaluate("window.__sim.lowFpsWindows") == 0
+
+    # 8. Another 6 low windows -> steps down to minimum
+    page.evaluate("for (let i = 0; i < 6; i++) window.__sim.autoQuality(20)")
+    assert page.evaluate("window.__sim.world.quality") == "minimum"
+    assert page.evaluate("window.__sim.lowFpsWindows") == 0
+
+    # 9. Clamped at minimum: synthetic load does not drop further or crash
+    page.evaluate("for (let i = 0; i < 12; i++) window.__sim.autoQuality(10)")
+    assert page.evaluate("window.__sim.world.quality") == "minimum"
+
     page.wait_for_function("document.getElementById('quality').textContent.includes('MINIMUM')")
     lowest = page.evaluate("[window.__sim.world.renderer.getPixelRatio(), window.__sim.world.scenery.map(s => [s.mesh.count, s.total])]")
     assert lowest[0] <= 0.5
     assert all(abs(c - max(1, round(t * 0.2))) <= 1 for c, t in lowest[1])
 
     assert page.errors == []
+
+
+test_auto_quality_drops_settings_under_load = test_quality_levels_and_auto_step_down
+
+
+def test_rel01_pixel_ratio_clamping_and_canvas_bounds(browser, server):
+    """Verify effective pixel ratio, canvas bounds, and aspect ratios across software-emulated device scale factors and quality levels."""
+    dprs = [1.0, 1.25, 1.5, 1.75, 2.0]
+    quality_caps = {
+        "high": 1.5,
+        "medium": 1.0,
+        "low": 0.75,
+        "minimum": 0.5,
+    }
+
+    for dpr in dprs:
+        context = browser.new_context(
+            device_scale_factor=dpr,
+            viewport={"width": 1280, "height": 720}
+        )
+        page = context.new_page()
+        page_errors = []
+        page.on("pageerror", lambda err: page_errors.append(err))
+        try:
+            begin(page, server, "id=s1-dawn-recon&speed=8")
+
+            # Verify window DPR matches configured software emulation
+            win_dpr = page.evaluate("window.devicePixelRatio")
+            assert abs(win_dpr - dpr) < 0.05
+
+            # Exercise every supported quality level and verify effective pixel ratio and canvas buffer dimensions
+            for q_name, cap in quality_caps.items():
+                page.evaluate(f"window.__sim.world.setQuality('{q_name}')")
+                info = page.evaluate("""() => {
+                    const w = window.__sim.world;
+                    const canvas = document.getElementById('gl');
+                    const rect = canvas.getBoundingClientRect();
+                    return {
+                        rendererDpr: w.renderer.getPixelRatio(),
+                        canvasWidth: canvas.width,
+                        canvasHeight: canvas.height,
+                        cssWidth: rect.width,
+                        cssHeight: rect.height,
+                        cameraAspect: w.camera.aspect,
+                        quality: w.quality
+                    };
+                }""")
+
+                expected_effective_ratio = min(dpr, cap)
+                # Production renderer must actually use the expected effective pixel ratio
+                assert abs(info["rendererDpr"] - expected_effective_ratio) < 0.05, (
+                    f"DPR {dpr} Quality {q_name}: expected renderer DPR {expected_effective_ratio}, got {info['rendererDpr']}"
+                )
+
+                # Canvas render buffer dimensions must equal cssDimensions * effectiveRatio
+                assert abs(info["canvasWidth"] - round(info["cssWidth"] * info["rendererDpr"])) <= 2
+                assert abs(info["canvasHeight"] - round(info["cssHeight"] * info["rendererDpr"])) <= 2
+
+                # Camera aspect ratio must match CSS aspect ratio
+                assert abs(info["cameraAspect"] - (info["cssWidth"] / info["cssHeight"])) < 0.01
+
+            # Check camera aspect ratio and renderer resolution after resize
+            page.set_viewport_size({"width": 1024, "height": 576})
+            page.wait_for_timeout(300)
+            page.evaluate("window.__sim.world.resize(1024, 576)")
+            resized_aspect = page.evaluate("window.__sim.world.camera.aspect")
+            assert abs(resized_aspect - (1024 / 576)) < 0.01
+
+            assert page_errors == []
+        finally:
+            page.close()
+            context.close()
 
 
 def test_help_page_shows_live_rubric(page, server):

@@ -35,6 +35,8 @@ def trainee(db, trainee_id, rubric):
     detect_times = []
     for r in rows:
         result = json.loads(r.pop("result"))
+        if r["grade"] == "INCOMPLETE":
+            continue
         for c in result["contacts"]:
             if not c["scored"]:
                 continue
@@ -44,32 +46,73 @@ def trainee(db, trainee_id, rubric):
             if c["detection"].get("t") is not None:
                 detect_times.append(c["detection"]["t"] - c["spawn_t"])
 
-    series = {m: [r[m] for r in rows] for m in METRICS + ("total",)}
+    completed = [r for r in rows if r["grade"] != "INCOMPLETE"]
+    incomplete = [r for r in rows if r["grade"] == "INCOMPLETE"]
+
+    # Qualifying series matching the session list index, with None for incomplete attempts
+    # to maintain temporal alignment for charts and table rows.
+    series = {m: [(r[m] if r["grade"] != "INCOMPLETE" else None) for r in rows] for m in METRICS + ("total",)}
+
+    # Rolling average of total score computed across qualifying completed sessions
+    qual_totals = [r["total"] for r in completed]
+    qual_rolling = _rolling(qual_totals, window=3)
+    roll_iter = iter(qual_rolling)
+    rolling = {
+        "total": [(next(roll_iter) if r["grade"] != "INCOMPLETE" else None) for r in rows]
+    }
+    for m in METRICS:
+        m_vals = [r[m] for r in completed]
+        m_roll = _rolling(m_vals, window=3)
+        m_iter = iter(m_roll)
+        rolling[m] = [(next(m_iter) if r["grade"] != "INCOMPLETE" else None) for r in rows]
+
+    averages = {m: _avg([r[m] for r in completed]) for m in METRICS + ("total",)}
+    change = {
+        m: (round([r[m] for r in completed][-1] - [r[m] for r in completed][0], 1) if len(completed) >= 2 else None)
+        for m in METRICS + ("total",)
+    }
+
     return {
         "trainee": dict(t),
         "sessions": rows,
+        "attempts": len(rows),
+        "completed": len(completed),
+        "incomplete": len(incomplete),
         "series": series,
-        "rolling": {m: _rolling(v) for m, v in series.items()},
-        "averages": {m: _avg(v) for m, v in series.items()},
-        "change": {m: (round(v[-1] - v[0], 1) if len(v) >= 2 else None) for m, v in series.items()},
+        "rolling": rolling,
+        "averages": averages,
+        "change": change,
         "mean_time_to_detect_s": _avg(detect_times),
-        "false_alarms_per_session": _avg([r["false_alarms"] for r in rows]),
+        "false_alarms_per_session": _avg([r["false_alarms"] for r in completed]),
         "confusion": {"rows": classes, "columns": columns, "counts": matrix},
     }
 
 
 def unit(db, unit_name):
-    stage_avgs = ", ".join(f"{avg1('s.' + m)} AS {m}" for m in ("total",) + METRICS)
+    stage_avgs = ", ".join(
+        f"{avg1(f'CASE WHEN s.grade != \'INCOMPLETE\' THEN s.{m} END')} AS {m}"
+        for m in ("total",) + METRICS
+    )
     trainees = [dict(r) for r in db.execute(
-        f"SELECT t.id, t.callsign, COUNT(s.id) AS sessions, {stage_avgs}, SUM(s.breaches) AS breaches "
-        "FROM trainees t LEFT JOIN sessions s ON s.trainee_id = t.id WHERE t.unit = ? "
-        "GROUP BY t.id ORDER BY t.callsign", (unit_name,))]
+        f"SELECT t.id, t.callsign, "
+        f"COUNT(s.id) AS attempts, "
+        f"COUNT(s.id) AS sessions, "
+        f"COUNT(CASE WHEN s.grade != 'INCOMPLETE' THEN 1 END) AS completed, "
+        f"COUNT(CASE WHEN s.grade = 'INCOMPLETE' THEN 1 END) AS incomplete, "
+        f"{stage_avgs}, "
+        f"COALESCE(SUM(s.breaches), 0) AS breaches "
+        f"FROM trainees t LEFT JOIN sessions s ON s.trainee_id = t.id WHERE t.unit = ? "
+        f"GROUP BY t.id ORDER BY t.callsign", (unit_name,))]
     if not trainees:
         return None
     agg = db.execute(
-        f"SELECT COUNT(*) AS sessions, {stage_avgs}, "
-        "COALESCE(SUM(s.breaches), 0) AS breaches FROM sessions s JOIN trainees t ON t.id = s.trainee_id "
-        "WHERE t.unit = ?", (unit_name,)).fetchone()
+        f"SELECT COUNT(*) AS attempts, "
+        f"COUNT(*) AS sessions, "
+        f"COUNT(CASE WHEN s.grade != 'INCOMPLETE' THEN 1 END) AS completed, "
+        f"COUNT(CASE WHEN s.grade = 'INCOMPLETE' THEN 1 END) AS incomplete, "
+        f"{stage_avgs}, "
+        f"COALESCE(SUM(s.breaches), 0) AS breaches FROM sessions s JOIN trainees t ON t.id = s.trainee_id "
+        f"WHERE t.unit = ?", (unit_name,)).fetchone()
     averages = {m: agg[m] for m in METRICS + ("total",)}
 
     weakest = None
@@ -79,14 +122,18 @@ def unit(db, unit_name):
         # fixed metric order (detection first) decides.
         weakest = min(present, key=lambda m: averages[m])
 
-    trained = [t for t in trainees if t["sessions"]]
+    # Only trainees with completed qualifying sessions are eligible for ranking
+    trained = [t for t in trainees if t["completed"] and t["total"] is not None]
     recent = [dict(r) for r in db.execute(
         "SELECT s.id, t.callsign, s.scenario_name, s.started_at, s.total, s.grade, s.breaches, s.false_alarms "
         "FROM sessions s JOIN trainees t ON t.id = s.trainee_id WHERE t.unit = ? "
         "ORDER BY s.started_at DESC, s.id DESC LIMIT 10", (unit_name,))]
     return {
         "unit": unit_name,
+        "attempts": agg["attempts"],
         "sessions": agg["sessions"],
+        "completed": agg["completed"],
+        "incomplete": agg["incomplete"],
         "breaches": agg["breaches"],
         "averages": averages,
         "target": TARGET,

@@ -14,3 +14,6 @@ frontend
 .agents
 .claude
 skills-lock.json
+backups
+reports
+scratch

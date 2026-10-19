@@ -102,10 +102,80 @@ function launch() {
   location.href = '/sim?' + q;
 }
 
+let currentRecommendation = null;
+let recDebounceTimer = null;
+
+function renderAdaptiveRecommendation(rec) {
+  if (!$('adaptive-card') || !$('adaptive-prompt')) return;
+  $('adaptive-prompt').hidden = true;
+  $('adaptive-card').hidden = false;
+  const p = rec.skill_profile || {};
+  const r = rec.recommendation || {};
+  const diffLabel = r.scenario_kind === 'scripted'
+    ? `Curriculum Tier ${r.difficulty || 1}`
+    : `Difficulty ${r.difficulty || 1}`;
+  if ($('adaptive-scen-name')) $('adaptive-scen-name').textContent = `${r.scenario_name || r.scenario_id} [${diffLabel}]`;
+  if ($('adaptive-focus')) $('adaptive-focus').textContent = `Focus: ${r.focus_area || '--'}`;
+  if ($('adaptive-rationale')) $('adaptive-rationale').textContent = `Evidence: ${r.rationale || '--'}`;
+  if ($('adaptive-criteria')) $('adaptive-criteria').textContent = `Next Target: ${r.progression_criteria || '--'}`;
+}
+
+async function fetchAdaptiveRecommendation() {
+  const cs = $('callsign').value.trim().toUpperCase();
+  const unit = $('unit').value.trim().toUpperCase();
+  if (!cs) {
+    if ($('adaptive-card')) $('adaptive-card').hidden = true;
+    if ($('adaptive-prompt')) {
+      $('adaptive-prompt').hidden = false;
+      $('adaptive-prompt').textContent = 'Enter Callsign & Unit to get AI-tailored scenario recommendation.';
+    }
+    currentRecommendation = null;
+    return;
+  }
+  try {
+    const q = new URLSearchParams({ callsign: cs });
+    if (unit) q.set('unit', unit);
+    const res = await fetch('/api/adaptive/recommendation?' + q);
+    if (!res.ok) return;
+    const data = await res.json();
+    currentRecommendation = data;
+    renderAdaptiveRecommendation(data);
+  } catch {
+    /* ignore offline or network glitch */
+  }
+}
+
+async function acceptRecommendation() {
+  if (!currentRecommendation || !currentRecommendation.recommendation) return;
+  const r = currentRecommendation.recommendation;
+  if (r.scenario_kind === 'scripted') {
+    select({ kind: 'scripted', id: r.scenario_id, name: r.scenario_name });
+    if (r.launch_params && r.launch_params.vary !== undefined) {
+      $('vary').checked = Boolean(r.launch_params.vary);
+      store.set('dtt.vary', $('vary').checked ? 'on' : 'off');
+    }
+  } else if (r.scenario_kind === 'procedural') {
+    const lp = r.launch_params?.params || {};
+    if (lp.seed !== undefined) $('seed').value = lp.seed;
+    if (lp.difficulty !== undefined) {
+      $('difficulty').value = lp.difficulty;
+      $('difficulty-out').textContent = lp.difficulty;
+    }
+    if (lp.terrain !== undefined) $('terrain').value = lp.terrain;
+    if (lp.time_of_day !== undefined) $('time_of_day').value = lp.time_of_day;
+    const p = await preview();
+    if (p) select({ kind: 'procedural', id: p.id, params: p.params, name: p.name });
+  }
+}
+
 $('callsign').value = store.get('dtt.callsign') || '';
 $('unit').value = store.get('dtt.unit') || '';
 $('quality').value = store.get('dtt.quality') || 'auto';
-['callsign', 'unit'].forEach((id) => $(id).addEventListener('input', updateHeader));
+['callsign', 'unit'].forEach((id) => $(id).addEventListener('input', () => {
+  updateHeader();
+  clearTimeout(recDebounceTimer);
+  recDebounceTimer = setTimeout(fetchAdaptiveRecommendation, 300);
+}));
 $('difficulty').addEventListener('input', () => { $('difficulty-out').textContent = $('difficulty').value; });
 $('vary').checked = store.get('dtt.vary') !== 'off';
 $('vary').addEventListener('change', () => store.set('dtt.vary', $('vary').checked ? 'on' : 'off'));
@@ -117,6 +187,7 @@ $('use-proc').addEventListener('click', async () => {
   const p = await preview();
   if (p) select({ kind: 'procedural', id: p.id, params: p.params, name: p.name });
 });
+$('btn-accept-rec')?.addEventListener('click', acceptRecommendation);
 $('launch').addEventListener('click', launch);
 document.addEventListener('keydown', (e) => {
   // Enter launches, except on buttons and links (such as Skip to main content), which keep their own action.
@@ -158,3 +229,4 @@ loadScripted();
 loadUnits();
 preview();
 updateHeader();
+fetchAdaptiveRecommendation();

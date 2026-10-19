@@ -9,7 +9,7 @@ from helpers import contact, ev, scenario
 
 
 def run(rubric, scen, events, ended_t=None):
-    return score_session(scen, validate_events(events, scen, rubric), rubric, ended_t)
+    return score_session(scen, validate_events(events, scen, rubric, ended_t=ended_t), rubric, ended_t)
 
 
 def by_id(result, cid):
