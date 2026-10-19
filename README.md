@@ -79,6 +79,11 @@ DATABASE_URL=<postgres url> .venv/bin/python scripts/seed_demo.py --reset   # sa
 .venv/bin/python run.py --port 8000 --lan        # expose on the local network (no login; trusted networks only)
 NO_BROWSER=1 ./start.sh                          # start without opening a browser
 .venv/bin/python scripts/package.py              # build dist/drone-threat-trainer-<date>.zip to copy to another machine
+.venv/bin/python scripts/backup.py backup        # create verified SQLite backup in backups/
+.venv/bin/python scripts/backup.py verify <file> # verify backup integrity & checksum
+.venv/bin/python scripts/backup.py restore <file> --dest <target.db>  # restore to destination
+.venv/bin/python scripts/migrate.py --check      # verify database schema readiness (schema v4)
+.venv/bin/python scripts/check_env.py --mode offline  # preflight environment validator
 ```
 
 **Graphics quality.** On a slow laptop, choose **Graphics quality** on Mission select:
@@ -170,6 +175,8 @@ app/
   geometry.py        Contact paths (shared maths with static/js/sim/path.js)
   rng.py             Seeded rolls (bit-identical with static/js/sim/rng.js)
   analytics.py       Trends, confusion matrix, unit rollup
+  adaptive.py        Explainable adaptive training engine (curriculum recommendations)
+  audit.py           Structured JSON security audit logging with redaction
   db.py, schema.sql  Storage: SQLite (data/trainer.db) by default; Postgres (schema_pg.sql) when DATABASE_URL is set
   templates/         Pages in the AEGIS (Stitch) style
   static/css/        aegis.css (design system), sim.css (HUD)
@@ -181,6 +188,9 @@ run.py               Start the app (start.sh / start.bat wrap it with first-run 
 index.py             Vercel entrypoint (hosted version)
 scripts/seed_demo.py Seed a demo cohort through the real API
 scripts/package.py   Build a clean zip to copy to another machine
+scripts/backup.py    Online database backup, verification and safe restore
+scripts/migrate.py   Database migration runner (schema v4)
+scripts/check_env.py Preflight environment validation (offline/hosted)
 tests/               pytest: generator, scenario variants, scoring tree, API, offline check, JS/Python roll parity
 tests/e2e/           Browser tests (Playwright with the installed Chrome); screenshots go to test-results/
 archive/             Earlier Antigravity prototype (Node/React/Unity) and the original Stitch screens
@@ -193,18 +203,22 @@ data/                SQLite database (created on first run, not committed; delet
 ```bash
 .venv/bin/pip install -r requirements-dev.txt         # once: pytest and Playwright (the browser tests drive the installed Chrome)
 .venv/bin/python -m pytest tests --ignore=tests/e2e    # Python tests, under a second
-.venv/bin/python -m pytest                              # all 207, about 6 minutes
+.venv/bin/python -m pytest                              # all 376, about 7 minutes
 TEST_DATABASE_URL=<postgres url> .venv/bin/python -m pytest tests --ignore=tests/e2e   # same tests on Postgres
 ```
 
 The browser tests block every non-local request, so they also check that nothing is fetched from the internet.
 
-## Status (2026-10-16)
+## Status (2026-10-18)
 
 - **Requirements:** 19 of the 21 PRD requirements are verified by tests or screenshots. Two are partial:
   - **F8 audio:** every cue and the mute key are tested in code, but nobody has listened yet (issue #11).
   - **F9 VR:** not built, by decision; rendering is isolated in `world.js` so it can be added later.
-- **Tests:** 207 pass: 164 Python tests and 43 browser tests. The browser tests play all six scenarios end to end, both standard and varied.
+- **Tests:** 376 pass: 332 Python tests and 44 browser tests (100% pass rate). The test suite covers security hardening, database schema v4 migrations, server-authoritative scoring, adaptive training recommendations, operational health checks, phone viewport layout responsiveness, and full end-to-end browser journeys in Chrome across desktop and mobile viewports.
+- **Security & Integrity:** Server-authoritative anti-tamper scoring, single-use signed assessment tokens (`/api/session/start`), replay protection, sliding-window rate limiting, and chronological event state machine.
+- **Database & Parity:** Versioned schema migrations (v1-v4) with transactional rollback across offline SQLite and hosted PostgreSQL, read-only `/health` endpoint, and verified online backup/restore CLI (`scripts/backup.py`).
+- **AI Adaptive Practice:** Deterministic, explainable recommendation engine (`app/adaptive.py`) evaluating detection speed, classification precision, false alarms, and breach prevention.
+- **Observability:** Structured JSON security audit logging for authentication, data exports, and rubric provenance (`app/audit.py`), plus preflight environment validation (`scripts/check_env.py`).
 - **Offline:** verified. Every browser test blocks non-local requests, and a full run with Wi-Fi off was done by hand on 2026-10-06.
 - **Target laptop:** MacBook Pro (Mac17,9), Apple M5 Pro (15-core CPU, 16-core GPU), 24 GB, macOS 27.0.1, Chrome 155.0.8059.39.
   - **12-drone swarm:** 120 fps on both Auto and Low quality at 1920 × 1080. That is the display's refresh cap.

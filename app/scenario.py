@@ -385,7 +385,7 @@ def generate(raw_params):
 
 def get_scenario(scenario_id=None, params=None):
     """Rebuild a scenario from what a client is allowed to send: a scripted id, or procedural params."""
-    if scenario_id and not str(scenario_id).startswith("proc-"):
+    if scenario_id and str(scenario_id).lower() != "procedural" and not str(scenario_id).startswith("proc-"):
         vary = params.get("vary") if isinstance(params, dict) else None
         return build_scripted(scenario_id, vary)
     return generate(params or {})

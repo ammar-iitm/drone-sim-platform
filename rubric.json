@@ -41,7 +41,8 @@
   "geometry": {
     "inner_ring_m": 120,
     "late_range_m": 300,
-    "mark_tolerance_s": 1.0
+    "mark_tolerance_s": 1.0,
+    "session_end_tolerance_s": 0.5
   },
   "classes": {
     "RECON_UAS": { "label": "Recon quadcopter", "family": "hostile_uas", "key": "1" },
@@ -103,5 +104,26 @@
     "balloon": { "true_class": "DECOY" },
     "bird": { "true_class": "BIRD" },
     "friendly_aircraft": { "true_class": "FRIENDLY" }
+  },
+  "adaptive": {
+    "target_score": 80.0,
+    "weak_threshold": 65.0,
+    "strong_threshold": 80.0,
+    "breach_rate_weak": 0.33,
+    "mttd_weak_s": 16.0,
+    "mttd_strong_s": 10.0,
+    "false_alarm_rate_weak": 1.25,
+    "classification_weak_score": 68.0,
+    "detection_weak_score": 70.0,
+    "expert_score": 82.0,
+    "practitioner_score": 65.0,
+    "fa_weak_count": 2.0,
+    "fa_strong_count": 1.0,
+    "env_drop_weak": 20.0,
+    "env_strong_score": 75.0,
+    "hotspots_weak_count": 3,
+    "hotspots_remediation_count": 2,
+    "breach_rate_expert": 0.2,
+    "breach_rate_practitioner": 0.5
   }
 }

@@ -24,7 +24,7 @@ def own_files():
 def test_no_external_urls_in_pages_scripts_or_styles():
     offenders = []
     for path in own_files():
-        for n, line in enumerate(path.read_text().splitlines(), 1):
+        for n, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
             # The SVG namespace is an identifier, not a fetch.
             if URL.search(line.replace("http://www.w3.org/2000/svg", "")):
                 offenders.append(f"{path.relative_to(ROOT)}:{n}")
@@ -35,7 +35,7 @@ def test_vendored_libraries_present_and_local():
     vendor = APP / "static" / "vendor"
     for name in ("three.module.js", "three.core.js", "chart.umd.min.js"):
         assert (vendor / name).stat().st_size > 100_000
-    imports = re.findall(r"from\s+'([^']+)'", (vendor / "three.module.js").read_text())
+    imports = re.findall(r"from\s+'([^']+)'", (vendor / "three.module.js").read_text(encoding="utf-8"))
     assert imports and all(i.startswith("./") for i in imports)
 
 

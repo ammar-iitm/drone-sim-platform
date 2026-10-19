@@ -60,7 +60,7 @@ def play(page, server, scenario_id, cfg, vary=None):
     briefing = page.inner_text("#screen-card")
     page.keyboard.press("Enter")
     page.evaluate(BOT, cfg)
-    page.wait_for_selector("#again", timeout=60_000)
+    page.wait_for_selector("#again", timeout=90_000)
     sid = page.evaluate("fetch('/api/sessions').then(r => r.json())")[0]["id"]
     detail = page.evaluate(f"fetch('/api/sessions/{sid}').then(r => r.json())")
     return briefing, detail

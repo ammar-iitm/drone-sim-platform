@@ -6,6 +6,7 @@ The browser never sends a score; the server recomputes everything, including the
 response success rolls, from the scenario seed.
 """
 
+import hashlib
 import json
 import math
 from pathlib import Path
@@ -17,28 +18,47 @@ SENSOR_MODES = {"eo", "nv", "thermal", "radar"}
 MAX_EVENTS = 5000
 
 
+def rubric_hash(path):
+    try:
+        content = Path(path).read_bytes()
+        return hashlib.sha256(content).hexdigest()[:16]
+    except Exception:
+        return "unknown"
+
+
 def load_rubric(path):
-    return json.loads(Path(path).read_text())
+    data = json.loads(Path(path).read_text(encoding="utf-8"))
+    data["_hash"] = rubric_hash(path)
+    return data
 
 
 # ---------------------------------------------------------------- validation
 
-def validate_events(raw_events, scenario, rubric):
+def validate_events(raw_events, scenario, rubric, ended_t=None):
     """Check a submitted event log and return it normalised and sorted by time.
+    Enforces per-contact chronology: contact must have spawned, and must have been
+    validly marked before or at classification/response. Events must occur within
+    the contact active lifetime and prior to session end.
     Raises ValueError with a message that names the first bad event."""
     if not isinstance(raw_events, list):
         raise ValueError("events must be a list")
     if len(raw_events) > MAX_EVENTS:
         raise ValueError(f"too many events (max {MAX_EVENTS})")
-    max_t = scenario["duration_s"] + 60
-    contact_ids = {c["id"] for c in scenario["contacts"]}
+
+    mark_tol = float(rubric.get("geometry", {}).get("mark_tolerance_s", 1.0))
+    session_end_tol = float(rubric.get("geometry", {}).get("session_end_tolerance_s", 0.5))
+    session_end = scenario["duration_s"] if ended_t is None else min(float(ended_t), scenario["duration_s"])
+    max_t = session_end + session_end_tol
+    contacts_map = {c["id"]: c for c in scenario["contacts"]}
+    contact_ids = set(contacts_map.keys())
+
     out = []
     for i, ev in enumerate(raw_events):
         if not isinstance(ev, dict):
             raise ValueError(f"event {i} is not an object")
         t = ev.get("t")
         if not isinstance(t, (int, float)) or isinstance(t, bool) or not math.isfinite(t) or not 0 <= t <= max_t:
-            raise ValueError(f"event {i}: t must be a number between 0 and {max_t}")
+            raise ValueError(f"event {i}: t must be a number between 0 and {round(max_t, 2)}")
         etype = ev.get("type")
         if etype not in EVENT_TYPES:
             raise ValueError(f"event {i}: unknown type {etype!r}")
@@ -49,7 +69,7 @@ def validate_events(raw_events, scenario, rubric):
         if not isinstance(data, dict) or len(json.dumps(data)) > 500:
             raise ValueError(f"event {i}: data must be a small object")
         if etype in ("classify", "respond", "breach"):
-            if cid not in contact_ids:
+            if not cid or cid not in contact_ids:
                 raise ValueError(f"event {i}: {etype} needs a contact_id from this scenario")
         if etype == "classify" and data.get("class") not in rubric["classes"]:
             raise ValueError(f"event {i}: class must be one of {', '.join(rubric['classes'])}")
@@ -58,7 +78,31 @@ def validate_events(raw_events, scenario, rubric):
         if etype == "sensor" and data.get("mode") not in SENSOR_MODES:
             raise ValueError(f"event {i}: sensor mode must be one of {', '.join(sorted(SENSOR_MODES))}")
         out.append({"t": round(float(t), 3), "type": etype, "contact_id": cid, "data": data, "seq": i})
+
+    # Sort chronologically by time and submission sequence (deterministic tie-breaking)
     out.sort(key=lambda e: (e["t"], e["seq"]))
+
+    # Chronological state machine validation
+    marked_contacts = set()
+    for ev in out:
+        cid = ev["contact_id"]
+        t = ev["t"]
+        etype = ev["type"]
+        if etype == "mark":
+            if cid in contacts_map:
+                c = contacts_map[cid]
+                if c["spawn_t"] - mark_tol <= t <= geometry.end_time(c) + mark_tol:
+                    marked_contacts.add(cid)
+        elif etype in ("classify", "respond"):
+            c = contacts_map[cid]
+            end_t = geometry.end_time(c)
+            if t < c["spawn_t"] - mark_tol:
+                raise ValueError(f"event {ev['seq']}: {etype} for {cid} occurred before spawn ({t} < {c['spawn_t']})")
+            if cid not in marked_contacts:
+                raise ValueError(f"event {ev['seq']}: {etype} for {cid} occurred before contact was marked")
+            if t > end_t + mark_tol:
+                raise ValueError(f"event {ev['seq']}: {etype} for {cid} occurred after contact left area ({t} > {round(end_t, 2)})")
+
     return out
 
 
@@ -173,9 +217,12 @@ def score_session(scenario, events, rubric, ended_t=None):
 
         marked = bool(log["marks"])
         scored = hostile or marked
+        inbound_unresolved = (hostile and neutralised_t is None and end_t > session_end
+                              and geometry.ends_inside(c, geo["inner_ring_m"]))
         entry = {"id": cid, "model": c["model"], "true_class": c["true_class"], "threat": c["threat"],
                  "spawn_t": c["spawn_t"], "par_detect_s": c["par_detect_s"], "scored": scored,
                  "breached": breached, "breach_t": round(end_t, 1) if breached else None,
+                 "inbound_unresolved": inbound_unresolved,
                  "neutralised_t": neutralised_t, "attempts": attempts, "critical": []}
 
         if not scored:
@@ -340,9 +387,17 @@ def score_session(scenario, events, rubric, ended_t=None):
     pen = rubric["penalties"]
     fa_points = min(pen["false_alarm_cap"], pen["false_alarm"] * len(false_alarm_events))
     breach_points = pen["breach"] * breaches
+    unresolved_count = sum(1 for r in results if r.get("inbound_unresolved"))
+    unresolved_points = pen["breach"] * unresolved_count
     critical_points = pen["critical"] * len(critical_events)
-    total = round(min(100.0, max(0.0, weighted - fa_points - breach_points - critical_points)), 1)
-    band = _grade(rubric, total)
+    total = round(min(100.0, max(0.0, weighted - fa_points - breach_points - unresolved_points - critical_points)), 1)
+
+    is_interrupted = (ended_t is not None and ended_t < scenario["duration_s"] - 1.0)
+    session_status = "interrupted" if is_interrupted else "completed"
+    if is_interrupted:
+        band = {"min": 0, "grade": "INCOMPLETE", "label": "Session interrupted — assessment incomplete"}
+    else:
+        band = _grade(rubric, total)
 
     # ---- timeline: every event in order, with the stage outcomes it produced
     timeline = []
@@ -360,22 +415,30 @@ def score_session(scenario, events, rubric, ended_t=None):
             timeline.append({"t": r["breach_t"], "type": "breach", "contact_id": r["id"], "data": {},
                              "notes": [{"stage": "penalty", "node": "breach", "points": -pen["breach"],
                                         "reason": "Hostile contact reached the inner ring."}]})
+        elif r.get("inbound_unresolved"):
+            timeline.append({"t": session_end, "type": "unresolved_threat", "contact_id": r["id"], "data": {},
+                             "notes": [{"stage": "penalty", "node": "inbound_unresolved", "points": -pen["breach"],
+                                        "reason": "Hostile contact was inbound toward inner ring when session ended prematurely."}]})
         if r["neutralised_t"] is not None:
             timeline.append({"t": r["neutralised_t"], "type": "neutralised", "contact_id": r["id"],
                              "data": {}, "notes": []})
     timeline.sort(key=lambda x: x["t"])
 
     return {
+        "app_version": "1.0.0",
         "rubric_version": rubric.get("version"),
+        "rubric_hash": rubric.get("_hash", "unknown"),
         "scenario": {"id": scenario["id"], "name": scenario["name"], "seed": seed,
                      "kind": scenario["kind"], "params": scenario.get("params")},
         "ended_t": session_end,
+        "session_status": session_status,
         "stages": stages,
         "weights": weights,
         "weighted": round(weighted, 1),
         "penalties": {
             "false_alarms": len(false_alarm_events), "false_alarm_points": fa_points,
             "breaches": breaches, "breach_points": breach_points,
+            "inbound_unresolved": unresolved_count, "inbound_unresolved_points": unresolved_points,
             "critical_errors": len(critical_events), "critical_points": critical_points,
             "critical_detail": critical_events,
         },

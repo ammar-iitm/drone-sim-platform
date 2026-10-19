@@ -15,8 +15,13 @@ SHOTS = Path(__file__).resolve().parents[2] / "test-results"
 
 
 @pytest.fixture(scope="module")
-def server(tmp_path_factory):
-    app = create_app({"DATABASE": str(tmp_path_factory.mktemp("e2e") / "e2e.db")})
+def db_path(tmp_path_factory):
+    return str(tmp_path_factory.mktemp("e2e") / "e2e.db")
+
+
+@pytest.fixture(scope="module")
+def server(db_path):
+    app = create_app({"DATABASE": db_path, "TESTING": True})
     srv = make_server("127.0.0.1", 0, app, threaded=True)
     thread = threading.Thread(target=srv.serve_forever, daemon=True)
     thread.start()
