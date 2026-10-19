@@ -955,3 +955,33 @@ All acceptance criteria across Priorities R-01 through R-06, SEC-01 through SEC-
   - Production Neon PostgreSQL credentials (`DATABASE_URL`): Not provided in local environment.
   - Safety rule applied: Cannot verify production database backup or run schema v4 migration against production Neon without credentials.
 - **Final Verdict:** **BLOCKED** on hosted production deployment credentials (local candidate is 100% integrated and verified; deployment requires maintainer Vercel CLI token and production database credentials).
+
+---
+
+## 20. Final Development Improvements, Release Candidate Freeze, and GitHub Publication
+
+- **Authoritative Date:** 2026-10-19
+- **Scope:** Completion of development, hardening, operational script parity, regression verification, and GitHub publication preparation.
+- **Release Candidate Baseline:** Commit `b5fd4e5` (Merge AEGIS Phase 1-4 hardening with GitHub master) + `be69d8e` (Release test audit).
+
+### 20.1 Windows Startup Script Parity (`start.bat`)
+- **Defect/Limitation:** `start.bat` previously hardcoded port 5050, passed only up to 4 arguments (`%1 %2 %3 %4`), did not honor `NO_BROWSER=1`, and had never been verified on Windows in Issue #10.
+- **Implementation:**
+  - Added delayed expansion loop parsing `--demo`, `--port <P>`, and accumulating all remaining arguments into `!ARGS!`.
+  - Added `if not "%NO_BROWSER%"=="1"` check matching `start.sh`.
+  - Verified on Windows 11 under Python 3.13.5 with CMD batch execution.
+  - Added automated regression test `tests/test_ops_phase4.py::test_startup_scripts_contract`.
+
+### 20.2 Hosted Deployment Architecture & Documentation
+- **Defect/Limitation:** `README.md` previously lacked explicit guidance on the Vercel deployment root directory and contained an outdated note that `start.bat` had never run on Windows.
+- **Implementation:**
+  - Added "Hosted Deployment Architecture & Directory" section explicitly documenting the repository root (`.`) as the deployment directory containing `index.py`, `app/`, `requirements.txt`, and `rubric.json`.
+  - Documented WSGI `DecodePath` middleware, schema v4 migration CLI (`scripts/migrate.py`), and read-only `/health` readiness check.
+  - Updated test counts to 377 passing tests (333 Python + 44 browser tests).
+  - Updated Issue #10 status reflecting Windows execution verification.
+
+### 20.3 Test Suite Expansion & Re-Verification
+- **Test Suite Total:** 377 tests (333 Python unit/integration tests, 44 Playwright browser e2e tests).
+- **Execution Target:** Isolated temporary databases, clean local environment.
+- **Pass Rate:** 100% (377/377 passing).
+- **Format Integrity:** `git diff --check` clean with 0 whitespace errors.

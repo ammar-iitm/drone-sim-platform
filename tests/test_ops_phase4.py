@@ -871,3 +871,43 @@ def test_deployment_migration_readiness_lifecycle(tmp_path):
     assert data_after["checks"]["database"] == "ok"
     assert data_after["checks"]["schema"] == "ok"
 
+
+def test_startup_scripts_contract(tmp_path):
+    """Verify that start.sh and start.bat have matching parity, NO_BROWSER, port, and argument handling."""
+    sh_path = ROOT / "start.sh"
+    bat_path = ROOT / "start.bat"
+
+    assert sh_path.exists(), "start.sh must exist"
+    assert bat_path.exists(), "start.bat must exist"
+
+    sh_text = sh_path.read_text(encoding="utf-8")
+    bat_text = bat_path.read_text(encoding="utf-8")
+
+    # Parity checks
+    assert "NO_BROWSER" in sh_text and "NO_BROWSER" in bat_text
+    assert "--demo" in sh_text and "--demo" in bat_text
+    assert "5050" in sh_text and "5050" in bat_text
+    assert "run.py" in sh_text and "run.py" in bat_text
+
+    # On Windows, verify batch syntax and argument parsing logic via cmd
+    if sys.platform == "win32":
+        test_script = (
+            "@echo off\n"
+            "setlocal enabledelayedexpansion\n"
+            "set DEMO=0\nset ARGS=\nset PORT=5050\nset NEXT_PORT=0\n"
+            + ":loop" + bat_text.split(":loop")[1].split("if not exist \".venv")[0]
+            + "echo DEMO=!DEMO! PORT=!PORT! ARGS=!ARGS!\n"
+        )
+        bat_file = tmp_path / "test_arg_parse.bat"
+        bat_file.write_text(test_script, encoding="utf-8")
+        proc = subprocess.run(
+            ["cmd", "/c", str(bat_file), "--demo", "--port", "8080", "--lan"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        out = proc.stdout.strip()
+        assert "DEMO=1" in out
+        assert "PORT=8080" in out
+        assert "--port 8080 --lan" in out
+

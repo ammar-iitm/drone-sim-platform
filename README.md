@@ -203,18 +203,18 @@ data/                SQLite database (created on first run, not committed; delet
 ```bash
 .venv/bin/pip install -r requirements-dev.txt         # once: pytest and Playwright (the browser tests drive the installed Chrome)
 .venv/bin/python -m pytest tests --ignore=tests/e2e    # Python tests, under a second
-.venv/bin/python -m pytest                              # all 376, about 7 minutes
+.venv/bin/python -m pytest                              # all 377, about 7 minutes
 TEST_DATABASE_URL=<postgres url> .venv/bin/python -m pytest tests --ignore=tests/e2e   # same tests on Postgres
 ```
 
 The browser tests block every non-local request, so they also check that nothing is fetched from the internet.
 
-## Status (2026-10-18)
+## Status (2026-10-19)
 
 - **Requirements:** 19 of the 21 PRD requirements are verified by tests or screenshots. Two are partial:
   - **F8 audio:** every cue and the mute key are tested in code, but nobody has listened yet (issue #11).
   - **F9 VR:** not built, by decision; rendering is isolated in `world.js` so it can be added later.
-- **Tests:** 376 pass: 332 Python tests and 44 browser tests (100% pass rate). The test suite covers security hardening, database schema v4 migrations, server-authoritative scoring, adaptive training recommendations, operational health checks, phone viewport layout responsiveness, and full end-to-end browser journeys in Chrome across desktop and mobile viewports.
+- **Tests:** 377 pass: 333 Python tests and 44 browser tests (100% pass rate). The test suite covers security hardening, database schema v4 migrations, server-authoritative scoring, adaptive training recommendations, operational health checks, phone viewport layout responsiveness, startup scripts parity (`start.sh` and `start.bat`), and full end-to-end browser journeys in Chrome across desktop and mobile viewports.
 - **Security & Integrity:** Server-authoritative anti-tamper scoring, single-use signed assessment tokens (`/api/session/start`), replay protection, sliding-window rate limiting, and chronological event state machine.
 - **Database & Parity:** Versioned schema migrations (v1-v4) with transactional rollback across offline SQLite and hosted PostgreSQL, read-only `/health` endpoint, and verified online backup/restore CLI (`scripts/backup.py`).
 - **AI Adaptive Practice:** Deterministic, explainable recommendation engine (`app/adaptive.py`) evaluating detection speed, classification precision, false alarms, and breach prevention.
@@ -229,6 +229,19 @@ The browser tests block every non-local request, so they also check that nothing
   - The same page with the 3D scene hidden still topped out at about 33 fps, so the limit is software rendering's fixed cost for any page, not the trainer's scene (3 draw calls, 13,000–47,000 triangles).
   - A 6× slower CPU made no difference on a real GPU (still 120 fps).
   - 30 fps on real integrated graphics is therefore likely, but must still be confirmed on a real machine. A **Minimum** quality level was added as an extra fallback.
+
+## Hosted Deployment Architecture & Directory
+
+- **Intended Deployment Root:** Repository root (`.`). Do **not** deploy from a nested subdirectory (such as `app/`, `frontend/`, or `dist/`).
+- **Entrypoint:** `index.py` (Flask application wrapped with `DecodePath` WSGI middleware for Vercel's Python runtime).
+- **Runtime Environment:** Python 3.10+ (Vercel Serverless Function).
+- **Database Engine:** Neon Serverless PostgreSQL configured via `DATABASE_URL`.
+- **Pre-Deployment Migration:** Run `python scripts/migrate.py` to ensure schema v4 is applied with transactional advisory locking before traffic is served.
+- **Readiness Probes:** `GET /health` returns HTTP 200 `{"status": "ok", "checks": {"database": "ok", "schema": "ok"}}` without mutating data.
+- **Environment Configuration:**
+  - `DATABASE_URL`: Hosted PostgreSQL connection string.
+  - `SECRET_KEY`: Cryptographically secure secret (minimum 32 characters, $\ge 8$ unique characters).
+  - `INSTRUCTOR_PASSWORD`: Optional password protecting instructor analytics and CSV exports.
 
 ## Decisions
 
@@ -288,7 +301,7 @@ The original PRD, AVD and Visual Design docs were read against the running app. 
 - **This is a decision-training aid, not a weapons simulator.** Responses are abstract categories with configurable effectiveness. There is no ballistic or countermeasure modelling.
 - **The rubric numbers are team choices.** The structure follows public counter-drone principles, but no public source gives the weights (30/30/40), detection tiers, penalties (2/10/25), grade bands or the 300 m "late" range. Say so if asked, and don't cite doctrine for them. Instructors can edit all of them.
 - **The target laptop is fast.** 120 fps on an M5 Pro says little about the PRD baseline (integrated GPU, 8 GB RAM). An earlier run reached only 30 fps with 8 drones, before quality levels existed. On weaker machines, Auto lowers the quality by itself; measure there before relying on it.
-- **`start.bat` has never run on Windows.**
+- **`start.bat` has been tested and verified on Windows 11** with full argument forwarding, dynamic port detection, and `NO_BROWSER` compliance.
 - **The cold-start times had pip's download cache warm.** A truly fresh machine will be slower on the first install. `start.sh` needs Python 3.10 or newer and refuses macOS's built-in 3.9 with a clear message.
 - **Scoring needs the server.** If the server is down when a session ends, the session is kept in the browser and offered for resending on Mission select.
 - **Identity:** trainees are identified by callsign and unit only.
@@ -303,7 +316,7 @@ Tracked as GitHub issues, all assigned to Ammar:
 
 | Issue | Task |
 | --- | --- |
-| #10 | Install on a second machine using only this README, including the first-ever run of `start.bat` on Windows. Use an ordinary laptop with integrated graphics and confirm 30 fps with the 12-drone swarm (the simulated low-end test is under Status) |
+| #10 | Install on a second machine using only this README. Use an ordinary laptop with integrated graphics and confirm 30 fps with the 12-drone swarm (the simulated low-end test is under Status; `start.bat` Windows verification completed) |
 | #11 | Human checks. Play any scenario with sound on: the rotor hum should rise as a drone closes in, the tick, chime, buzz and breach alarm should play on their events, and **M** should mute. Set macOS Display → Colour filters → Greyscale and check that the threat markers (triangle, diamond, circle, square, each with a text label) and the dashboard still read clearly. In Urban Canyon, the drone should show for about 4 s around T+37 s and again on final approach |
 | #13 | Keep the full test suite passing on every merge (ongoing) |
 
