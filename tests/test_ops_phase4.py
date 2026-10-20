@@ -253,14 +253,15 @@ def test_check_env_lan_mode_requires_secret_key_and_password():
     assert "Instructor Authentication" in warn_names
 
 
-def test_check_env_hosted_mode_requires_secret_key_and_password():
-    """Hosted mode requires both SECRET_KEY and INSTRUCTOR_PASSWORD without bypass."""
+def test_check_env_hosted_mode_requires_secret_key_password_optional():
+    """Hosted mode requires SECRET_KEY; INSTRUCTOR_PASSWORD is optional and only warns when unset."""
     env_hosted_empty = {"HOSTED": "1", "PATH": os.environ.get("PATH", "")}
     checks, code, _ = run_checks(mode="hosted", env=env_hosted_empty)
     assert code == 1
     fail_names = {c["name"] for c in checks if c["status"] == "FAIL"}
     assert "SECRET_KEY Policy" in fail_names
-    assert "Instructor Authentication" in fail_names
+    auth = next(c for c in checks if c["name"] == "Instructor Authentication")
+    assert auth["status"] == "WARN"
 
     # Configured with valid keys -> passes
     env_hosted_valid = {

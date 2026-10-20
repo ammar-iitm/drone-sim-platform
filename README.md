@@ -25,7 +25,7 @@ A browser-based 3D simulator that trains unit-level personnel to recognise, clas
 - **Built for Indian users:** a हिंदी / English switch, dates in IST, accessibility per GIGW (WCAG 2.1 AA contrast, a skip link, keyboard-only play), and a clear disclaimer that it is a training tool.
 - **Runs anywhere:** a browser and Python on an ordinary laptop, offline after the first install. Graphics quality steps down by itself on weak machines.
 - **Works on phones for review:** the dashboard, session replays and help read cleanly on a phone; the simulator itself needs a keyboard and mouse and says so.
-- **Optional instructor login** for the hosted version: results can be restricted to instructors while trainees keep playing. It's off for now.
+- **Optional instructor login:** results can be restricted to instructors while trainees keep playing. It's off unless `INSTRUCTOR_PASSWORD` is set, and it's off on the hosted version for now.
 
 ![Mission select in Hindi](docs/img/hindi.png)
 
@@ -76,7 +76,8 @@ Options:
 ```bash
 .venv/bin/python scripts/seed_demo.py --reset    # reset the database to the demo cohort
 DATABASE_URL=<postgres url> .venv/bin/python scripts/seed_demo.py --reset   # same, for a hosted database
-.venv/bin/python run.py --port 8000 --lan        # expose on the local network (no login; trusted networks only)
+.venv/bin/python run.py --port 8000 --lan        # expose on the local network (needs INSTRUCTOR_PASSWORD and SECRET_KEY)
+.venv/bin/python run.py --lan --allow-unauthenticated-lan  # same, with the login off (isolated classroom network only)
 NO_BROWSER=1 ./start.sh                          # start without opening a browser
 .venv/bin/python scripts/package.py              # build dist/drone-threat-trainer-<date>.zip to copy to another machine
 .venv/bin/python scripts/backup.py backup        # create verified SQLite backup in backups/
@@ -138,7 +139,7 @@ Live at **https://drone-sim-platform.vercel.app**. It's public. The instructor l
 - **Sidebar labels:** the sidebar and simulator show **Hosted / Postgres hosted** instead of **Offline / SQLite local**.
 - **Instructor login (optional, off for now):** to turn it on, set `INSTRUCTOR_PASSWORD` as a Vercel environment variable (`npx vercel env add INSTRUCTOR_PASSWORD production`) and redeploy. `SECRET_KEY` is already set on the project. To turn it off again, remove the variable and redeploy.
   - With it set, the dashboard, session reviews, CSV exports and the results APIs need an instructor login (`/login`); trainees can still choose a scenario, play and see their own score.
-  - Without it, everything stays open, as on an offline laptop.
+  - Without it, everything stays open, as on an offline laptop. The app does **not** refuse to run or return errors when the password is missing; `scripts/check_env.py --mode hosted` only shows a warning.
   - The session cookie is signed with `SECRET_KEY`. If that isn't set, a key is derived from the password, so changing the password signs everyone out.
 
 ## Editing the rubric
@@ -241,7 +242,7 @@ The browser tests block every non-local request, so they also check that nothing
 - **Environment Configuration:**
   - `DATABASE_URL`: Hosted PostgreSQL connection string.
   - `SECRET_KEY`: Cryptographically secure secret (minimum 32 characters, $\ge 8$ unique characters).
-  - `INSTRUCTOR_PASSWORD`: Optional password protecting instructor analytics and CSV exports.
+  - `INSTRUCTOR_PASSWORD`: Optional. Turns on the instructor login for the dashboard, session reviews, analytics and CSV exports. Unset (the current hosted setting) means results are open.
 
 ## Decisions
 
@@ -264,6 +265,7 @@ The browser tests block every non-local request, so they also check that nothing
 | 2026-10-16 | **Indian conventions:** the banner reads "For training use only" instead of the US-style "Unclassified //" (India's scheme is Top Secret, Secret, Confidential, Restricted). Dates show in IST with the 24-hour clock ("10 Oct 2026, 0945 hrs IST"); CSV exports keep UTC. The page language is `en-IN`, with a GIGW-style "Skip to main content" link and a disclaimer that this is not an official Indian Army or Government of India system. Demo units are fictional ("1 TRG BN", "2 TRG BN") instead of real battalions |
 | 2026-10-16 | **Dawn lighting** for Dawn Recon Pass, which ran at dusk before. It's for scripted scenarios only, so procedural seeds are unchanged |
 | 2026-10-17 | **Instructor login is optional and off for now** on the hosted version; the feature stays in the code and can be turned on with one environment variable |
+| 2026-10-20 | **Instructor login stays optional when hosted.** The Phase 1 hardening had made a hosted copy without `INSTRUCTOR_PASSWORD` refuse results with HTTP 503, which broke the live dashboard; that rule is reverted. `--lan` still needs a password unless started with `--allow-unauthenticated-lan` |
 
 ## Scoring decisions (issue #15, agreed 2026-10-16)
 
@@ -305,8 +307,8 @@ The original PRD, AVD and Visual Design docs were read against the running app. 
 - **The cold-start times had pip's download cache warm.** A truly fresh machine will be slower on the first install. `start.sh` needs Python 3.10 or newer and refuses macOS's built-in 3.9 with a clear message.
 - **Scoring needs the server.** If the server is down when a session ends, the session is kept in the browser and offered for resending on Mission select.
 - **Identity:** trainees are identified by callsign and unit only.
-- **`--lan` mode has no login.** Use it only on a trusted network.
-- **The hosted version's results are public while the instructor login is off** (the current setting). Anyone with the link can read the dashboard and CSV exports, so keep real personnel data off it. Trainee play stays open by design, so anyone can add sessions. When the login is on, it adds a 0.5 s delay after a wrong password but has no lockout.
+- **`--lan` mode needs a password** (`INSTRUCTOR_PASSWORD`) and a strong `SECRET_KEY`. `--allow-unauthenticated-lan` turns the login off; use that only on an isolated, trusted network.
+- **The hosted version's results are public while the instructor login is off** (the current setting). Anyone with the link can read the dashboard and CSV exports, so keep real personnel data off it. Trainee play stays open by design, so anyone can add sessions. When the login is on, five wrong passwords from one address lock it out for 60 seconds (counted per server instance).
 - **Hosted latency:** every request opens a new database connection to Neon, and Neon's free tier sleeps when idle. The first request after a quiet spell takes a second or two longer.
 - **Visual effects are not scored.** Swarm separation and wobble are drawn on top of each drone's path; the server always scores the clean path.
 

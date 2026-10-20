@@ -58,6 +58,7 @@ On Windows, use `start.bat --demo` and `.venv\Scripts\pip`.
 - **Accessibility:** keep WCAG 2.1 AA contrast, keyboard access to everything, text of at least 14 px for data (12 px only for captions), and threat state shown by shape and text as well as colour. `tests/e2e/test_access.py` checks text sizes, keyboard-only play and the skip link; check contrast by hand when you change colours.
 - **Database:** don't commit `data/trainer.db`; it's created on first run. Regenerate demo data with `scripts/seed_demo.py --reset`. Queries use `?` placeholders and must run on both SQLite and Postgres (see `app/db.py`).
 - **Hosted version:** deploying to Vercel is done by the maintainer (`npx vercel deploy --prod`); pushing to GitHub does not deploy.
+- **Instructor login is optional.** It's off unless `INSTRUCTOR_PASSWORD` is set, offline and hosted alike, and it's off on the live site for now. Don't make a missing password an error on the hosted version (a 503 there broke the live dashboard on 2026-10-20). Only `--lan` requires it, unless `--allow-unauthenticated-lan` is given.
 
 ## Reporting bugs and security issues
 

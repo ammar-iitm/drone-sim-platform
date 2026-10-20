@@ -1,5 +1,7 @@
 # AEGIS — Independent Re-audit Remediation and Verification Report
 
+> **Update 2026-10-20:** the instructor login is **optional**. A hosted copy without `INSTRUCTOR_PASSWORD` no longer returns HTTP 503 on results; it serves them openly, as the README documents. `--lan` still requires a password unless `--allow-unauthenticated-lan` is given. The test `test_hosted_fails_closed_when_password_missing` is now `test_hosted_login_is_optional_when_password_missing`. Statements below about hosted fail-closed authentication describe the earlier state.
+
 **Project:** SIH 2026 — PS 26247: AI-Enabled Drone & Counter-Drone Threat Simulation Trainer  
 **Repository:** `c:\Users\Kmano\Dropbox\Project\Current_Project\drone-sim-platform`  
 **Governing Documents:** `Project.md`, `Improvement.md`, `reports/INDEPENDENT_REAUDIT_PHASE1.md`  

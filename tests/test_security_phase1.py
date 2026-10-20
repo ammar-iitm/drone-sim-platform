@@ -54,8 +54,8 @@ def reset_rate_limiters():
 
 # ---------------------------------------------------------------- R-04 / R-05: Hosted configuration
 
-def test_hosted_fails_closed_when_password_missing(test_db):
-    """When HOSTED is true and INSTRUCTOR_PASSWORD is not set, protected routes fail closed (503)."""
+def test_hosted_login_is_optional_when_password_missing(test_db):
+    """The instructor login is optional: hosted with no INSTRUCTOR_PASSWORD leaves results open."""
     app = create_app({
         "DATABASE": test_db,
         "TESTING": True,
@@ -65,13 +65,11 @@ def test_hosted_fails_closed_when_password_missing(test_db):
     c = app.test_client()
 
     for path in ("/api/trainees", "/api/sessions", "/api/analytics/unit/1%20TRG%20BN"):
-        r = c.get(path)
-        assert r.status_code == 503, f"{path} should return 503 in misconfigured hosted mode"
-        assert "hosted security configuration missing" in r.get_json()["error"]
+        # An empty test database has no such unit, so 404 there still means it got past the login.
+        assert c.get(path).status_code in (200, 404), f"{path} should be open while the login is off"
 
-    r = c.get("/dashboard")
-    assert r.status_code == 503
-    assert "Hosted deployment requires INSTRUCTOR_PASSWORD" in r.get_data(as_text=True)
+    assert c.get("/dashboard").status_code == 200
+    assert c.get("/login").status_code == 302  # nothing to log in to
 
     for path in ("/mission", "/sim", "/help", "/api/scenarios", "/api/rubric"):
         assert c.get(path).status_code == 200, f"{path} should be open"
@@ -623,7 +621,7 @@ def test_lan_mode_policy_enforcement(test_db):
     c = app.test_client()
     r = c.get("/dashboard")
     assert r.status_code == 503
-    assert "Hosted deployment requires INSTRUCTOR_PASSWORD" in r.get_data(as_text=True)
+    assert "LAN mode requires INSTRUCTOR_PASSWORD" in r.get_data(as_text=True)
 
 
 def test_https_resolved_secure_cookies_and_hsts(test_db):
@@ -995,7 +993,7 @@ def test_run_py_cli_and_lan_opt_in_configuration(test_db):
     cfg_lan_open = build_app_config(args_lan_open, env={"SECRET_KEY": strong_key})
     assert cfg_lan_open == {"LAN_MODE": True, "ALLOW_UNAUTHENTICATED_LAN": True, "SECRET_KEY": strong_key}
 
-    # 8. Verify unauthenticated LAN does not override HOSTED security
+    # 8. Verify an explicitly unauthenticated LAN classroom is open (the login is optional)
     hosted_lan_app = create_app({
         "TESTING": True,
         "HOSTED": True,
@@ -1004,7 +1002,7 @@ def test_run_py_cli_and_lan_opt_in_configuration(test_db):
         "INSTRUCTOR_PASSWORD": None,
     })
     c = hosted_lan_app.test_client()
-    assert c.get("/api/sessions").status_code == 503
+    assert c.get("/api/sessions").status_code == 200
 
 
 # ---------------------------------------------------------------- Phase 1.1: Assessment Idempotency & Deterministic Fingerprinting

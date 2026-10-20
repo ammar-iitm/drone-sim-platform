@@ -1,6 +1,8 @@
 """Instructor login: protects results (dashboard, session reviews, exports, analytics).
 
-Off unless INSTRUCTOR_PASSWORD is set, so the offline laptop version stays open. When it is
+Optional: off unless INSTRUCTOR_PASSWORD is set, on the laptop and on the hosted version alike,
+so results stay open until a password is configured. The one exception is a --lan classroom
+server, which needs a password unless started with --allow-unauthenticated-lan. When it is
 set, trainees can still pick a scenario, play it and see their own score; only the pages and
 API calls that show other people's results need an instructor login.
 """
@@ -39,7 +41,7 @@ def login_enabled():
 
 
 def is_instructor():
-    if (is_hosted() or is_lan()) and not login_enabled():
+    if is_lan() and not login_enabled():
         return False
     return not login_enabled() or session.get("instructor") is True
 
@@ -160,16 +162,16 @@ def _safe_audit(*args, **kwargs):
 
 def instructor_required(view):
     """Pages redirect to the login page; API calls get a 401 with a JSON error.
-    In hosted mode where INSTRUCTOR_PASSWORD is missing, fails closed with 503."""
+    In LAN mode where INSTRUCTOR_PASSWORD is missing, fails closed with 503."""
     @functools.wraps(view)
     def wrapped(*args, **kwargs):
-        if (is_hosted() or is_lan()) and not login_enabled():
+        if is_lan() and not login_enabled():
             _safe_audit("auth.access.denied", outcome="denied", actor="anonymous",
-                        resource_type="endpoint", details={"target": request.path, "reason": "hosted_config_missing"})
+                        resource_type="endpoint", details={"target": request.path, "reason": "lan_config_missing"})
             if request.path.startswith("/api/"):
-                return jsonify({"error": "hosted security configuration missing: INSTRUCTOR_PASSWORD must be configured"}), 503
+                return jsonify({"error": "LAN security configuration missing: INSTRUCTOR_PASSWORD must be configured"}), 503
             return render_template("login.html", active="dashboard",
-                                   error="Hosted deployment requires INSTRUCTOR_PASSWORD to be configured before accessing training records.",
+                                   error="LAN mode requires INSTRUCTOR_PASSWORD to be configured before accessing training records.",
                                    next=""), 503
         if is_instructor():
             return view(*args, **kwargs)
@@ -198,9 +200,9 @@ def _safe_next(target):
 
 @bp.route("/login", methods=["GET", "POST"])
 def login():
-    if is_hosted() and not login_enabled():
+    if is_lan() and not login_enabled():
         return render_template("login.html", active="dashboard",
-                               error="Hosted deployment requires INSTRUCTOR_PASSWORD to be configured before accessing training records.",
+                               error="LAN mode requires INSTRUCTOR_PASSWORD to be configured before accessing training records.",
                                next=""), 503
     if not login_enabled():
         return redirect(url_for("views.dashboard"))

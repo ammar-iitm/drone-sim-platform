@@ -118,7 +118,7 @@ Following the initial Phase 1 delivery, an independent source audit (`reports/IN
 
 - **AD-01: Dual Security Profile (Offline Workstation vs. Hosted Enterprise).**
   - Offline workstation: Defaults to loopback (`127.0.0.1`), local SQLite file, open access for quick single-user training without mandatory login or token friction.
-  - Hosted / Network deployment: Detected via `DATABASE_URL`, `HOSTED=1`, `VERCEL=1`, or `--lan`. Fails closed if security credentials (`INSTRUCTOR_PASSWORD`, `SECRET_KEY`) are missing.
+  - Hosted / Network deployment: Detected via `DATABASE_URL`, `HOSTED=1`, `VERCEL=1`, or `--lan`. Refuses to start without a strong `SECRET_KEY`. `INSTRUCTOR_PASSWORD` is **optional** when hosted (results stay open without it); `--lan` requires it unless `--allow-unauthenticated-lan` is given. *(Changed 2026-10-20; see the note under Phase 1.)*
 - **AD-02: Server-Issued Session Nonce for Assessment Integrity.**
   - When a trainee launches a mission (`/api/session/start` or `/api/scenario?token=1`), the server generates a cryptographically signed session token containing the scenario ID, seed, canonical parameter hash, timestamp, and a 96-bit nonce.
   - The submission (`POST /api/sessions`) requires this token in hosted mode. The server consumes the nonce transactionally, protected by a unique database partial index.
@@ -143,6 +143,7 @@ Following the initial Phase 1 delivery, an independent source audit (`reports/IN
 - **Files Changed:**
   - `app/api.py`: Implemented parameter hashing, seed/param token verification, mandatory token enforcement in hosted mode, request-hash idempotency, transaction replay rejection, numeric `ended_t` bounds, hosted write rate limiting, and numeric-preserving CSV sanitization.
   - `app/auth.py`: Centralized `is_hosted()` and `is_lan()`, bounded `_FAILED_ATTEMPTS` to 5,000 IPs, enforced fail-closed HTTP 503 for both hosted and LAN mode without password, hardened proxy IP detection.
+  - **Update 2026-10-20:** the hosted half of this rule was reverted by decision of the project owner. The instructor login is optional: a hosted copy without `INSTRUCTOR_PASSWORD` serves results openly (as before Phase 1) instead of returning HTTP 503, which had broken the live dashboard. The LAN rule is unchanged. `scripts/check_env.py --mode hosted` now warns instead of failing, and `test_hosted_fails_closed_when_password_missing` became `test_hosted_login_is_optional_when_password_missing`.
   - `app/__init__.py`: Enforced mandatory high-entropy `SECRET_KEY` on startup in hosted mode, aligned HTTPS cookie/HSTS security, injected CSP without `'unsafe-eval'` in production.
   - `app/scoring.py`: Added chronological validation to `validate_events()` (spawn timing, prior-mark requirement, unknown contact rejection), added `session_status` ("completed" vs "interrupted") and `inbound_unresolved` contact tracking.
   - `app/db.py`: Created `schema_migrations` table, implemented versioned migration runners (versions 1 and 2), removed swallowed exceptions.

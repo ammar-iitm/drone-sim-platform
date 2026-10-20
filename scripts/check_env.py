@@ -162,12 +162,11 @@ def run_checks(mode="auto", env=None):
     if resolved_mode == "hosted":
         if not pwd:
             checks.append({
-                "status": "FAIL",
+                "status": "WARN",
                 "name": "Instructor Authentication",
                 "message": (
-                    "INSTRUCTOR_PASSWORD is mandatory for HOSTED deployment. "
-                    "Without it, endpoints fail closed with HTTP 503. "
-                    "Remediation: Set INSTRUCTOR_PASSWORD in your environment."
+                    "Instructor login is off (optional): INSTRUCTOR_PASSWORD is unset, so results "
+                    "are visible to anyone with the link. Set it to turn the login on."
                 ),
             })
         else:
